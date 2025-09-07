@@ -13,18 +13,18 @@ async function bootstrap() {
       winston.format.errors({ stack: true }),
       winston.format.json(),
     ),
-    defaultMeta: { service: 'auth-app' },
+    defaultMeta: { service: 'data-bank' },
     transports: [
       new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
       new winston.transports.File({ filename: 'logs/combined.log' }),
       new winston.transports.Console({
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple(),
-        ),
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+      ),
       }),
     ],
-  });
+    });
 
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
@@ -33,10 +33,10 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
-  
+
   // Enable CORS
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:4000', 'http://127.0.0.1:4000'],  // Add port 4000
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

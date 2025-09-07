@@ -1,8 +1,8 @@
 services:
     
-    mongodb:
+    mongodb-service:
         image: mongodb/mongodb-community-server:latest
-        container_name: databank-mongodb-unique
+        container_name: databank-mongodb
         restart: unless-stopped
         ports:
             - "38130:27017"
@@ -11,29 +11,33 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: databank
             MONGO_INITDB_ROOT_PASSWORD: password1234
-    backend:
+        networks:
+            - app-network
+    backend-data-bank-service:
         build: ./backend-data-bank
         container_name: backend-data-bank
         restart: unless-stopped
         ports:
-            - "5000:5000"
+            - "5000:5000"   
         env_file:
-            - ./frontend-data-bank/.env
+            - ./backend-data-bank/.env
         depends_on:
-            - mongodb
+            - mongodb-service
+        networks:
+            - app-network  # Add this so backend can communicate with frontend
 
-    frontend:
+    frontend-data-bank-service:
         build:
             context: ./frontend-data-bank
             dockerfile: Dockerfile
         container_name: frontend-data-bank
         ports:
-            - "3000:3000"
+            - "4000:3000"
         restart: unless-stopped
         env_file:
             - ./frontend-data-bank/.env
         depends_on:
-            - backend
+            - backend-data-bank-service
         networks:
             - app-network
 volumes:
