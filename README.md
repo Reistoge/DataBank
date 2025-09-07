@@ -46,8 +46,8 @@ npm install
 ```
 Run the following command to start the MongoDB container:
 ```bash
-    cd ..
-    docker-compose up --build
+cd ..
+docker-compose up --build
 ```
 Then enter http://localhost:4000/login to access the application.
  
