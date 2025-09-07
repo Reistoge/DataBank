@@ -63,7 +63,7 @@ export const VALIDATION = Object.freeze({
 
 // Application Configuration
 export const APP_CONFIG = Object.freeze({
-  NAME: 'Auth App',
+  NAME: 'DataBank',
   VERSION: '1.0.0',
   AUTHOR: 'Ferran Rojas',
   GITHUB: 'https://github.com/Reistoge',
