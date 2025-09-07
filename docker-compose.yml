@@ -1,0 +1,46 @@
+services:
+    
+    mongodb:
+        image: mongodb/mongodb-community-server:latest
+        container_name: databank-mongodb-unique
+        restart: unless-stopped
+        ports:
+            - "38130:27017"
+        volumes:
+            - databank_mongodb:/data/db 
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: databank
+            MONGO_INITDB_ROOT_PASSWORD: password1234
+    backend:
+        build: ./backend-data-bank
+        container_name: backend-data-bank
+        restart: unless-stopped
+        ports:
+            - "5000:5000"
+        env_file:
+            - ./frontend-data-bank/.env
+        depends_on:
+            - mongodb
+
+    frontend:
+        build:
+            context: ./frontend-data-bank
+            dockerfile: Dockerfile
+        container_name: frontend-data-bank
+        ports:
+            - "3000:3000"
+        restart: unless-stopped
+        env_file:
+            - ./frontend-data-bank/.env
+        depends_on:
+            - backend
+        networks:
+            - app-network
+volumes:
+    databank_mongodb:
+
+# docker-compose down --volumes --rmi all
+ 
+networks:
+  app-network:
+    driver: bridge
