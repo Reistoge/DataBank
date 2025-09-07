@@ -12,20 +12,6 @@
 
 - docker and docker-compose installed on your machine.
 - Node.js and npm installed on your machine.
-# Data-Bank
-
-## Features
-
-- User registration
-- User login
-- JWT authentication
-- Protected routes
-- Password hashing with bcryptjs
-
-## Prerequisites
-
-- docker and docker-compose installed on your machine.
-- Node.js and npm installed on your machine.
 - MongoDb image will be pulled from [docker hub](https://hub.docker.com/_/mongo/).
  
 ## Set up
