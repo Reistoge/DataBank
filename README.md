@@ -1,5 +1,5 @@
 # Data-Bank
-
+ [Link de informe/doc](https://docs.google.com/document/d/1qJwkj68HOp2WV_NTjYjJDgEB8n-_47j6r3HtbazvcbY/edit?tab=t.0).
 ## Features
 
 - User registration
