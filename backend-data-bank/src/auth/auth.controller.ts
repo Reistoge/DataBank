@@ -27,6 +27,7 @@ export class AuthController {
     this.logger.log(`Profile request from user: ${req.user.email}`);
     return req.user;
   }
+  
   @UseGuards(JwtAuthGuard)
   @Post(`logout`)
   logout(@Request() req){

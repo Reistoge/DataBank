@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useReducer, useCallback, type ReactNode } from "react";
-import type { AuthContextType } from "../types/auth.types";
+import type { AuthContextType, LoginCredentials, RegisterCredentials } from "../types/auth.types";
 import { authReducer, initialAuthState } from "../reducers/auth.reducer";
 import { authService } from "../services/auth.service";
 import { tokenStorage } from "../utils/storage";
@@ -32,10 +32,10 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     }, []);  
 
     // Use useCallback to prevent function recreation on every render
-    const login = useCallback(async (email: string, password: string) => {
+    const login = useCallback(async (loginCredentials: LoginCredentials) => {
         try {
             dispatch({ type: 'AUTH_START' });
-            const data = await authService.login({ email, password });
+            const data = await authService.login(loginCredentials);
             tokenStorage.set(data.access_token);
             dispatch({ type: 'AUTH_SUCCESS', payload: data.user });
         } catch (error) {
@@ -44,10 +44,10 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         }
     }, []);
 
-    const register = useCallback(async (username: string, email: string, password: string) => {
+    const register = useCallback(async (registerCredentials: RegisterCredentials) => {
         try {
             dispatch({ type: 'AUTH_START' });
-            const data = await authService.register({ username, email, password });
+            const data = await authService.register(registerCredentials);
             tokenStorage.set(data.access_token);
             dispatch({ type: 'AUTH_SUCCESS', payload: data.user });
         } catch (error) {

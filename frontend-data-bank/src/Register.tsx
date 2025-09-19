@@ -2,25 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ROUTES, RESOURCES, ANIMATION } from "../constants";
 import { useAuth } from "./hooks/useAuth.hook";
+import type { RegisterCredentials } from "./types/auth.types";
+ 
 
-export interface UserRegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export interface UserRegisterResponse {
-  username: string;
-  email: string;
-  refreshToken: null;
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
 
 function Register() {
   const [formData, setFormData] = useState({
+    rut: "",
     username: "",
     email: "",
     password: "",
@@ -61,7 +49,13 @@ function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await register(formData.username, formData.email, formData.password);
+    const userRegisterRequest: RegisterCredentials = {
+      rut: formData.rut,
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+    };
+    await register(userRegisterRequest);
   };
 
   return (
@@ -97,6 +91,16 @@ function Register() {
                 placeholder="Username"
                 type="text"
                 value={formData.username}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+              <input
+                name="rut"
+                className="p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                placeholder="Rut"
+                type="rut"
+                value={formData.rut}
                 onChange={handleChange}
                 required
                 disabled={isLoading}

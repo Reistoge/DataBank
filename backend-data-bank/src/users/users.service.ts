@@ -1,38 +1,53 @@
+// users/users.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
+import { User, UserDocument } from './schemas/user.schema';
+import { CreateUserDto,UserResponse } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-     private readonly logger = new Logger(UsersService.name);
+  private readonly logger = new Logger(UsersService.name);
 
-    constructor(@InjectModel('User') private readonly userModel: Model<User>) { }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-    async create(userData: {
-        username: string,
-        email: string,
-        password: string
-    }): Promise<User> {
-        this.logger.log(`Creating user: ${userData.email}`);
-        const newUser = new this.userModel(userData);
-        return newUser.save();
- 
-    }
+  async create(userData: CreateUserDto): Promise<UserResponse> {
+    this.logger.log(`Creating user: ${userData.email}`);
+    const newUser = new this.userModel(userData);
+    const savedUser = await newUser.save();
 
-    async findOne(username: string): Promise<User | null> {
-        return await this.userModel.findOne({ username }).exec();
-    }
+    return this.toResponseDto(savedUser);
+  }
 
-    async findByEmail(email: string): Promise<User | null> {
-        return await this.userModel.findOne({ email }).exec();
-    }
+  async findOne(username: string): Promise<UserResponse | null> {
+    const user = await this.userModel.findOne({ username }).exec();
+    return user ? this.toResponseDto(user) : null;
+  }
 
-    async findById(id: string): Promise<User | null> {
-        return await this.userModel.findById(id).exec();
-    }
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    // Keep returning full document here (AuthService needs password for validation)
+    return await this.userModel.findOne({ email }).exec();
+  }
+  async findByRut(rut: string): Promise<UserDocument | null>{
+    return await this.userModel.findOne({rut}).exec();
+  }
 
-    async findAll(): Promise<User[]> {
-        return await this.userModel.find().select('-password').exec();
-    }
+  async findById(id: string): Promise<UserResponse | null> {
+    const user = await this.userModel.findById(id).exec();
+    return user ? this.toResponseDto(user) : null;
+  }
+
+  async findAll(): Promise<UserResponse[]> {
+    const users = await this.userModel.find().select('-password').exec();
+    return users.map(u => this.toResponseDto(u));
+  }
+
+  private toResponseDto(user: UserDocument): UserResponse {
+    return {
+      rut: user.rut,
+      id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+    };
+  }
 }

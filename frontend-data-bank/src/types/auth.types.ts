@@ -1,14 +1,15 @@
 
 
-export interface User{
-    _id: string;
+export interface User {
+    id: string;
+    rut: string;
     username: string;
     email: string;
 }
-export interface AuthState{
+export interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
-    isLoading : boolean;
+    isLoading: boolean;
     error: string | null;
 }
 
@@ -16,11 +17,11 @@ export interface AuthState{
 // This is a discriminated union that defines all possible authentication actions:
 
 export type AuthAction =
-| {type : 'AUTH_START'} // Triggered when login/register begins (no payload needed)
-| {type: 'AUTH_SUCCESS'; payload: User}  // When authentication succeeds (carries User data)
-| {type: 'AUTH_ERROR'; payload: string}// When authentication fails (carries error message) 
-| {type: 'AUTH_LOGOUT'} // When user logs out
-| {type: 'CLEAR_ERROR'}; // To reset error state
+    | { type: 'AUTH_START' } // Triggered when login/register begins (no payload needed)
+    | { type: 'AUTH_SUCCESS'; payload: User }  // When authentication succeeds (carries User data)
+    | { type: 'AUTH_ERROR'; payload: string }// When authentication fails (carries error message) 
+    | { type: 'AUTH_LOGOUT' } // When user logs out
+    | { type: 'CLEAR_ERROR' }; // To reset error state
 
 
 
@@ -41,9 +42,9 @@ Context (AuthContextType) provides both current state and dispatch methods
 
 */
 
-export interface AuthContextType extends AuthState{
-    login: (email: string, password: string) => Promise<void>;
-    register: (username: string, email: string, password: string) => Promise<void>;
+export interface AuthContextType extends AuthState {
+    login: (login: LoginCredentials) => Promise<void>;
+    register: (credentials: RegisterCredentials) => Promise<void>;
     logout: () => void;
     clearError: () => void;
 }
@@ -56,17 +57,28 @@ export interface LoginCredentials {
     email: string;
     password: string;
 }
-export interface RegisterCredentials{
+export interface RegisterCredentials {
+    rut: string;
     username: string;
     email: string;
-    password:string;
+    password: string;
 
+}
+export interface UserRegisterResponse {
+
+    username: string;
+    email: string;
+    refreshToken: null;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
 }
 /**
  * @interface User
  * @string access_token
  */
-export interface AuthResponse{
-    user: User ;
+export interface AuthResponse {
+    user: User;
     access_token: string;
 }

@@ -7,11 +7,11 @@ function Dashboard() {
   const rotation = useRef(0);
 
   const handleRotate = () => {
-    const img = document.getElementById("dashboardLogo");
+    const img = document.getElementById('dashboardLogo');
     if (img) {
       rotation.current += 360;
       img.style.transform = `rotate(${rotation.current}deg)`;
-      img.style.transition = "transform 1s ease-in-out";
+      img.style.transition = 'transform 1s ease-in-out';
     }
   };
 
@@ -46,7 +46,9 @@ function Dashboard() {
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">User Profile</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            User Profile
+          </h2>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
               <dt className="text-sm font-medium text-gray-500">Username</dt>
@@ -57,8 +59,12 @@ function Dashboard() {
               <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">User ID</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?._id}</dd>
+              <dt className="text-sm font-medium text-gray-500">RUT</dt>
+              <dd className="mt-1 text-sm text-gray-900">{user?.rut}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">ID</dt>
+              <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
             </div>
           </dl>
         </div>
@@ -69,7 +75,9 @@ function Dashboard() {
             Click the logo to make it spin! 🎯
           </h3>
           <p className="text-gray-600">
-            Rotation count: <span className="font-bold">{rotation.current / 360}</span> full spins
+            Rotation count:{' '}
+            <span className="font-bold">{rotation.current / 360}</span> full
+            spins
           </p>
         </div>
       </main>

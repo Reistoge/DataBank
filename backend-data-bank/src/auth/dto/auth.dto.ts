@@ -1,5 +1,6 @@
-import { IsString, MinLength, isEmail } from "class-validator";
+import { IsString, Length, MinLength, isEmail } from "class-validator";
 import { Types } from "mongoose";
+import { CreateUserDto,UserResponse } from "src/users/dto/user.dto";
 // LOGIN DATA TRANSFER OBJECT
 export class LoginDto {
   @IsString()
@@ -15,21 +16,24 @@ export class RegisterDto {
   @MinLength(3)
   username: string;
 
+  
+  @IsString()
+  @Length(9)
+  rut: string;
+
+
   @IsString()
   email: string;
 
   @IsString()
   @MinLength(6)
   password: string;
+
+
 }
 
 // AUTH RESPONSE DATA TRANSFER OBJECT
 export class AuthResponseDto{
-  user: {
-    _id: Types.ObjectId;
-    username: string;
-    email: string;
-
-  };
+  user: UserResponse;
   access_token: string;
 }

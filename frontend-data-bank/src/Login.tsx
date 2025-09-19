@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ROUTES, RESOURCES, ANIMATION } from "../constants";
 import { useAuth } from "./hooks/useAuth.hook";
+import type { LoginCredentials } from "./types/auth.types";
 
-export interface UserLoginRequest {
-  email: string;
-  password: string;
-}
+ 
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -49,7 +47,11 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(formData.email, formData.password);
+    const userLoginRequest: LoginCredentials = {
+      email: formData.email,
+      password: formData.password,
+    };
+    await login( userLoginRequest);
   };
 
   return (
