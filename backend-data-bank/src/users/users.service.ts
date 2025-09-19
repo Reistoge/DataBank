@@ -10,9 +10,10 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
-
+  
   async create(userData: CreateUserDto): Promise<UserResponse> {
     this.logger.log(`Creating user: ${userData.email}`);
+ 
     const newUser = new this.userModel(userData);
     const savedUser = await newUser.save();
 
@@ -24,13 +25,17 @@ export class UsersService {
     return user ? this.toResponseDto(user) : null;
   }
 
+  // Returns full document (including password) for authentication purposes.
+  // If you only need public data, use toResponseDto instead.
   async findByEmail(email: string): Promise<UserDocument | null> {
-    // Keep returning full document here (AuthService needs password for validation)
-    return await this.userModel.findOne({ email }).exec();
+    return this.userModel.findOne({ email: email }).exec();
   }
-  async findByRut(rut: string): Promise<UserDocument | null>{
-    return await this.userModel.findOne({rut}).exec();
+
+  // Returns full document for internal use. Restrict usage to trusted services.
+  async findByRut(rut: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ rut: rut }).exec();
   }
+
 
   async findById(id: string): Promise<UserResponse | null> {
     const user = await this.userModel.findById(id).exec();

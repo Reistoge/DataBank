@@ -1,0 +1,44 @@
+### 1. Create a new card for the user
+POST http://localhost:5000/api/card
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q5NjQ4OGNjM2E2MmJmZTZlOGE1NiIsImlhdCI6MTc1ODMwODU1MywiZXhwIjoxNzU4MzA5NDUzfQ.ZWHwsIDZDahQO1VfIr40Qq0PTqjh85I8oaNC-Hdx_CU
+
+{
+  "userId": "68cd96488cc3a62bfe6e8a56",
+  "password": "1234"
+}
+
+### 2. Get user's cards
+GET http://localhost:5000/api/card/myCards
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q5NjQ4OGNjM2E2MmJmZTZlOGE1NiIsImlhdCI6MTc1ODMwODU1MywiZXhwIjoxNzU4MzA5NDUzfQ.ZWHwsIDZDahQO1VfIr40Qq0PTqjh85I8oaNC-Hdx_CU
+
+{
+  "id": "68cd96488cc3a62bfe6e8a56",
+  "username": "user2",
+  "email": "user2@email.com",
+  "rut": "222222222"
+}
+
+### 3. Update a card (e.g., block it or change limit)
+PATCH http://localhost:5000/api/card/updateCard
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q4YTliMDBiZDRiNGJkYTEwY2JiZSIsImlhdCI6MTc1ODMwMTEyNiwiZXhwIjoxNzU4MzAyMDI2fQ.WKCFXr-OVIHX67kyUEviNWjcqapzLjbG1srq6tBXFAQ
+
+{
+  "id": "cardIdHere",  // Replace with actual card ID from create response
+  "cvv": 123,
+  "number": "4111111111111111",
+  "penalties": 0,
+  "spentLimit": 5000
+}
+accessPassword: "secureCardPassword123"
+
+### 4. Delete a card
+DELETE http://localhost:5000/api/card/deleteCard
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q4YTliMDBiZDRiNGJkYTEwY2JiZSIsImlhdCI6MTc1ODMwMTEyNiwiZXhwIjoxNzU4MzAyMDI2fQ.WKCFXr-OVIHX67kyUEviNWjcqapzLjbG1srq6tBXFAQ
+
+{
+  "id": "cardIdHere"  // Replace with actual card ID
+}

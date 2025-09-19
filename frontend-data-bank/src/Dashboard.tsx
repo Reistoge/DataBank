@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useAuth } from './hooks/useAuth.hook';
 import { RESOURCES } from '../constants';
+import { tokenStorage } from './utils/storage';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -62,6 +63,12 @@ function Dashboard() {
               <dt className="text-sm font-medium text-gray-500">RUT</dt>
               <dd className="mt-1 text-sm text-gray-900">{user?.rut}</dd>
             </div>
+            
+            <div>
+              <dt className="text-sm font-medium text-gray-500">BEARER TOKEN</dt>
+              <dd className="mt-1 text-sm text-gray-900">{tokenStorage.get()}</dd>
+            </div>
+
             <div>
               <dt className="text-sm font-medium text-gray-500">ID</dt>
               <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>

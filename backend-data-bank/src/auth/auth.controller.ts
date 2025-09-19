@@ -34,4 +34,10 @@ export class AuthController {
     this.logger.log(`Logout request from user: ${req.user.email}`);
     return {message: `Logged out succesfully`}; // messages always return as a object or document data
   }
+ 
+// Use @Request() when you need the full request object.
+// Use @Body() when you only need the data sent in the request body.
+
+// If you use @Body() in a GET request, it will usually be empty, since GET requests don’t have a body by HTTP convention.
+
 }

@@ -11,6 +11,7 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: databank
             MONGO_INITDB_ROOT_PASSWORD: password1234
+            MONGODB_EXTRA_ARGS: --logpath /var/log/mongodb/mongod.log --logappend --verbose
         networks:
             - app-network
     backend-data-bank-service:

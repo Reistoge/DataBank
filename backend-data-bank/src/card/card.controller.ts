@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, Logger, Patch, Param, Delete } from '@nestjs/common';
 import { CardService } from './card.service';
-import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
+import { CreateCardDto, UserUpdateCardReqDto, UserCardReqDto } from './dto/card.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserResponse } from 'src/users/dto/user.dto';
 
 @Controller('card')
 export class CardController {
-  constructor(private readonly cardService: CardService) {}
+  private readonly logger = new Logger(CardController.name);
+  constructor(private readonly cardService: CardService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createCardDto: CreateCardDto) {
     return this.cardService.create(createCardDto);
   }
 
-  @Get()
-  findAll() {
-    return this.cardService.findAll();
+  @UseGuards(JwtAuthGuard)
+  @Get('myCards')
+  getUserCards(@Body() user: UserCardReqDto) {
+    return this.cardService.getUserCards(user);
+
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cardService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Patch('updateCard')
+  update(
+    @Body() updateCardDto: UserUpdateCardReqDto,
+    @Body('accessPassword') accessPassword: string,
+  ) {
+    return this.cardService.update(accessPassword, updateCardDto);
   }
+  
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardService.update(+id, updateCardDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cardService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Delete('deleteCard')
+  remove(@Body('id') id: string) {
+    return this.cardService.remove(id);
   }
 }

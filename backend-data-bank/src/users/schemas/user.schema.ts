@@ -16,11 +16,16 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({required: true, unique: true})
+  @Prop({ required: true, unique: true })
   rut: string;
+
+  @Prop({ default: 0 })
+  balance: number;
 
   @Prop({ default: null })
   refreshToken: string;
+
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
