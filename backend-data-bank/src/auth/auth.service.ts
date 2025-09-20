@@ -32,6 +32,8 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
+      balance: 0,
+  
     });
 
     const payload = { email: user.email, sub: user.id };
@@ -61,6 +63,7 @@ export class AuthService {
         rut: userDoc.rut,
         username: userDoc.username,
         email: userDoc.email,
+        balance: 0,
 
       },
       access_token,

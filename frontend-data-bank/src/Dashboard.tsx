@@ -46,47 +46,196 @@ function Dashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            User Profile
-          </h2>
-          <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Username</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.username}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">RUT</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.rut}</dd>
-            </div>
-            
-            <div>
-              <dt className="text-sm font-medium text-gray-500">BEARER TOKEN</dt>
-              <dd className="mt-1 text-sm text-gray-900">{tokenStorage.get()}</dd>
-            </div>
+        <div className="grid grid-cols-2">
+          {/* User */}
+          <div className="bg-white shadow rounded-lg p-6 m-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              User Profile
+            </h2>
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Username</dt>
+                <dd className="mt-1 text-sm text-gray-900">{user?.username}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Email</dt>
+                <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">RUT</dt>
+                <dd className="mt-1 text-sm text-gray-900">{user?.rut}</dd>
+              </div>
 
-            <div>
-              <dt className="text-sm font-medium text-gray-500">ID</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
-            </div>
-          </dl>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  BEARER TOKEN
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 break-all">
+                  {tokenStorage.get()}
+                </dd>
+              </div>
+
+              <div>
+                <dt className="text-sm font-medium text-gray-500">ID</dt>
+                <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Balance</dt>
+                <dd className="mt-1 text-sm text-gray-900">{user?.balance}</dd>
+              </div>
+            </dl>
+          </div>
+
+          {/* Transaction form */}
+          <div className=" bg-white shadow rounded-lg p-6 m-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              New Transaction
+            </h3>
+            <form className="space-y-4">
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="recipient"
+                >
+                  Recipient
+                </label>
+                <input
+                  type="text"
+                  id="recipient"
+                  name="recipient"
+                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Enter recipient username or ID"
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="amount"
+                >
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Enter amount"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="description"
+                >
+                  Description
+                </label>
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Optional description"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+              >
+                Send Transaction
+              </button>
+            </form>
+          </div>
         </div>
 
-        {/* Fun rotating logo section */}
-        <div className="mt-8 bg-white shadow rounded-lg p-6 text-center">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Click the logo to make it spin! 🎯
-          </h3>
-          <p className="text-gray-600">
-            Rotation count:{' '}
-            <span className="font-bold">{rotation.current / 360}</span> full
-            spins
-          </p>
+        <div className="grid grid-cols-2">
+          {/* Cards */}
+          <div className="bg-white shadow rounded-lg p-6 m-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Cards</h2>
+              <button
+                className="hover:bg-gray-300 text-white px-0 py-0 rounded-lg text-xl transition duration-200"
+                onClick={() => alert('Show next card')}
+              >
+                ➡️
+              </button>
+            </div>
+
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Id</dt>
+                <dd className="mt-1 text-sm text-gray-900">{}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">cvv</dt>
+                <dd className="mt-1 text-sm text-gray-900">{}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">number</dt>
+                <dd className="mt-1 text-sm text-gray-900">{}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">penalties</dt>
+                <dd className="mt-1 text-sm text-gray-900">{}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  spentLimit
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">{}</dd>
+              </div>
+            </dl>
+          </div>
+
+          {/* History */}
+          <div className="bg-white shadow rounded-lg p-6 m-2   ">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">History</h2>
+              <button
+                className="hover:bg-gray-300 text-white px-0 py-0 rounded-lg text-xl transition duration-200"
+                onClick={() => alert('Show full history')}
+              >
+                🔍
+              </button>
+            </div>
+
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Transaction 1
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">info1</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Transaction 2
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">info2</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Transaction 3
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">info3</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Transaction 4
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">info4</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Transaction 5
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">info5</dd>
+              </div>
+            </dl>
+          </div>
         </div>
+
+        {/* Transaction form section */}
       </main>
     </div>
   );

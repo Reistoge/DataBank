@@ -1,4 +1,4 @@
-import { IsString, Length, MinLength } from "class-validator"
+import { IsNumber, IsString, Length, MinLength } from "class-validator"
  
 export class CreateUserDto {
     @IsString()
@@ -14,6 +14,9 @@ export class CreateUserDto {
     @MinLength(4)
     @IsString()
     password: string;
+
+    @IsNumber()
+    balance: 0;
 
 
 }
@@ -31,6 +34,9 @@ export class UserResponse{
     @IsString()
     @Length(9)
     rut: string;
+
+    @IsNumber()
+    balance: Number;
         
 
 }

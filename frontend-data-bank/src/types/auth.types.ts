@@ -5,6 +5,7 @@ export interface User {
     rut: string;
     username: string;
     email: string;
+    balance: number
 }
 export interface AuthState {
     user: User | null;
