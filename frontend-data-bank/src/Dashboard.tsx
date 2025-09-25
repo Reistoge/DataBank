@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useAuth } from './hooks/useAuth.hook';
-import { RESOURCES } from '../constants';
+import { RESOURCES } from './utils/constants';
 import { tokenStorage } from './utils/storage';
 
 function Dashboard() {
