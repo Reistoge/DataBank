@@ -52,33 +52,36 @@ function Dashboard() {
 
 
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-20">
+
         <div className="grid grid-cols-2">
-        {/* MiCuenta */}
-          <div className="bg-white shadow rounded-lg p-6 m-20 px-2xl py">
-            <h2 className=" text-2xl font-bold text-gray-900 mb-4">
-              Mi Cuenta
-            </h2>
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
-              <div>
-                <dt className="text-lg font-medium text-gray-500">Balance</dt>
-                <dd className="mt-1 text-4xl text-gray-900">${user?.balance}</dd>
-                <dt className="text-lg font-medium text-gray-500">id</dt> 
-                <dd className="mt-1 text-2xl text-gray-900 text-center">{user?.id}</dd>
-              </div>
-            </dl>
-        <div className="grid grid-cols-1">
-                  <div className="flex items-center">
-                      <img
-                        id="showInfo"
-                      /*onClick={handleRotate}*/
-                        className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                        src={RESOURCES.WARNING}
-                        alt="Warning"
-                        title="Show Info"
-                      />
-                  </div>
-          </div>
+          <div className="relative m-20">
+            {/* Recuadro blanco */}
+            <div className="bg-white shadow rounded-3xl p-5">
+              {/* MiCuenta */}
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Mi Cuenta</h2>
+
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
+                <div>
+                  {/* Balance */}
+                  <dt className="text-lg font-medium text-gray-500">Balance</dt>
+                  <dd className="mt-1 text-4xl text-gray-900">${user?.balance}</dd>
+                  {/* ID */}
+                  <dt className="text-lg font-medium text-gray-500">ID</dt>
+                  <dd className="mt-1 text-2xl text-gray-900">{user?.id}</dd>
+                </div>
+              </dl>
+            </div>
+            {/* Ícono afuera del recuadro */}
+            <img
+              id="showInfo"
+              /* onClick={mostrarInfo/OcultarInfo} */
+              className="absolute top-1/5 right-0 transform translate-x-10 -translate-y-12 
+                        w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              src={"../public/warning-circle.png"}
+              alt="Warning"
+              title="Show Info"
+            />
           </div>
 
 
