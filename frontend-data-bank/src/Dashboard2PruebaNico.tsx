@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react'; 
 import { useAuth } from './hooks/useAuth.hook';
 import { RESOURCES } from '../constants';
 import { tokenStorage } from './utils/storage';
@@ -6,6 +6,8 @@ import { tokenStorage } from './utils/storage';
 function Dashboard() {
   const { user, logout } = useAuth();
   const rotation = useRef(0);
+  const [open, setOpen] = useState(false);
+  const [showId, setShowId] = useState(false);
 
   const handleRotate = () => {
     const img = document.getElementById('dashboardLogo');
@@ -17,43 +19,67 @@ function Dashboard() {
   };
 
   return (
-     // 
+
     <div className="min-h-screen bg-gray-100">
       {/* First barra */}
       <nav className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 items-center h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-3 items-center h-16">
           {/* Logo */}
-            <div className="flex items-center">
-              <img
-                id="dashboardLogo"
-                onClick={handleRotate}
-                className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                src={RESOURCES.LOGO}
-                alt="App Logo"
-                title="Click to rotate!"
-              />
-            </div>
-            {/* Centro */}
-            <h1 className="text-xl font-semibold text-white text-center">DataBank</h1>
-            {/* Usuario */}
-            <div className="flex justify-end items-center space-x-4">
-              <span className="text-white">Welcome, {user?.username}! 👋</span>
-              <button
-                onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-200"
-              >
-                Logout
-              </button>
-            </div>
+          <div className="flex items-center">
+            <img
+              id="dashboardLogo"
+              onClick={handleRotate}
+              className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              src={RESOURCES.LOGO}
+              alt="App Logo"
+              title="Click to rotate!"
+            />
+          </div>
+
+          {/* Centro */}
+          <h1 className="text-xl font-semibold text-white text-center">DataBank</h1>
+
+          {/* Usuario */}
+          <div className="flex justify-end items-center space-x-4 relative">
+            <span className="text-white">Welcome, {user?.username}! 👋</span>
+
+            {/* Icono de Configuración */}
+            <img
+              id="showInfo"
+              onClick={() => setOpen(!open)}
+              className="w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              src={"../public/configIMG.png"}
+              alt="Configuracion"
+              title="Configuracion"
+            />
+
+            {/* Dropdown */}
+            {open && (
+              <div className="absolute right-0 top-12 bg-white rounded-md shadow-lg py-2 w-40 z-50">
+                <button
+                  onClick={logout}
+                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+                <button
+                  onClick={() => alert("Otra opción")}
+                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Otra opción
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      </nav>
+      </div>
+    </nav>
 
 
 
+       
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-20">
-
         <div className="grid grid-cols-2">
           <div className="relative m-20">
             {/* Recuadro blanco */}
@@ -68,14 +94,14 @@ function Dashboard() {
                   <dd className="mt-1 text-4xl text-gray-900">${user?.balance}</dd>
                   {/* ID */}
                   <dt className="text-lg font-medium text-gray-500">ID</dt>
-                  <dd className="mt-1 text-2xl text-gray-900">{user?.id}</dd>
+                  <dd className="mt-1 text-2xl text-gray-900">{showId ? user?.id : "XXXXXXXXXXXXXXXXXXXXXXXX"}</dd>
                 </div>
               </dl>
             </div>
             {/* Ícono afuera del recuadro */}
             <img
               id="showInfo"
-              /* onClick={mostrarInfo/OcultarInfo} */
+              onClick={() => setShowId(!showId)}
               className="absolute top-1/5 right-0 transform translate-x-10 -translate-y-12 
                         w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
               src={"../public/warning-circle.png"}
@@ -83,15 +109,6 @@ function Dashboard() {
               title="Show Info"
             />
           </div>
-
-
-
-
-
-
-
-
-
 
           {/* User */}
           <div className="bg-white shadow rounded-lg p-6 m-2">
