@@ -10,8 +10,7 @@ import Dashboard from "./Dashboard";
 import { AuthProvider } from "./contexts/auth.context";
 import { ROUTES as CONSTANT_ROUTES } from "./utils/constants";
 import ProtectedRoute from "./components/protectedRoute.component";
-import DashboardNico from "./Dashboard2PruebaNico";
-
+ 
 function App() {
   return (
     <AuthProvider>
@@ -30,7 +29,7 @@ function App() {
               path={CONSTANT_ROUTES.DASHBOARD}
               element={
                 <ProtectedRoute>
-                  <DashboardNico />
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />

@@ -1,25 +1,30 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { UserResponse } from 'src/users/dto/user.dto';
- export class AccountResponseDto {
+export class CreateAccountDto {
+    userId: string;
+    type?: AccountType;
+}
+
+export class AccountResponseDto {
     id: string;
-    userId: string; // referencia al User
+    userId: string;
     accountNumber: string;
     balance: number;
-    type: string; // tipo de cuenta
+    type: AccountType;
     isActive: boolean;
-
 }
-export class CreateAccountDto extends PartialType(UserResponse) {
+export class UpdateAccountDto {
+    id: string;
+    userId?: string;
+    accountNumber?: string;
+    balance?: number;
     type?: AccountType;
-     
+    isActive?: boolean;
+    // Add other fields as needed for updating an account
 }
-
-export class UpdateAccountDto extends PartialType(AccountResponseDto) { }
-
-export class AccountReqDto extends PartialType(UserResponse){}
 
 export enum AccountType {
     SAVINGS = 'SAVINGS',
     CHECKING = 'CHECKING',
- 
+
 }

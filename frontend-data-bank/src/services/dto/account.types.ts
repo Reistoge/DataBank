@@ -1,23 +1,25 @@
 export type AccountResponse = {
-    id: string
-    userId: string; // referencia al User
+    id: string;
+    userId: string;
     accountNumber: string;
     balance: number;
-    type: string; // tipo de cuenta
+    type: string;
     isActive: boolean;
-
-}
+};
 
 export type CardResponse = {
-
-    // _id: Types.ObjectId;
-    id: string | undefined;
-    cvv: Number;
+    id: string;
+    cvv: number;
     number: string;
-    penalties: Number;
-    spentLimit: Number;
+    penalties: number;
+    spentLimit: number;
+};
 
-}
-export type CreateCard = AccountResponse & {
+export type CreateAccountDto = {
+    type?: string;
+};
+
+export type CreateCardDto = {
+    accountId: string;
     password: string;
 };

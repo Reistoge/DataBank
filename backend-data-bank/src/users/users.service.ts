@@ -1,11 +1,10 @@
-// users/users.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, UserResponse } from './dto/user.dto';
 import { AccountService } from 'src/account/account.service';
-import { CreateAccountDto } from 'src/account/dto/account.dto';
+import { AccountType } from 'src/account/dto/account.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,20 +13,19 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private accountService: AccountService
-  ) { }
+  ) {}
 
   async create(userData: CreateUserDto): Promise<UserResponse> {
     this.logger.log(`Creating user: ${userData.email}`);
-
     const newUser = new this.userModel(userData);
-
     const savedUser = await newUser.save();
     this.logger.log(`User ${savedUser.id} saved with no errors`);
-    // create account
     const userResponse = this.toResponseDto(savedUser);
-    
-    this.accountService.create({
-        ...userResponse
+
+    // Create default account for user
+    await this.accountService.create({
+      userId: userResponse.id,
+      type: 'CHECKING' as AccountType,
     });
 
     return userResponse;
@@ -38,17 +36,13 @@ export class UsersService {
     return user ? this.toResponseDto(user) : null;
   }
 
-  // Returns full document (including password) for authentication purposes.
-  // If you only need public data, use toResponseDto instead.
   async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email: email }).exec();
+    return this.userModel.findOne({ email }).exec();
   }
 
-  // Returns full document for internal use. Restrict usage to trusted services.
   async findByRut(rut: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ rut: rut }).exec();
+    return this.userModel.findOne({ rut }).exec();
   }
-
 
   async findById(id: string): Promise<UserResponse | null> {
     const user = await this.userModel.findById(id).exec();
@@ -66,8 +60,6 @@ export class UsersService {
       id: user._id.toString(),
       username: user.username,
       email: user.email,
-
     };
   }
-  
 }
