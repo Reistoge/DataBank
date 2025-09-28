@@ -2,11 +2,27 @@
 
 export interface User {
     id: string;
-    rut: string;
     username: string;
     email: string;
-    balance: number
+    rut: string;
 }
+export interface Account {
+    id: string
+    userId: string; // referencia al User
+    accountNumber: string;
+    balance: number;
+    type: string; // tipo de cuenta
+    isActive: boolean;
+}
+export interface Card {
+    id: string | undefined;
+    cvv: Number;
+    number: string;
+    penalties: Number;
+    spentLimit: Number;
+}
+ 
+
 export interface AuthState {
     user: User | null;
     isAuthenticated: boolean;

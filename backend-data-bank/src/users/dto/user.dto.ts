@@ -15,8 +15,7 @@ export class CreateUserDto {
     @IsString()
     password: string;
 
-    @IsNumber()
-    balance: 0;
+ 
 
 
 }
@@ -35,8 +34,7 @@ export class UserResponse{
     @Length(9)
     rut: string;
 
-    @IsNumber()
-    balance: Number;
+ 
         
 
 }

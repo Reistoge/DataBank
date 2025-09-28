@@ -1,0 +1,70 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Account, AccountDocument } from './schemas/account.schema';
+import { Model } from 'mongoose';
+import { CardService } from 'src/card/card.service';
+import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType } from './dto/account.dto';
+
+@Injectable()
+export class AccountService {
+  private readonly logger = new Logger(AccountService.name);
+  constructor(
+    @InjectModel(Account.name) private readonly accountModel: Model<AccountDocument>,
+    private cardService: CardService
+  ) {}
+
+  async create(createAccountDto: CreateAccountDto): Promise<AccountResponseDto> {
+    if (!createAccountDto.userId) throw new Error('userId is required to create an account');
+
+    const accountNumber = await this.generateUniqueAccountNumber();
+    const balance = 0;
+    const type = createAccountDto.type ?? AccountType.CHECKING;
+    const isActive = true;
+
+    const newAccount = {
+      userId: createAccountDto.userId,
+      accountNumber,
+      balance,
+      type,
+      isActive,
+    };
+
+    const savedAccount = await new this.accountModel(newAccount).save();
+
+    return {
+      ...newAccount,
+      id: savedAccount._id.toString(),
+    };
+  }
+
+  async getUserAccounts(userId: string): Promise<AccountResponseDto[]> {
+    const accountDocs = await this.accountModel.find({ userId }).exec();
+    return accountDocs.map(account => ({
+      id: account._id?.toString(),
+      userId: account.userId,
+      accountNumber: account.accountNumber,
+      balance: account.balance,
+      type: account.type,
+      isActive: account.isActive,
+    }));
+  }
+
+  async update(updateAccountDto: UpdateAccountDto) {
+    await this.accountModel.findOneAndUpdate({ _id: updateAccountDto.id }, updateAccountDto).exec();
+  }
+
+  async remove(accountId: string) {
+    await this.accountModel.findOneAndDelete({ _id: accountId }).exec();
+    await this.cardService.deleteCardsForAccount(accountId);
+  }
+
+  private async generateUniqueAccountNumber(): Promise<string> {
+    let accountNumber: string;
+    let exists: { _id: any } | null;
+    do {
+      accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      exists = await this.accountModel.exists({ accountNumber });
+    } while (exists);
+    return accountNumber;
+  }
+}

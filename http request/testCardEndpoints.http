@@ -1,44 +1,91 @@
-### 1. Create a new card for the user
+ ### Register a new user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "rut": "123456789",
+  "username": "testuser",
+  "email": "testuser@email.com",
+  "password": "password123"
+}
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@email.com",
+  "password": "password123"
+}
+
+### Get profile (requires JWT)
+GET http://localhost:5000/api/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+
+### Logout (requires JWT)
+POST http://localhost:5000/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+
+### Get all users
+GET http://localhost:5000/api/users/allUsers
+
+### Create account (requires JWT)
+POST http://localhost:5000/api/account
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+Content-Type: application/json
+
+{
+  "type": "SAVINGS"
+}
+
+### Get user's accounts (requires JWT)
+GET http://localhost:5000/api/account/myAccounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+
+### Update account (requires JWT)
+PATCH http://localhost:5000/api/account/updateAccount
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+Content-Type: application/json
+
+{
+  "id": "68d8ae271bbb764010dce275",
+  "type": "SAVINGS",
+  "balance": 1000,
+  "isActive": true
+}
+
+### Delete account (requires JWT)
+DELETE http://localhost:5000/api/account/68d8ae271bbb764010dce275
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+
+### Create card (requires JWT)
 POST http://localhost:5000/api/card
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q5NjQ4OGNjM2E2MmJmZTZlOGE1NiIsImlhdCI6MTc1ODMwODU1MywiZXhwIjoxNzU4MzA5NDUzfQ.ZWHwsIDZDahQO1VfIr40Qq0PTqjh85I8oaNC-Hdx_CU
 
 {
-  "userId": "68cd96488cc3a62bfe6e8a56",
-  "password": "1234"
+  "accountId": "68d8ae271bbb764010dce275",
+  "password": "4321"
 }
 
-### 2. Get user's cards
-GET http://localhost:5000/api/card/myCards
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q5NjQ4OGNjM2E2MmJmZTZlOGE1NiIsImlhdCI6MTc1ODMwODU1MywiZXhwIjoxNzU4MzA5NDUzfQ.ZWHwsIDZDahQO1VfIr40Qq0PTqjh85I8oaNC-Hdx_CU
+### Get account's cards (requires JWT)
+GET http://localhost:5000/api/card/myCards?accountId=68d8ae271bbb764010dce275
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
 
-{
-  "id": "68cd96488cc3a62bfe6e8a56",
-  "username": "user2",
-  "email": "user2@email.com",
-  "rut": "222222222"
-}
-
-### 3. Update a card (e.g., block it or change limit)
+### Update card (requires JWT)
 PATCH http://localhost:5000/api/card/updateCard
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q4YTliMDBiZDRiNGJkYTEwY2JiZSIsImlhdCI6MTc1ODMwMTEyNiwiZXhwIjoxNzU4MzAyMDI2fQ.WKCFXr-OVIHX67kyUEviNWjcqapzLjbG1srq6tBXFAQ
 
 {
-  "id": "cardIdHere",  // Replace with actual card ID from create response
+  "id": "68d99221cabf2dde826ed1d5",
   "cvv": 123,
   "number": "4111111111111111",
   "penalties": 0,
-  "spentLimit": 5000
+  "spentLimit": 5000,
+  "accessPassword": "cardpassword"
 }
-accessPassword: "secureCardPassword123"
 
-### 4. Delete a card
-DELETE http://localhost:5000/api/card/deleteCard
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGVtYWlsLmNvbSIsInN1YiI6IjY4Y2Q4YTliMDBiZDRiNGJkYTEwY2JiZSIsImlhdCI6MTc1ODMwMTEyNiwiZXhwIjoxNzU4MzAyMDI2fQ.WKCFXr-OVIHX67kyUEviNWjcqapzLjbG1srq6tBXFAQ
-
-{
-  "id": "cardIdHere"  // Replace with actual card ID
-}
+### Delete card (requires JWT)
+DELETE http://localhost:5000/api/card/68d99221cabf2dde826ed1d5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8

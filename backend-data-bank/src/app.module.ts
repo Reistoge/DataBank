@@ -7,13 +7,14 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CardModule } from './card/card.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Add this line
     DatabaseModule, 
     UsersModule, 
-    AuthModule, CardModule, TransactionModule
+    AuthModule, CardModule, TransactionModule, AccountModule
   ],
   controllers: [AppController],
   providers: [AppService],
