@@ -27,13 +27,14 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // create user
     const user = await this.usersService.create({
       rut,
       username,
       email,
       password: hashedPassword,
-      balance: 0,
-  
+      
     });
 
     const payload = { email: user.email, sub: user.id };
@@ -63,8 +64,6 @@ export class AuthService {
         rut: userDoc.rut,
         username: userDoc.username,
         email: userDoc.email,
-        balance: 0,
-
       },
       access_token,
     };
@@ -77,6 +76,7 @@ export class AuthService {
         id: user._id.toString(),
         username: user.username,
         email: user.email,
+        rut: user.rut,
       };
     }
     return null;

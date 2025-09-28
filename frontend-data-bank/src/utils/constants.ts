@@ -11,6 +11,7 @@ export const ROUTES = Object.freeze({
   HOME: '/',
 } as const);
 
+
 // API Endpoint Routes
 export const API_REQUEST_ROUTE = Object.freeze({
   LOGIN: '/auth/login',
@@ -19,6 +20,8 @@ export const API_REQUEST_ROUTE = Object.freeze({
   LOGOUT: '/auth/logout',
 } as const);
 
+
+
 // Resource URLs
 export const RESOURCES = Object.freeze({
   LOGO: 'https://avatars.githubusercontent.com/u/64452194?v=4',
@@ -26,6 +29,22 @@ export const RESOURCES = Object.freeze({
   WARNING: 'https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/warning-circle.png://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.veryicon.com%2Ficons%2Fphotographic%2Fant-design-official-icon-library%2Fwarning-circle.html&psig=AOvVaw3dedn0n-bz4OdPgFYlr52r&ust=1758893099542000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDkv8SB9I8DFQAAAAAdAAAAABAE',
   VITE_WARNING: '/vite.svg',
 } as const);
+
+export const ACCOUNT_ROUTES = Object.freeze({
+  CREATE_ACCOUNT: '/api/account', // req token
+  GET_ACCOUNTS: '/api/account/myAccounts', // req token
+
+})
+export const CARD_ROUTES = Object.freeze({
+  CREATE_CARD: '/api/card', // req token
+  GET_CARDS: '/api/card/myCards', // req token
+
+})
+export const USER_ROUTES =  Object.freeze({
+    GET_PROFILE: '/api/auth/profile', // req token
+
+
+})
 
 // HTTP Status Codes
 export const HTTP_STATUS = Object.freeze({

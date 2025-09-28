@@ -89,9 +89,6 @@ function Dashboard() {
 
               <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
                 <div>
-                  {/* Balance */}
-                  <dt className="text-lg font-medium text-gray-500">Balance</dt>
-                  <dd className="mt-1 text-4xl text-gray-900">${user?.balance}</dd>
                   {/* ID */}
                   <dt className="text-lg font-medium text-gray-500">ID</dt>
                   <dd className="mt-1 text-2xl text-gray-900">{showId ? user?.id : "XXXXXXXXXXXXXXXXXXXXXXXX"}</dd>
@@ -141,10 +138,6 @@ function Dashboard() {
               <div>
                 <dt className="text-sm font-medium text-gray-500">ID</dt>
                 <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Balance</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.balance}</dd>
               </div>
             </dl>
           </div>

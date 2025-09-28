@@ -4,27 +4,32 @@ import { Document } from 'mongoose';
 export type CardDocument = Card & Document;
 
 @Schema({ timestamps: true })
-export class Card extends Document{
-
-    // _id: Types.ObjectId;
-
-    @Prop({ required: true })
-    userId: string;
+export class Card extends Document {
+ 
 
     @Prop({ required: true })
-    password: string;
+    accountId: string; // referencia a la cuenta
 
     @Prop({ required: true })
-    cvv: number
+    password: string; // PIN de la tarjeta
+
+    @Prop({ required: true })
+    cvv: number;
 
     @Prop({ required: true, unique: true })
-    number: string
+    number: string; // número de tarjeta
+
+    @Prop({ default: 'DEBIT' })
+    type: string; // para futuro: crédito/débito
 
     @Prop({ default: 0 })
     penalties: number;
-    
-    @Prop({ default: Number.MAX_VALUE})
+
+    @Prop({ default: Number.MAX_VALUE })
     spentLimit: number;
 
+    @Prop({ default: true })
+    isActive: boolean;
 }
+
 export const CardSchema = SchemaFactory.createForClass(Card);

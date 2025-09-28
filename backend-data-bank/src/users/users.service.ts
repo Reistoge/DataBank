@@ -3,21 +3,34 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto,UserResponse } from './dto/user.dto';
+import { CreateUserDto, UserResponse } from './dto/user.dto';
+import { AccountService } from 'src/account/account.service';
+import { CreateAccountDto } from 'src/account/dto/account.dto';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
-  
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private accountService: AccountService
+  ) { }
+
   async create(userData: CreateUserDto): Promise<UserResponse> {
     this.logger.log(`Creating user: ${userData.email}`);
- 
-    const newUser = new this.userModel(userData);
-    const savedUser = await newUser.save();
 
-    return this.toResponseDto(savedUser);
+    const newUser = new this.userModel(userData);
+
+    const savedUser = await newUser.save();
+    this.logger.log(`User ${savedUser.id} saved with no errors`);
+    // create account
+    const userResponse = this.toResponseDto(savedUser);
+    
+    this.accountService.create({
+        ...userResponse
+    });
+
+    return userResponse;
   }
 
   async findOne(username: string): Promise<UserResponse | null> {
@@ -53,7 +66,8 @@ export class UsersService {
       id: user._id.toString(),
       username: user.username,
       email: user.email,
-      balance: 0,
+
     };
   }
+  
 }

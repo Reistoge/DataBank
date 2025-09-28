@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseGuards, Get, Request, Logger, Patch, Param, Delete } from '@nestjs/common';
 import { CardService } from './card.service';
-import { CreateCardDto, UserUpdateCardReqDto, UserCardReqDto } from './dto/card.dto';
+import { CardReqDto, CreateCardDto, UserUpdateCardReqDto } from './dto/card.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserResponse } from 'src/users/dto/user.dto';
 
@@ -17,8 +17,8 @@ export class CardController {
 
   @UseGuards(JwtAuthGuard)
   @Get('myCards')
-  getUserCards(@Body() user: UserCardReqDto) {
-    return this.cardService.getUserCards(user);
+  getUserCards(@Body() account: CardReqDto) {
+    return this.cardService.getAccountCards(account);
 
   }
 
