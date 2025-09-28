@@ -6,13 +6,14 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CardModule } from './card/card.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Add this line
     DatabaseModule, 
     UsersModule, 
-    AuthModule, CardModule
+    AuthModule, CardModule, TransactionModule
   ],
   controllers: [AppController],
   providers: [AppService],
