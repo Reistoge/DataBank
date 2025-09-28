@@ -56,7 +56,6 @@ export class CardService {
 
   }
 
-
   async update(accessPassword: string, updateCardDto: UserUpdateCardReqDto) {
 
     const card = await this.cardModel.findById(updateCardDto.id).exec()

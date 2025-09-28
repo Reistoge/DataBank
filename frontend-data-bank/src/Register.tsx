@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ROUTES, RESOURCES, ANIMATION } from "../constants";
+import { ROUTES, RESOURCES, ANIMATION } from "./utils/constants";
 import { useAuth } from "./hooks/useAuth.hook";
 import type { RegisterCredentials } from "./types/auth.types";
  

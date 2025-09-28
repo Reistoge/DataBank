@@ -8,7 +8,7 @@ import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
 import { AuthProvider } from "./contexts/auth.context";
-import { ROUTES as CONSTANT_ROUTES } from "../constants";
+import { ROUTES as CONSTANT_ROUTES } from "./utils/constants";
 import ProtectedRoute from "./components/protectedRoute.component";
 import DashboardNico from "./Dashboard2PruebaNico";
 
