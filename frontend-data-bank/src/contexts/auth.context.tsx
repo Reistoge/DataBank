@@ -3,7 +3,6 @@ import type { AuthContextType, LoginCredentials, RegisterCredentials } from "../
 import { authReducer, initialAuthState } from "../reducers/auth.reducer";
 import { authService } from "../services/auth.service";
 import { tokenStorage } from "../utils/storage";
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {

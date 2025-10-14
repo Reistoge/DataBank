@@ -4,6 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
+import { UserDocument } from 'src/users/schemas/user.schema';
+import { UserResponse } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,14 +14,14 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { rut, username, email, password } = registerDto;
+    const { rut, username, email, password, birthday, country, region, } = registerDto;
     this.logger.log(`Registration attempt for email: ${email} with rut ${rut}`);
 
     const existingUser = await this.usersService.findByEmail(email);
-    
+
 
     if (existingUser) {
       this.logger.warn(`Registration failed: User with email ${email} already exists`);
@@ -27,14 +29,20 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // create user
     const user = await this.usersService.create({
       rut,
       username,
       email,
       password: hashedPassword,
-      
+      birthday,
+      country,
+      region,
+
+
+
+
     });
 
     const payload = { email: user.email, sub: user.id };
@@ -54,17 +62,14 @@ export class AuthService {
     if (!isPasswordValid) throw new UnauthorizedException(`Invalid credentials`);
 
     this.logger.log(`User logged in successfully: ${email}`);
-
+    userDoc.lastLogin = new Date();
+    await userDoc.save();
     const payload = { email: userDoc.email, sub: userDoc._id };
     const access_token = this.jwtService.sign(payload);
+    const user = this.toUserResponse(userDoc);
 
     return {
-      user: {
-        id: userDoc._id.toString(),
-        rut: userDoc.rut,
-        username: userDoc.username,
-        email: userDoc.email,
-      },
+      user,
       access_token,
     };
   }
@@ -80,5 +85,19 @@ export class AuthService {
       };
     }
     return null;
+  }
+
+  toUserResponse(doc: UserDocument): UserResponse {
+    
+    return {
+      id: doc._id.toString(),
+      rut: doc.rut,
+      username: doc.username,
+      email: doc.email,
+      birthday: doc.birthday,
+      country: doc.country,
+      region: doc.region,
+    };
+
   }
 }

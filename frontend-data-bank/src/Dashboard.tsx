@@ -1,10 +1,19 @@
-import React, { useRef, useState } from 'react'; 
+import React, { useRef, useState } from 'react';
 import { useAuth } from './hooks/useAuth.hook';
 import { RESOURCES } from './utils/constants';
 import { tokenStorage } from './utils/storage';
 
+function userData(label: string,data: string) {
+  return (
+    <div>
+      <dt className="text-sm font-medium text-gray-500">{label}</dt>
+      <dd className="mt-1 text-sm text-gray-900">{data}</dd>
+    </div>
+  );
+}
 function Dashboard() {
   const { user, logout } = useAuth();
+  
   const rotation = useRef(0);
   const [open, setOpen] = useState(false);
   const [showId, setShowId] = useState(false);
@@ -19,79 +28,81 @@ function Dashboard() {
   };
 
   return (
-
     <div className="min-h-screen bg-gray-100">
       {/* First barra */}
       <nav className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <img
-              id="dashboardLogo"
-              onClick={handleRotate}
-              className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={RESOURCES.LOGO}
-              alt="App Logo"
-              title="Click to rotate!"
-            />
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <img
+                id="dashboardLogo"
+                onClick={handleRotate}
+                className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                src={RESOURCES.LOGO}
+                alt="App Logo"
+                title="Click to rotate!"
+              />
+            </div>
 
-          {/* Centro */}
-          <h1 className="text-xl font-semibold text-white text-center">DataBank</h1>
+            {/* Centro */}
+            <h1 className="text-xl font-semibold text-white text-center">
+              DataBank
+            </h1>
 
-          {/* Usuario */}
-          <div className="flex justify-end items-center space-x-4 relative">
-            <span className="text-white">Welcome, {user?.username}! 👋</span>
+            {/* Usuario */}
+            <div className="flex justify-end items-center space-x-4 relative">
+              <span className="text-white">Welcome, {user?.username}! 👋</span>
 
-            {/* Icono de Configuración */}
-            <img
-              id="showInfo"
-              onClick={() => setOpen(!open)}
-              className="w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={"../public/configIMG.png"}
-              alt="Configuracion"
-              title="Configuracion"
-            />
+              {/* Icono de Configuración */}
+              <img
+                id="showInfo"
+                onClick={() => setOpen(!open)}
+                className="w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                src={'../public/configIMG.png'}
+                alt="Configuracion"
+                title="Configuracion"
+              />
 
-            {/* Dropdown */}
-            {open && (
-              <div className="absolute right-0 top-12 bg-white rounded-md shadow-lg py-2 w-40 z-50">
-                <button
-                  onClick={logout}
-                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-                <button
-                  onClick={() => alert("Otra opción")}
-                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Otra opción
-                </button>
-              </div>
-            )}
+              {/* Dropdown */}
+              {open && (
+                <div className="absolute right-0 top-12 bg-white rounded-md shadow-lg py-2 w-40 z-50">
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={() => alert('Otra opción')}
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Otra opción
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-
-
-       
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-20">
         <div className="grid grid-cols-2">
           <div className="relative m-20">
             {/* Recuadro blanco */}
             <div className="bg-white shadow rounded-3xl p-5">
               {/* MiCuenta */}
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Mi Cuenta</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Mi Cuenta
+              </h2>
 
               <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
                 <div>
                   {/* ID */}
                   <dt className="text-lg font-medium text-gray-500">ID</dt>
-                  <dd className="mt-1 text-2xl text-gray-900">{showId ? user?.id : "XXXXXXXXXXXXXXXXXXXXXXXX"}</dd>
+                  <dd className="mt-1 text-2xl text-gray-900">
+                    {showId ? user?.id : 'XXXXXXXXXXXXXXXXXXXXXXXX'}
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -101,7 +112,7 @@ function Dashboard() {
               onClick={() => setShowId(!showId)}
               className="absolute top-1/5 right-0 transform translate-x-10 -translate-y-12 
                         w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={"../public/warning-circle.png"}
+              src={'../public/warning-circle.png'}
               alt="Warning"
               title="Show Info"
             />
@@ -113,19 +124,12 @@ function Dashboard() {
               User Profile
             </h2>
             <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Username</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.username}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Email</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">RUT</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.rut}</dd>
-              </div>
-
+              {user
+                ? Object.entries(user).map(([key, value]) => (
+                    userData(String(key), String(value))
+                  ))
+                : null};
+              
               <div>
                 <dt className="text-sm font-medium text-gray-500">
                   BEARER TOKEN
@@ -135,10 +139,7 @@ function Dashboard() {
                 </dd>
               </div>
 
-              <div>
-                <dt className="text-sm font-medium text-gray-500">ID</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
-              </div>
+
             </dl>
           </div>
 

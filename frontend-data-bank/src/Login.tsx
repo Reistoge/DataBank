@@ -15,6 +15,7 @@ function Login() {
   const { login, isLoading, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
   const rotation = useRef(0);
+  
 
   useEffect(() => {
     if (isAuthenticated) {

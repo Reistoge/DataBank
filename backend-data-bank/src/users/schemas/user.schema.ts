@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-
+import { timeStamp } from 'node:console';
+  
 export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
@@ -24,6 +25,19 @@ export class User {
 
   @Prop({ type: [String], enum: ['CLIENT', 'ADMIN', 'EXEC'], default: ['CLIENT'] })
   roles: string[];
+
+  @Prop({ type: Date })
+  birthday?: Date;
+
+  @Prop({ type: String, required: true })
+  country: string;
+
+  @Prop({ type: String, required: true })
+  region: string;
+
+  @Prop({ type: Date, default: null })
+  lastLogin?: Date | null;
+ 
 }
 
 

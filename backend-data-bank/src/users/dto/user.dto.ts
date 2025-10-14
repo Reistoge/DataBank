@@ -1,26 +1,36 @@
-import { IsNumber, IsString, Length, MinLength } from "class-validator"
- 
+import { IsDate, IsNumber, IsString, Length, MinLength } from "class-validator"
+
 export class CreateUserDto {
+    @IsString()
+    @MinLength(3)
+    username: string;
+
     @IsString()
     @Length(9)
     rut: string;
 
     @IsString()
-    username: string;
-
-    @IsString()
     email: string;
 
-    @MinLength(4)
     @IsString()
+    @MinLength(6)
     password: string;
 
- 
+    @IsDate()
+    birthday: Date;
+
+    @IsString()
+    country: string;
+
+    @IsString()
+    region: string;
+
+
 
 
 }
 
-export class UserResponse{
+export class UserResponse {
     @IsString()
     id: string;
 
@@ -34,7 +44,17 @@ export class UserResponse{
     @Length(9)
     rut: string;
 
- 
-        
+    @IsDate()
+    birthday?: Date;
+
+    @IsString()
+    country: string;
+
+    @IsString()
+    region: string;
+
+
+
+
 
 }

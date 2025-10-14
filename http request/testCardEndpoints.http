@@ -18,9 +18,18 @@ Content-Type: application/json
   "password": "password123"
 }
 
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@gmail.com",
+  "password": "1234"
+}
+
 ### Get profile (requires JWT)
 GET http://localhost:5000/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInN1YiI6IjY4ZDhhZTI3MWJiYjc2NDAxMGRjZTI3MiIsImlhdCI6MTc1OTA4OTA1OCwiZXhwIjoxNzU5MDg5OTU4fQ.I1URrL_vCr9XJttvmWX-osLywoHALjG4pVu5hzjwXg8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQxNjY4NywiZXhwIjoxNzYwNDE3NTg3fQ.Obp5LjqM5WORpJ1PfW_W589ym3ROBkbYWTODYoBDDbU
 
 ### Logout (requires JWT)
 POST http://localhost:5000/api/auth/logout

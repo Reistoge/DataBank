@@ -6,10 +6,7 @@ import type {
 } from '../types/auth.types'
 
 import { tokenStorage, createAuthHeaders, apiEndpoints } from '../utils/storage';
-
-
-
-
+ 
 class AuthService {
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         const response = await fetch(apiEndpoints.login, {
@@ -52,6 +49,7 @@ class AuthService {
             throw new Error('Session expired');
             // send to login ?
         }
+        console.log(`current user response: ${response.json()}` );
         return response.json();
 
     }

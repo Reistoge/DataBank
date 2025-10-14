@@ -41,6 +41,7 @@ export const createAccount = async (dto: CreateAccountDto): Promise<AccountRespo
   return response.json();
 };
 
+
 // Create a new card for a specific account
 export const createCard = async (dto: CreateCardDto): Promise<CardResponse> => {
   const response = await fetch(CARD_ROUTES.CREATE_CARD, {

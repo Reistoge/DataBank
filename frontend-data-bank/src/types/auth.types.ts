@@ -5,6 +5,10 @@ export interface User {
     username: string;
     email: string;
     rut: string;
+    birthday: Date;
+    country: string;
+    region: string;
+    
 }
 export interface Account {
     id: string
@@ -21,7 +25,7 @@ export interface Card {
     penalties: Number;
     spentLimit: Number;
 }
- 
+
 
 export interface AuthState {
     user: User | null;
@@ -71,14 +75,22 @@ export interface AuthContextType extends AuthState {
  * @string pass
  */
 export interface LoginCredentials {
+ 
     email: string;
     password: string;
+ 
+
 }
 export interface RegisterCredentials {
     rut: string;
     username: string;
     email: string;
     password: string;
+    birthday?: string;
+    country: string;
+    region: string;
+
+
 
 }
 export interface UserRegisterResponse {
