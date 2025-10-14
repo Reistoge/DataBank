@@ -2,8 +2,9 @@ import React, { useRef, useState } from 'react';
 import { useAuth } from './hooks/useAuth.hook';
 import { RESOURCES } from './utils/constants';
 import { tokenStorage } from './utils/storage';
+import type { User } from './types/auth.types';
 
-function userData(label: string,data: string) {
+function userData(label: string, data: string) {
   return (
     <div>
       <dt className="text-sm font-medium text-gray-500">{label}</dt>
@@ -11,12 +12,34 @@ function userData(label: string,data: string) {
     </div>
   );
 }
+function showUserData(user: User | null) {
+  return (
+    <div className="bg-white shadow rounded-lg p-6 m-2">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">User Profile</h2>
+      <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        {user
+          ? Object.entries(user).map(([key, value]) =>
+              userData(String(key), String(value)),
+            )
+          : null}
+        ;
+        <div>
+          <dt className="text-sm font-medium text-gray-500">BEARER TOKEN</dt>
+          <dd className="mt-1 text-sm text-gray-900 break-all">
+            {tokenStorage.get()}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
 function Dashboard() {
   const { user, logout } = useAuth();
-  
+
   const rotation = useRef(0);
   const [open, setOpen] = useState(false);
   const [showId, setShowId] = useState(false);
+  const [accounts, setAccounts] = useState(false);
 
   const handleRotate = () => {
     const img = document.getElementById('dashboardLogo');
@@ -27,23 +50,70 @@ function Dashboard() {
     }
   };
 
+  function showAccounts(user: User | null): React.ReactNode {
+    return (
+      <div className="relative m-20">
+        {/* Recuadro blanco */}
+
+        <div className="bg-white shadow rounded-3xl p-5">
+          
+          <span
+            id="showInfo"
+          
+            className="absolute right-5 top-5 cursor-pointer hover:shadow-lg transition-shadow duration-200 text-2xl"
+            title="Show Info"
+          >
+            ➡️
+          </span>
+
+          {/* MiCuenta */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Mi Cuenta</h2>
+          <img
+            id="showInfo"
+            onClick={() => setShowId(!showId)}
+            className=" w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            src={'../public/warning-circle.png'}
+            alt="Warning"
+            title="Show Info"
+          />
+          <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
+            <div>
+              {/* ID */}
+
+              <dt className="text-lg font-medium text-gray-500">ID</dt>
+              <dd className="mt-1 text-2xl text-gray-900">
+                {showId ? user?.id : 'XXXXXXXXXXXXXXXXXXXXXXXX'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        {/* Ícono afuera del recuadro */}
+      </div>
+    );
+  }
+
+  function showLogo(): React.ReactNode {
+    return (
+      <div className="flex items-center">
+        <img
+          id="dashboardLogo"
+          onClick={handleRotate}
+          className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          src={RESOURCES.LOGO}
+          alt="App Logo"
+          title="Click to rotate!"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* First barra */}
       <nav className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-3 items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img
-                id="dashboardLogo"
-                onClick={handleRotate}
-                className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                src={RESOURCES.LOGO}
-                alt="App Logo"
-                title="Click to rotate!"
-              />
-            </div>
+            {showLogo()}
 
             {/* Centro */}
             <h1 className="text-xl font-semibold text-white text-center">
@@ -88,60 +158,8 @@ function Dashboard() {
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-20">
         <div className="grid grid-cols-2">
-          <div className="relative m-20">
-            {/* Recuadro blanco */}
-            <div className="bg-white shadow rounded-3xl p-5">
-              {/* MiCuenta */}
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Mi Cuenta
-              </h2>
-
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-4">
-                <div>
-                  {/* ID */}
-                  <dt className="text-lg font-medium text-gray-500">ID</dt>
-                  <dd className="mt-1 text-2xl text-gray-900">
-                    {showId ? user?.id : 'XXXXXXXXXXXXXXXXXXXXXXXX'}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-            {/* Ícono afuera del recuadro */}
-            <img
-              id="showInfo"
-              onClick={() => setShowId(!showId)}
-              className="absolute top-1/5 right-0 transform translate-x-10 -translate-y-12 
-                        w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={'../public/warning-circle.png'}
-              alt="Warning"
-              title="Show Info"
-            />
-          </div>
-
-          {/* User */}
-          <div className="bg-white shadow rounded-lg p-6 m-2">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              User Profile
-            </h2>
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              {user
-                ? Object.entries(user).map(([key, value]) => (
-                    userData(String(key), String(value))
-                  ))
-                : null};
-              
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  BEARER TOKEN
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 break-all">
-                  {tokenStorage.get()}
-                </dd>
-              </div>
-
-
-            </dl>
-          </div>
+          {showAccounts(user)}
+          {showUserData(user)}
 
           {/* Transaction form */}
           <div className=" bg-white shadow rounded-lg p-6 m-2">
