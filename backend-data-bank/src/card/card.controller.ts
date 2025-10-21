@@ -22,12 +22,14 @@ export class CardController {
   @UseGuards(JwtAuthGuard)
   @Patch('updateCard')
   update(@Body() updateCardDto: UserUpdateCardReqDto, @Body('accessPassword') accessPassword: string) {
+    // structure: JSON containing the dto and the password above
     return this.cardService.update(accessPassword, updateCardDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':cardId')
   remove(@Param('cardId') id: string, @Query('password') password: string) {
+    // structure of url : `${API_BASE_URL + CARD_ROUTES.DELETE_CARD}/${cardId}?password=${accessPassword}`, 
     return this.cardService.removeCard(id,password);
   }
 }
