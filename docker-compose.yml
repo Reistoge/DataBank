@@ -39,20 +39,20 @@ services:
         networks:
             - app-network  # Add this so backend can communicate with frontend
 
-    frontend-data-bank-service:
-        build:
-            context: ./frontend-data-bank
-            dockerfile: Dockerfile
-        container_name: frontend-data-bank
-        ports:
-            - "4000:3000"
-        restart: unless-stopped
-        env_file:
-            - ./frontend-data-bank/.env
-        depends_on:
-            - backend-data-bank-service
-        networks:
-            - app-network
+    # frontend-data-bank-service:
+    #     build:
+    #         context: ./frontend-data-bank
+    #         dockerfile: Dockerfile
+    #     container_name: frontend-data-bank
+    #     ports:
+    #         - "3000:3000"
+    #     restart: unless-stopped
+    #     env_file:
+    #         - ./frontend-data-bank/.env
+    #     depends_on:
+    #         - backend-data-bank-service
+    #     networks:
+    #         - app-network
 volumes:
     databank_mongodb:
     databank_neo4j_data:

@@ -53,7 +53,7 @@ export const tokenStorage = {
 };
 
 
- 
+
 /**
  * Creates HTTP headers for authenticated requests.
  * 
@@ -70,19 +70,20 @@ export const tokenStorage = {
  * ```
  */
 export const createAuthHeaders = (token?: string) => {
+    
     const authToken = token || tokenStorage.get();
     return {
         'Content-Type': 'application/json',
-        ...(authToken && {Authorization: `Bearer ${authToken}`}),
-    };  
+        ...(authToken && { Authorization: `Bearer ${authToken}` }),
+    };
 };
 
 
 
 
- 
+
 export const apiEndpoints = {
-  login: `${API_BASE_URL}/auth/login`,
-  register: `${API_BASE_URL}/auth/register`,
-  profile: `${API_BASE_URL}/auth/profile`,
+    login: `${API_BASE_URL}/auth/login`,
+    register: `${API_BASE_URL}/auth/register`,
+    profile: `${API_BASE_URL}/auth/profile`,
 } as const;

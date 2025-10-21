@@ -28,3 +28,11 @@ export enum AccountType {
     CHECKING = 'CHECKING',
 
 }
+export enum AccountState{
+    DEFAULT = 'DEFAULT',
+    DELETED = 'DELETED',
+    BLOCKED = 'BLOCKED',
+    
+
+}
+

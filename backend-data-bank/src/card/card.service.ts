@@ -1,13 +1,14 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
-import { CardResponse, CreateCardDto, UserUpdateCardReqDto } from './dto/card.dto';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { CardResponse, CardState, CreateCardDto, UserUpdateCardReqDto } from './dto/card.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Card, CardDocument } from './schemas/card.schema';
 import { Model } from 'mongoose';
+import { AccountState } from 'src/account/dto/account.dto';
 
 @Injectable()
 export class CardService {
   private readonly logger = new Logger(CardService.name);
-  constructor(@InjectModel(Card.name) private readonly cardModel: Model<CardDocument>) {}
+  constructor(@InjectModel(Card.name) private readonly cardModel: Model<CardDocument>) { }
 
   async create(createCardDto: CreateCardDto): Promise<CardResponse> {
     const cvv = await this.generateUniqueCvvNumber();
@@ -17,6 +18,7 @@ export class CardService {
       ...createCardDto,
       cvv,
       number: cardNumber,
+
     };
 
     const createdCard = await new this.cardModel(newCard).save();
@@ -31,7 +33,7 @@ export class CardService {
   }
 
   async getAccountCards(accountId: string): Promise<CardResponse[]> {
-    const cardDocs = await this.cardModel.find({ accountId }).exec();
+    const cardDocs = await this.cardModel.find({ accountId, state: CardState.DEFAULT }).exec();
     return cardDocs.map(card => ({
       id: card._id?.toString(),
       cvv: card.cvv,
@@ -61,19 +63,40 @@ export class CardService {
     return cvv;
   }
 
+
   async update(accessPassword: string, updateCardDto: UserUpdateCardReqDto) {
+    this.logger.log(`updateCardDto: ${(Object.entries(updateCardDto).map(([key, value]) => (`${String(key)}: ${String(value)} \n`)))} accesPasword: ${accessPassword}`);
     const card = await this.cardModel.findById(updateCardDto.id).exec();
+    this.logger.log(`Card find ${card}`);
     if (!card) throw new ConflictException(`Problem finding user card`);
     if (card.password !== accessPassword) throw new ConflictException(`Invalid password`);
     Object.assign(card, updateCardDto);
+    this.logger.log(`Card updated succesfully ${card}`);
     await card.save();
   }
 
   deleteCardsForAccount(accountId: string) {
-    return this.cardModel.deleteMany({ accountId }).exec();
+    return this.cardModel.updateMany({ accountId }, { state: AccountState.DELETED }).exec();
+    //return this.cardModel.deleteMany({ accountId }).exec();
   }
 
-  remove(id: string) {
+  private remove(id: string) {
     return this.cardModel.findByIdAndDelete(id).exec();
   }
+  async removeCard(id: string, password: string) {
+    this.logger.log(`try to remove card with id: ${id} and pass: ${password}`)
+    // verify password
+    try {
+      const card = await this.cardModel.findById(id).exec();
+      if (!card) throw new NotFoundException('Card not found');
+      if (card.password !== password) throw new ConflictException('Invalid password');
+
+      return this.cardModel.updateOne({ _id: id }, { state: CardState.DELETED }).exec();
+    } catch (err) {
+      this.logger.error(`Error removing card: ${err?.message || err}`);
+      throw err;
+    }
+
+  }
+
 }

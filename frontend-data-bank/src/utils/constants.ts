@@ -8,6 +8,11 @@ export const ROUTES = Object.freeze({
   LOGIN: '/login',
   REGISTER: '/register', 
   DASHBOARD: '/dashboard',
+  ADD_ACCOUNT: '/addAccount',
+  ADD_CARD: '/addCard',
+  DELETE_ACCOUNT: '/deleteAccount',
+  DELETE_CARD: '/deleteCard',
+ 
   HOME: '/',
 } as const);
 
@@ -31,13 +36,16 @@ export const RESOURCES = Object.freeze({
 } as const);
 
 export const ACCOUNT_ROUTES = Object.freeze({
-  CREATE_ACCOUNT: '/api/account', // req token
-  GET_ACCOUNTS: '/api/account/myAccounts', // req token
+  CREATE_ACCOUNT: '/account', // req token
+  GET_ACCOUNTS: '/account/myAccounts', // req token
+  DELETE_ACCOUNT: '/account', // req token
 
 })
 export const CARD_ROUTES = Object.freeze({
-  CREATE_CARD: '/api/card', // req token
-  GET_CARDS: '/api/card/myCards', // req token
+  CREATE_CARD: '/card', // req token
+  GET_CARDS: '/card/myCards', // req token
+  UPDATE_CARD: '/card/updateCard', // req token
+  DELETE_CARD: '/card'
 
 })
 export const USER_ROUTES =  Object.freeze({

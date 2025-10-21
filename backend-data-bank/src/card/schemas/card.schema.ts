@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { CardState } from '../dto/card.dto';
 
 export type CardDocument = Card & Document;
 
 @Schema({ timestamps: true })
 export class Card extends Document {
- 
+
 
     @Prop({ required: true })
     accountId: string; // referencia a la cuenta
@@ -30,6 +31,9 @@ export class Card extends Document {
 
     @Prop({ default: true })
     isActive: boolean;
+
+    @Prop({ default: CardState.DEFAULT, enum: CardState })
+    state: CardState;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

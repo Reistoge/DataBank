@@ -25,4 +25,8 @@ export class UserUpdateCardReqDto extends PartialType(CardResponse) {
 export class CardReqDto extends PartialType(AccountResponseDto) {
     
 }
-
+export enum CardState{
+    DEFAULT ='DEFAULT',
+    BLOCKED = 'BLOCKED',
+    DELETED = 'DELETED',
+}

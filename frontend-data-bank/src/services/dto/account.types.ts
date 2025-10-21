@@ -23,3 +23,14 @@ export type CreateCardDto = {
     accountId: string;
     password: string;
 };
+
+
+export const AccountType = {
+    CHECKING: 'CHECKING',
+    SAVINGS: 'SAVINGS',
+} as const;
+
+export type AccountType = typeof AccountType[keyof typeof AccountType];
+
+
+ 

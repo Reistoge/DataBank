@@ -3,15 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Account, AccountDocument } from './schemas/account.schema';
 import { Model } from 'mongoose';
 import { CardService } from 'src/card/card.service';
-import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType } from './dto/account.dto';
+import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType, AccountState } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
-  private readonly logger = new Logger(AccountService.name);
   constructor(
     @InjectModel(Account.name) private readonly accountModel: Model<AccountDocument>,
     private cardService: CardService
-  ) {}
+  ) { }
+  private readonly logger = new Logger(AccountService.name);
 
   async create(createAccountDto: CreateAccountDto): Promise<AccountResponseDto> {
     if (!createAccountDto.userId) throw new Error('userId is required to create an account');
@@ -38,7 +38,8 @@ export class AccountService {
   }
 
   async getUserAccounts(userId: string): Promise<AccountResponseDto[]> {
-    const accountDocs = await this.accountModel.find({ userId }).exec();
+    this.logger.log(`userAccountRequest for user ${userId}`);
+    const accountDocs = await this.accountModel.find({ userId, state: AccountState.DEFAULT }).exec();
     return accountDocs.map(account => ({
       id: account._id?.toString(),
       userId: account.userId,
@@ -53,9 +54,27 @@ export class AccountService {
     await this.accountModel.findOneAndUpdate({ _id: updateAccountDto.id }, updateAccountDto).exec();
   }
 
-  async remove(accountId: string) {
-    await this.accountModel.findOneAndDelete({ _id: accountId }).exec();
-    await this.cardService.deleteCardsForAccount(accountId);
+  private async remove(accountId: string) {
+    try {
+      await this.accountModel.findOneAndDelete({ _id: accountId }).exec();
+      await this.cardService.deleteCardsForAccount(accountId);
+    } catch (err) {
+      throw new Error(err);
+    }
+
+
+
+  }
+   async removeAccount(accountId: string) {
+    try {
+      await this.accountModel.updateMany({ _id: accountId }, {state: AccountState.DELETED}).exec();
+      await this.cardService.deleteCardsForAccount(accountId);
+    } catch (err) {
+      throw new Error(err);
+    }
+
+
+
   }
 
   private async generateUniqueAccountNumber(): Promise<string> {

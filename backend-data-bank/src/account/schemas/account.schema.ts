@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
-import { AccountType } from "../dto/account.dto";
+import { AccountState, AccountType } from "../dto/account.dto";
 export type AccountDocument = Account & Document;
 @Schema({timestamps: true})
 export class Account {
@@ -20,6 +20,11 @@ export class Account {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({default: AccountState.DEFAULT, enum: AccountState})
+  state: AccountState;
+
+
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);

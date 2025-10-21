@@ -27,7 +27,7 @@ export class CardController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':cardId')
-  remove(@Param('cardId') cardId: string) {
-    return this.cardService.remove(cardId);
+  remove(@Param('cardId') id: string, @Query('password') password: string) {
+    return this.cardService.removeCard(id,password);
   }
 }

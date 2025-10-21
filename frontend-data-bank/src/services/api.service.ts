@@ -1,5 +1,5 @@
-import { ACCOUNT_ROUTES, CARD_ROUTES } from "../utils/constants";
-import { createAuthHeaders } from "../utils/storage";
+import { ACCOUNT_ROUTES, API_BASE_URL, CARD_ROUTES } from "../utils/constants";
+import { createAuthHeaders, tokenStorage } from "../utils/storage";
 import type {
   AccountResponse,
   CardResponse,
@@ -9,46 +9,111 @@ import type {
 
 // Get all accounts for the authenticated user (JWT in header)
 export const getUserAccounts = async (): Promise<AccountResponse[]> => {
-  const response = await fetch(ACCOUNT_ROUTES.GET_ACCOUNTS, {
+  const headers = createAuthHeaders();
+  console.log("headers:", headers);
+
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.GET_ACCOUNTS, {
     method: "GET",
-    headers: createAuthHeaders(),
+    headers: headers,
   });
+
   if (!response.ok) throw new Error("getAccounts failed");
-  return response.json();
+  const result = await response.json();
+  console.log(`result ${result}`);
+  return result;
 };
+export const deleteAccount = async (accountId: string | undefined) => {
+  if (!accountId) throw new Error("accountId no provided ");
+  const headers = createAuthHeaders();
+  const response = await fetch(`${API_BASE_URL + ACCOUNT_ROUTES.DELETE_ACCOUNT}/${accountId} `, {
+    method: 'DELETE',
+    headers: headers
+  });
+  if (!response.ok) throw new Error("deleteAccount failed");
+
+  const result = await response.json();
+  return result;
+
+
+}
 
 // Get all cards for a specific account
 export const getCards = async (accountId: string): Promise<CardResponse[]> => {
   const response = await fetch(
-    `${CARD_ROUTES.GET_CARDS}?accountId=${accountId}`,
+    `${API_BASE_URL + CARD_ROUTES.GET_CARDS}?accountId=${accountId}`,
     {
       method: "GET",
       headers: createAuthHeaders(),
     }
   );
   if (!response.ok) throw new Error("getCards failed");
-  return response.json();
+  return await response.json();
 };
 
 // Create a new account for the authenticated user
 export const createAccount = async (dto: CreateAccountDto): Promise<AccountResponse> => {
-  const response = await fetch(ACCOUNT_ROUTES.CREATE_ACCOUNT, {
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.CREATE_ACCOUNT, {
     method: "POST",
     headers: createAuthHeaders(),
     body: JSON.stringify(dto),
   });
   if (!response.ok) throw new Error("createAccount failed");
-  return response.json();
+  return await response.json();
 };
 
 
 // Create a new card for a specific account
 export const createCard = async (dto: CreateCardDto): Promise<CardResponse> => {
-  const response = await fetch(CARD_ROUTES.CREATE_CARD, {
+  Object.entries(dto).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+  });
+  const response = await fetch(API_BASE_URL + CARD_ROUTES.CREATE_CARD, {
     method: "POST",
     headers: createAuthHeaders(),
     body: JSON.stringify(dto),
   });
   if (!response.ok) throw new Error("createCard failed");
-  return response.json();
+  return await response.json();
 };
+
+export const updateCard = async (dto: CardResponse, accessPassword: string) => {
+  Object.entries(dto).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+  });
+  const updateCardReq = {
+    ...dto,
+    accessPassword,
+  }
+  const response = await fetch(API_BASE_URL + CARD_ROUTES.UPDATE_CARD, {
+    method: "PATCH",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(updateCardReq),
+  });
+  if (!response.ok) {
+    console.error(response.text);
+    throw new Error(`update card Error`);
+  };
+
+
+}
+export const deleteCard = async (cardId: string, accessPassword: string) => {
+  const response = await fetch(
+    `${API_BASE_URL + CARD_ROUTES.DELETE_CARD}/${cardId}?password=${accessPassword}`,
+    {
+      method: "DELETE",
+      headers: createAuthHeaders(),
+    }
+  );
+  if (!response.ok) {
+    console.error(response.statusText);
+    throw new Error("deleteCard failed");
+  }
+  return await response.json();
+};
+
+export const updateCardSpentLimit = async (dto: CardResponse, newLimit: number, accessPassword: string) => {
+  const copy = { ...dto };
+  copy.spentLimit = newLimit;
+
+  return await updateCard(copy, accessPassword);
+}

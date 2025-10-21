@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('account')
 export class AccountController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(private readonly accountService: AccountService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -31,7 +31,12 @@ export class AccountController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':accountId')
-  remove(@Param('accountId') accountId: string) {
-    return this.accountService.remove(accountId);
+  async remove(@Param('accountId') accountId: string) {
+    try {
+      await this.accountService.removeAccount(accountId);
+      return { statusCode: 200, message: `Account deleted successfully` };
+    } catch (error) {
+      return { statusCode: 400, message: error.message || 'Failed to delete account' };
+    }
   }
 }
