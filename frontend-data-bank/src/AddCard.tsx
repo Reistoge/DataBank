@@ -197,6 +197,16 @@ function AddCard() {
   function AccountIdPicker() {
     return (
       <div className="w-full">
+        <div className="fixed top-4 left-4 z-50">
+          <img 
+            id="go_back"
+            onClick={() => navigate(ROUTES.DASHBOARD)}
+            className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
+            src="../public/go-back.png"
+            alt="go_back"
+            title="Click to return"
+          />
+        </div>    
         <label
           htmlFor="AccountIdPicker"
           className="block text-white font-semibold mb-2"

@@ -221,6 +221,16 @@ function DeleteCard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black flex flex-col">
+      <div className="fixed top-4 left-4 z-50">
+        <img 
+          id="go_back"
+          onClick={() => navigate(ROUTES.DASHBOARD)}
+          className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
+          src="../public/go-back.png"
+          alt="go_back"
+          title="Click to return"
+        />
+      </div>
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         {/* Form Section */}
