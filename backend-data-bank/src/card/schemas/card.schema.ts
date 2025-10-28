@@ -33,7 +33,7 @@ export class Card extends Document {
     isActive: boolean;
 
     @Prop({ default: CardState.DEFAULT, enum: CardState })
-    state: CardState;
+    state: CardState;   
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

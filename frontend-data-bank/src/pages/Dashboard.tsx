@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useAuth } from './hooks/useAuth.hook';
-import { RESOURCES, ROUTES } from './utils/constants';
-import { tokenStorage } from './utils/storage';
-import type { User } from './types/auth.types';
-import type {
-  AccountResponse,
-  CardResponse,
-} from './services/dto/account.types';
+import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.hook';
 import {
   getUserAccounts,
   getCards,
   updateCardSpentLimit,
-} from './services/api.service';
-import { Link } from 'react-router-dom';
-import { translate, userTranslations } from './utils/translations';
+} from '../services/api.service';
+import type {
+  AccountResponse,
+  CardResponse,
+} from '../services/dto/account.types';
+import type { User } from '../types/auth.types';
+import { RESOURCES, ROUTES } from '../utils/constants';
+import { tokenStorage } from '../utils/storage';
+import { translate, userTranslations } from '../utils/translations';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -228,6 +228,10 @@ function Dashboard() {
             {displayAccountPropertie(
               'Saldo: ',
               selectedAccount?.balance?.toString(),
+            )}
+            {displayAccountPropertie(
+              'Sucursal Bancaria: ',
+              selectedAccount?.bankBranch?.toString(),
             )}
           </dl>
         </div>

@@ -1,19 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, Link, Form } from 'react-router-dom';
-import { ROUTES, RESOURCES, ANIMATION } from './utils/constants';
-import { useAuth } from './hooks/useAuth.hook';
-import { motion } from 'framer-motion';
-import {
-  AccountType,
-  type AccountResponse,
-  type CardResponse,
-  type CreateAccountDto,
-  type CreateCardDto,
-} from './services/dto/account.types';
-import { createCard, getUserAccounts } from './services/api.service';
-import displayAccountResponseComponent from './display-account.component';
-import displayCardResponseComponent from './display-card.component';
+import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import displayAccountResponseComponent from "../components/display-account.component";
+import displayCardResponseComponent from "../components/display-card.component";
+import { useAuth } from "../hooks/useAuth.hook";
+import { getUserAccounts, createCard } from "../services/api.service";
+import type { AccountResponse, CardResponse } from "../services/dto/account.types";
+import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
 
+ 
 function AddCard() {
   type FormDeleteState = 'form' | 'submit' | 'success' | 'error';
 

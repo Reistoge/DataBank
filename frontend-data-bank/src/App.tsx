@@ -4,16 +4,18 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom';
-import Login from './Login';
-import Register from './Register';
-import Dashboard from './Dashboard';
+
+
 import { AuthProvider } from './contexts/auth.context';
 import { CARD_ROUTES, ROUTES as CONSTANT_ROUTES } from './utils/constants';
 import ProtectedRoute from './components/protectedRoute.component';
-import AddAccount from './AddAccount';
-import DeleteAccount from './DeleteAccount';
-import AddCard from './AddCard';
-import DeleteCard from './DeleteCard';
+import AddAccount from './pages/AddAccount';
+import AddCard from './pages/AddCard';
+import Dashboard from './pages/Dashboard';
+import DeleteAccount from './pages/DeleteAccount';
+import DeleteCard from './pages/DeleteCard';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (

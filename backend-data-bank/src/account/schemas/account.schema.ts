@@ -21,6 +21,9 @@ export class Account {
   @Prop({ default: true })
   isActive: boolean;
 
+  @Prop({required: true})
+  bankBranch: string;
+
   @Prop({default: AccountState.DEFAULT, enum: AccountState})
   state: AccountState;
 

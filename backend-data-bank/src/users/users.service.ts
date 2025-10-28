@@ -26,6 +26,7 @@ export class UsersService {
     await this.accountService.create({
       userId: userResponse.id,
       type: 'CHECKING' as AccountType,
+      bankBranch: userResponse.region
     });
 
     return userResponse;

@@ -1,5 +1,5 @@
-import type { AccountResponse } from './services/dto/account.types';
-import { translate, accountTranslations, formatAccountValue } from './utils/translations';
+import type { AccountResponse } from '../services/dto/account.types';
+import { translate, accountTranslations, formatAccountValue } from '../utils/translations';
  
 function displayAccountResponseComponent(
   account: AccountResponse,

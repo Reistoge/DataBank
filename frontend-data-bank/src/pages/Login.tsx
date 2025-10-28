@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ROUTES, RESOURCES, ANIMATION } from "./utils/constants";
-import { useAuth } from "./hooks/useAuth.hook";
-import type { LoginCredentials } from "./types/auth.types";
+import { useAuth } from "../hooks/useAuth.hook";
+import type { LoginCredentials } from "../types/auth.types";
+import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
 
  
-
 function Login() {
   const [formData, setFormData] = useState({
     email: "",

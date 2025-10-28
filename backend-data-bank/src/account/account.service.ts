@@ -20,21 +20,24 @@ export class AccountService {
     const balance = 0;
     const type = createAccountDto.type ?? AccountType.CHECKING;
     const isActive = true;
-
-    const newAccount = {
+    const newAccount  = {
       userId: createAccountDto.userId,
       accountNumber,
       balance,
       type,
       isActive,
-    };
+      bankBranch: createAccountDto.bankBranch as string,
+      
+    } as Account;
 
     const savedAccount = await new this.accountModel(newAccount).save();
-
+    
     return {
       ...newAccount,
       id: savedAccount._id.toString(),
+      bankBranch: savedAccount.bankBranch,
     };
+    
   }
 
   async getUserAccounts(userId: string): Promise<AccountResponseDto[]> {
@@ -47,6 +50,7 @@ export class AccountService {
       balance: account.balance,
       type: account.type,
       isActive: account.isActive,
+      bankBranch: account.bankBranch
     }));
   }
 

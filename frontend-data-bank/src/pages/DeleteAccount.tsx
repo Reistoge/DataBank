@@ -1,21 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ROUTES, RESOURCES, ANIMATION } from './utils/constants';
-import { useAuth } from './hooks/useAuth.hook';
-import { motion } from 'framer-motion';
-import {
-  AccountType,
-  type AccountResponse,
-  type CardResponse,
-  type CreateAccountDto,
-} from './services/dto/account.types';
-import {
-  createAccount,
-  deleteAccount,
-  getCards,
-  getUserAccounts,
-} from './services/api.service';
+import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.hook";
+import { getUserAccounts, getCards, deleteAccount } from "../services/api.service";
+import type { AccountResponse, CardResponse } from "../services/dto/account.types";
+import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
 
+ 
 function DeleteAccount() {
   type FormDeleteState = 'form' | 'submit' | 'success' | 'error';
 

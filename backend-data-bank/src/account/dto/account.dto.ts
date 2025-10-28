@@ -3,6 +3,7 @@ import { UserResponse } from 'src/users/dto/user.dto';
 export class CreateAccountDto {
     userId: string;
     type?: AccountType;
+    bankBranch?: string;
 }
 
 export class AccountResponseDto {
@@ -11,7 +12,9 @@ export class AccountResponseDto {
     accountNumber: string;
     balance: number;
     type: AccountType;
+    bankBranch: string;
     isActive: boolean;
+
 }
 export class UpdateAccountDto {
     id: string;
@@ -26,6 +29,7 @@ export class UpdateAccountDto {
 export enum AccountType {
     SAVINGS = 'SAVINGS',
     CHECKING = 'CHECKING',
+    BUSINESS = 'BUSINESS',
 
 }
 export enum AccountState{

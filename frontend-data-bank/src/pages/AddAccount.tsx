@@ -1,20 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ROUTES, RESOURCES, ANIMATION } from './utils/constants';
-import { useAuth } from './hooks/useAuth.hook';
 import { motion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.hook';
+import { createAccount } from '../services/api.service';
 import {
-  AccountType,
   type AccountResponse,
   type CreateAccountDto,
-} from './services/dto/account.types';
-import { createAccount } from './services/api.service';
+  AccountType,
+} from '../services/dto/account.types';
+import { ANIMATION, RESOURCES } from '../utils/constants';
+import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 
 function AddAccount() {
   type CreateAccountState = 'form' | 'submit' | 'success' | 'error';
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateAccountDto>({
     type: 'SAVINGS',
+    bankBranch: '',
   });
 
   const { user } = useAuth();
@@ -23,13 +25,28 @@ function AddAccount() {
 
   const [creationState, setCreationState] =
     useState<CreateAccountState>('form');
+  const [country, setCountry] = useState('');
 
   const navigate = useNavigate();
 
   const rotation = useRef(0);
 
   const [creationError, setCreationError] = useState<Error>();
+  const handleCountryChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      country: value,
+      // Reset region when country changes
+      region: '',
+    }));
+  };
 
+  const handleRegionChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      bankBranch: value,
+    }));
+  };
   function displayAccountPropertie(
     key: string,
     value: string | undefined,
@@ -175,6 +192,25 @@ function AddAccount() {
             />
 
             {AccountTypePicker()}
+            <div className="flex flex-row gap-2">
+              <div>
+                <p>Sucursal bancaria</p>
+                <div className=" grid grid-cols-2 gap-2 h-8 ">
+                  <CountryDropdown
+                    className="center rounded border border-gray-300"
+                    onChange={setCountry}
+                    value={country}
+                  />
+
+                  <RegionDropdown
+                    className="center rounded border border-gray-300"
+                    onChange={handleRegionChange}
+                    value={formData.bankBranch as string}
+                    country={country}
+                  />
+                </div>
+              </div>
+            </div>
             <button
               className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"

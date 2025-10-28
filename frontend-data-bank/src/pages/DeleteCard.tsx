@@ -1,15 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES, RESOURCES, ANIMATION } from './utils/constants';
-import { useAuth } from './hooks/useAuth.hook';
-import { motion } from 'framer-motion';
-import type {
-  AccountResponse,
-  CardResponse,
-} from './services/dto/account.types';
-import { deleteCard, getCards, getUserAccounts } from './services/api.service';
-import displayCardResponseComponent from './display-card.component';
+import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import displayCardResponseComponent from "../components/display-card.component";
+import { useAuth } from "../hooks/useAuth.hook";
+import { getUserAccounts, getCards, deleteCard } from "../services/api.service";
+import type { AccountResponse, CardResponse } from "../services/dto/account.types";
+import { ANIMATION, RESOURCES, ROUTES } from "../utils/constants";
 
+ 
 function DeleteCard() {
   type FormState = 'form' | 'submit' | 'success' | 'error';
 

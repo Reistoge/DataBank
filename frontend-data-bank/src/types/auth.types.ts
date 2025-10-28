@@ -16,6 +16,7 @@ export interface Account {
     accountNumber: string;
     balance: number;
     type: string; // tipo de cuenta
+    bankBranch: string;
     isActive: boolean;
 }
 export interface Card {
@@ -111,3 +112,4 @@ export interface AuthResponse {
     user: User;
     access_token: string;
 }
+ 

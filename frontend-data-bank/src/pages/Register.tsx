@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ROUTES, RESOURCES, ANIMATION } from './utils/constants';
-import { useAuth } from './hooks/useAuth.hook';
-import type { RegisterCredentials } from './types/auth.types';
+ 
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
+import { useAuth } from '../hooks/useAuth.hook';
+import type { RegisterCredentials } from '../types/auth.types';
+import { ROUTES, ANIMATION, RESOURCES } from '../utils/constants';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ function Register() {
     }));
   };
   // Add these new handlers specifically for dropdowns
-  const handleCountryChange = (value: string) => {
+  const   handleCountryChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
       country: value,

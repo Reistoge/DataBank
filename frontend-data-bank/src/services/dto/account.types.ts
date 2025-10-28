@@ -4,6 +4,7 @@ export type AccountResponse = {
     accountNumber: string;
     balance: number;
     type: string;
+    bankBranch: string
     isActive: boolean;
 };
 
@@ -17,6 +18,8 @@ export type CardResponse = {
 
 export type CreateAccountDto = {
     type?: string;
+    bankBranch?: string;
+
 };
 
 export type CreateCardDto = {
@@ -26,11 +29,12 @@ export type CreateCardDto = {
 
 
 export const AccountType = {
-    CHECKING: 'CHECKING',
+    CHECKING: 'CHECKING' ,
     SAVINGS: 'SAVINGS',
+    BUSINESS: 'BUSINESS'
+
 } as const;
 
 export type AccountType = typeof AccountType[keyof typeof AccountType];
-
 
  

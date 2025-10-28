@@ -10,7 +10,9 @@ export const accountTranslations: Translations<AccountResponse> = {
     balance: 'Saldo',
     type: 'Tipo de Cuenta',
     isActive: 'Estado',
+    bankBranch: 'Sucursal Bancaria'
 } satisfies Translations<AccountResponse>;
+
 export const userTranslations: Translations<User> = {
     username: 'Nombre',
     birthday: 'Fecha de Nacimiento',
@@ -29,6 +31,7 @@ export const cardTranslations: Translations<CardResponse> = {
 export const AccountTypeLabels: Record<AccountType, string> = {
     [AccountType.CHECKING]: 'Corriente',
     [AccountType.SAVINGS]: 'Ahorros',
+    [AccountType.BUSINESS]: 'Negocios'
 };
 export function formatAccountValue(key: keyof AccountResponse, value: any): string {
     switch (key) {

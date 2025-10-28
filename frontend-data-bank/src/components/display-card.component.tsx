@@ -1,5 +1,5 @@
-import type { CardResponse } from './services/dto/account.types';
-import { cardTranslations, translate } from './utils/translations';
+import type { CardResponse } from '../services/dto/account.types';
+import { cardTranslations, translate } from '../utils/translations';
  
 
 function showCardPropertie(
