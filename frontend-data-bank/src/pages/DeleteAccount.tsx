@@ -188,6 +188,16 @@ function DeleteAccount() {
     return (
       <>
         <div >
+          <div className="fixed top-4 left-4 z-50">
+            <img 
+              id="go_back"
+              onClick={() => navigate(ROUTES.DASHBOARD)}
+              className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
+              src="../public/go-back.png"
+              alt="go_back"
+              title="Click to return"
+            />
+          </div>
           <label htmlFor="AccountIdPicker" className='font-semibold'>Select Account</label>
           <select
             className="rounded w-full p-2 bg-white text-black font-semibold"
