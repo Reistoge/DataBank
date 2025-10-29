@@ -49,8 +49,9 @@ class AuthService {
             throw new Error('Session expired');
             // send to login ?
         }
-        console.log(`current user response: ${response.json()}` );
-        return response.json();
+        const user: User = await response.json();
+        console.log(`current user response: ${user}` );
+        return user;
 
     }
     async initializeAuth(): Promise<User | null> {

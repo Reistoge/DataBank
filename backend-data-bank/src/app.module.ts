@@ -8,13 +8,14 @@ import { AuthModule } from './auth/auth.module';
 import { CardModule } from './card/card.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { AccountModule } from './account/account.module';
+import { FraudSystemModule } from './fraud-system/fraud-system.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Add this line
     DatabaseModule, 
     UsersModule, 
-    AuthModule, CardModule, TransactionModule, AccountModule
+    AuthModule, CardModule, TransactionModule, AccountModule, FraudSystemModule
   ],
   controllers: [AppController],
   providers: [AppService],

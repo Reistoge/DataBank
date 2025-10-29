@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+ import { TransactionRequestDto, TransactionResponseDto } from './dto/transaction.dto';
+import { FraudSystemService } from 'src/fraud-system/fraud-system.service';
 
 @Injectable()
 export class TransactionService {
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+  constructor(fraudSystem : FraudSystemService){
+    
+  }
+  create(txRequestDto: TransactionRequestDto) : TransactionResponseDto{
+    
+    return new TransactionResponseDto;
   }
 
   findAll() {
@@ -16,9 +20,6 @@ export class TransactionService {
     return `This action returns a #${id} transaction`;
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} transaction`;

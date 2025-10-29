@@ -84,7 +84,7 @@ function AddCard() {
     return (
       <div className="text-green-600 bg-green-50 p-4 rounded-lg">
         <p className="font-semibold">Success!</p>
-        <p>Account deleted successfully</p>
+        <p>Card created successfully</p>
         <button
           onClick={() => navigate(ROUTES.DASHBOARD)}
           className="mt-2 bg-green-600 text-white px-4 py-2 rounded"

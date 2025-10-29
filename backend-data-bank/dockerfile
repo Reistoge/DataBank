@@ -16,7 +16,7 @@ RUN npm run build
 
  
 # Expose application port
-EXPOSE 6000
+EXPOSE 5000
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
