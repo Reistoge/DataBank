@@ -16,20 +16,29 @@ export class CardController {
   @UseGuards(JwtAuthGuard)
   @Get('myCards')
   getAccountCards(@Query('accountId') accountId: string) {
-    return this.cardService.getAccountCards(accountId);
+    return this.cardService.findCardsByAccountId(accountId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('updateCard')
-  update(@Body() updateCardDto: UserUpdateCardReqDto, @Body('accessPassword') accessPassword: string) {
+  async update(@Body() updateCardDto: UserUpdateCardReqDto, @Body('accessPassword') accessPassword: string) {
     // structure: JSON containing the dto and the password above
-    return this.cardService.update(accessPassword, updateCardDto);
+    return await this.cardService.updateCard(accessPassword, updateCardDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':cardId')
-  remove(@Param('cardId') id: string, @Query('password') password: string) {
-    // structure of url : `${API_BASE_URL + CARD_ROUTES.DELETE_CARD}/${cardId}?password=${accessPassword}`, 
-    return this.cardService.removeCard(id,password);
+  async remove(@Param('cardId') id: string, @Query('password') password: string) {
+    // structure of url : `${API_BASE_URL + CARD_ROUTES.DELETE_CARD}/${cardId}?password=${accessPassword}`,
+    try{
+      await this.cardService.deleteCard(id,password);
+      return {statusCode: 200, message: 'Card deleted succesfully'};
+    } catch(err){
+      return{
+        statuscode: 400,
+        message: err instanceof Error ? err.message :  'Failed to delete card'
+      }
+    }
+     
   }
 }

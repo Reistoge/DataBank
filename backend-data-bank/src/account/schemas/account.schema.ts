@@ -9,6 +9,9 @@ export class Account {
   @Prop({ required: true })
   userId: string; // referencia al User
 
+  @Prop({required:true})
+  userNumber:string;
+  
   @Prop({ required: true, unique: true })
   accountNumber: string;
 

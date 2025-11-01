@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Neo4jModule } from 'nest-neo4j';
+import { Neo4jService } from './neo4j/neo4j.service';
 
 @Module({
   imports: [
@@ -25,5 +26,7 @@ import { Neo4jModule } from 'nest-neo4j';
       inject: [ConfigService],
     })
   ],
+  providers: [Neo4jService], 
+  exports: [Neo4jService],    
 })
 export class DatabaseModule { }

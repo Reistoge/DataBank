@@ -7,9 +7,11 @@ export type UserDocument = User & Document;
 @Schema({ timestamps: true })
 export class User {
   _id: Types.ObjectId;
-
   @Prop({ required: true, unique: true })
   username: string;
+
+  @Prop({required:true,unique:true})
+  userNumber:string
 
   @Prop({ required: true })
   password: string; // almacenada con bcrypt

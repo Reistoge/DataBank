@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { UserResponse } from 'src/users/dto/user.dto';
 export class CreateAccountDto {
     userId: string;
+    userNumber:string
     type?: AccountType;
     bankBranch?: string;
 }
@@ -27,9 +28,9 @@ export class UpdateAccountDto {
 }
 
 export enum AccountType {
-    SAVINGS = 'SAVINGS',
-    CHECKING = 'CHECKING',
-    BUSINESS = 'BUSINESS',
+    SAVINGS = 'Savings',
+    CHECKING = 'Checking',
+    BUSINESS = 'Business',
 
 }
 export enum AccountState{

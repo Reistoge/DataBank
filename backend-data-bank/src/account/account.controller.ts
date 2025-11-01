@@ -20,7 +20,7 @@ export class AccountController {
   @UseGuards(JwtAuthGuard)
   @Get('myAccounts')
   getUserAccounts(@Request() req) {
-    return this.accountService.getUserAccounts(req.user.id);
+    return this.accountService.findAccountsByUserId(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -33,7 +33,7 @@ export class AccountController {
   @Delete(':accountId')
   async remove(@Param('accountId') accountId: string) {
     try {
-      await this.accountService.removeAccount(accountId);
+      await this.accountService.deleteAccount(accountId);
       return { statusCode: 200, message: `Account deleted successfully` };
     } catch (error) {
       return { statusCode: 400, message: error.message || 'Failed to delete account' };
