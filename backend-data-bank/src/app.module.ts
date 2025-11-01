@@ -13,8 +13,7 @@ import { Neo4jService } from './database/neo4j/neo4j.service';
 import { GeolocationService } from './geolocation/geolocation.service';
 import { RepositoryService } from './repository/repository.service';
 import { UsersModule } from './users/users.module';
-import { RepositoryModule } from './repository/repository.module';
-
+ 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), 
@@ -25,7 +24,7 @@ import { RepositoryModule } from './repository/repository.module';
     AuthModule, 
     ScheduleModule.forRoot(),
     TransactionModule, 
-    FraudSystemModule, RepositoryModule,
+    FraudSystemModule,
     
   ],
   controllers: [AppController],

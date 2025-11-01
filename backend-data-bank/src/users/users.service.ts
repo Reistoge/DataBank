@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -16,6 +16,7 @@ export class UsersService {
 
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => AccountService))
     private accountService: AccountService,
     private neo4jService: Neo4jService,
   ) { }

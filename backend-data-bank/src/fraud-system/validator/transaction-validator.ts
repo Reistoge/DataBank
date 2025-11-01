@@ -1,24 +1,20 @@
- import { RepositoryService } from "src/repository/repository.service";
+// backend-data-bank/src/fraud-system/validator/transaction-validator.ts
+import { Inject, Injectable } from '@nestjs/common'; // <-- ADD @Injectable
 import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
 import { SuspiciousBehaviour } from "../dto/fraud.dto";
 import { TransactionValidation } from "./transaction-validation";
-import { LowAmountValidation } from "./validations";
-import { Neo4jService } from "src/database/neo4j/neo4j.service";
+// REMOVE all other imports
 
+@Injectable() // <-- MAKE IT INJECTABLE
 export class TransactionValidator {
-    v: TransactionValidation[];
     constructor(
-        neo4jService: Neo4jService,
-        repositoryService: RepositoryService
-    ) {
-        this.v = []
-        this.v.push(new LowAmountValidation(neo4jService, repositoryService));
+        // This is magic: Nest will find all providers
+        // that extend TransactionValidation and inject them as an array.
+        @Inject(TransactionValidation) private readonly v: TransactionValidation[],
+    ) { }
 
-    };
     async runAll(tx: TransactionDocument): Promise<SuspiciousBehaviour[]> {
         const results = await Promise.all(this.v.map(s => s.validate(tx)));
         return results.flat();
     }
-
-
 }

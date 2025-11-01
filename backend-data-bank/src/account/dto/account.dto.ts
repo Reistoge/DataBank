@@ -28,9 +28,9 @@ export class UpdateAccountDto {
 }
 
 export enum AccountType {
-    SAVINGS = 'Savings',
-    CHECKING = 'Checking',
-    BUSINESS = 'Business',
+    SAVINGS = 'SAVINGS',
+    CHECKING = 'CHECKING',
+    BUSINESS = 'BUSINESS',
 
 }
 export enum AccountState{

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Account, AccountDocument } from './schemas/account.schema';
 import { Model } from 'mongoose';
@@ -16,6 +16,7 @@ export class AccountService {
 
   constructor(
     @InjectModel(Account.name) private readonly accountModel: Model<AccountDocument>,
+    @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
     private cardService: CardService,
     //private neo4jService: Neo4jService
@@ -26,7 +27,7 @@ export class AccountService {
 
     const accountNumber = await this.generateUniqueAccountNumber();
     const balance = 0;
-    const type = createAccountDto.type ?? AccountType.CHECKING;
+    const type = createAccountDto.type ?? AccountType.SAVINGS;
     const isActive = true;
     const newAccount = {
       userId: createAccountDto.userId,

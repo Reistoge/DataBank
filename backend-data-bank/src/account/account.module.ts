@@ -11,7 +11,7 @@ import { DatabaseModule } from 'src/database/database.module';
   imports: [
     MongooseModule.forFeature([{ name: Account.name, schema: AccountSchema }]), 
     CardModule, 
-    // forwardRef(() => UsersModule),   
+    forwardRef(() => UsersModule),   
     DatabaseModule   
   ],
   controllers: [AccountController],
