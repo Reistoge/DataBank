@@ -3,10 +3,11 @@ import { TransactionRequestDto } from "src/transaction/dto/transaction.dto";
 import { FraudResult, SuspiciousBehaviour } from "../dto/fraud.dto";
 import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
 import { UserResponse } from "src/users/dto/user.dto";
-import { AccountResponseDto } from "src/account/dto/account.dto";
+import { AccountResponseDto, AccountType } from "src/account/dto/account.dto";
 import { UserDocument } from "src/users/schemas/user.schema";
 import { AccountDocument } from "src/account/schemas/account.schema";
 import { CardDocument } from "src/card/schemas/card.schema";
+import { Result } from "nest-neo4j/dist";
 /**
  * Abstract base class for executing parameterized Cypher queries against a Neo4j service.
  *
@@ -66,14 +67,14 @@ export class CreateUserNode extends CypherQuery<UserDocument> {
     protected get cypher(): string {
         return `
         CREATE (u:User {
-        rut: $rut
-        userNumber: $userNumber
-
+        rut:$rut,
+        userNumber:$userNumber
         })
         RETURN u
         `
     }
     protected get params(): any {
+
         return {
             rut: this.dto.rut,
             userNumber: this.dto.userNumber,
@@ -103,17 +104,22 @@ export class UpdateUserNode extends CypherQuery<UserDocument> {
 export class CreateAccountNode extends CypherQuery<AccountDocument> {
     protected get cypher(): string {
         return `
-        MATCH (u: User)
+        MATCH (u:User)
         WHERE u.userNumber = $userNumber
-        CREATE (a: Account {accountNumber: $accountNumber,type: $accountType, bankBranch:$bankBranch } )
+        CREATE (a:Account {
+            accountNumber: $accountNumber,
+            type: $accountType, 
+            bankBranch: $bankBranch 
+        })
         CREATE (u)-[o:OWNS]->(a)
-        return o`
+        RETURN a, o`
     }
     protected get params(): any {
         return {
             userNumber: this.dto.userNumber,
             accountNumber: this.dto.accountNumber,
             bankBranch: this.dto.bankBranch,
+            accountType: this.dto.type
         }
     }
 
@@ -150,7 +156,7 @@ export class CreateCardNode extends CypherQuery<CardDocument> {
         return `
         MATCH (a: Account)
         WHERE a.accountNumber = $accountNumber
-        CREATE (c: Card {number: $number,type: $cardType} )
+        CREATE (c: Card {number: $number,type: $type} )
         CREATE (a)-[h:HAS]->(c)
         return h`
     }

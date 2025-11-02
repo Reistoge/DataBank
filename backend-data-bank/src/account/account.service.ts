@@ -7,7 +7,7 @@ import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType, Ac
 import { UsersService } from 'src/users/users.service';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
-import { CypherQuery } from 'src/fraud-system/queries/cypher-query';
+import { CreateAccountNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
 
 @Injectable()
 export class AccountService {
@@ -19,7 +19,7 @@ export class AccountService {
     @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
     private cardService: CardService,
-    //private neo4jService: Neo4jService
+    private neo4jService: Neo4jService
   ) { }
 
   async create(createAccountDto: CreateAccountDto): Promise<AccountResponseDto> {
@@ -35,11 +35,20 @@ export class AccountService {
       accountNumber,
       balance,
       type,
-      isActive, 
+      isActive,
       bankBranch: createAccountDto.bankBranch as string,
     } as Account;
-
     const savedAccount = await new this.accountModel(newAccount).save();
+
+    try {
+      this.logger.log('creating account Node');
+      const q: CypherQuery<AccountDocument> = new CreateAccountNode(this.neo4jService, savedAccount);
+      q.execute();
+    } catch (err) {
+      this.logger.error('Error creating node account', err);
+      throw err instanceof Error ? err : new Error('Error creating node account');
+    }
+
  
     return {
       ...newAccount,

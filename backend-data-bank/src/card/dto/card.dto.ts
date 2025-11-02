@@ -15,6 +15,12 @@ export class CardResponse {
 export class CreateCardDto extends PartialType(AccountResponseDto) {
     @IsString()
     password: string;
+    @IsString()
+    accountId: string;
+    @IsString()
+    accountNumber: string;
+
+
 }
 
 export class UserUpdateCardReqDto extends PartialType(CardResponse) {
@@ -23,10 +29,10 @@ export class UserUpdateCardReqDto extends PartialType(CardResponse) {
 
 
 export class CardReqDto extends PartialType(AccountResponseDto) {
-    
+
 }
-export enum CardState{
-    DEFAULT ='DEFAULT',
+export enum CardState {
+    DEFAULT = 'DEFAULT',
     BLOCKED = 'BLOCKED',
     DELETED = 'DELETED',
 }

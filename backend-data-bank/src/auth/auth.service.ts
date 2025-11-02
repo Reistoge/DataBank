@@ -9,6 +9,7 @@ import { UserResponse } from 'src/users/dto/user.dto';
 export class AuthPayloadDto {
   id: string;
   username: string;
+  userNumber:string;
   email: string;
   rut: string;
 }
@@ -89,6 +90,7 @@ export class AuthService {
         username: user.username,
         email: user.email,
         rut: user.rut,
+        userNumber:user.userNumber,
       };
     }
     return null;

@@ -14,6 +14,7 @@ export class AccountController {
     return this.accountService.create({
       ...createAccountDto,
       userId: req.user.id,
+      userNumber: req.user.userNumber,
     });
   }
 

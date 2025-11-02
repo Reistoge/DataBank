@@ -3,12 +3,17 @@ import { CardResponse, CardState, CreateCardDto, UserUpdateCardReqDto } from './
 import { InjectModel } from '@nestjs/mongoose';
 import { Card, CardDocument } from './schemas/card.schema';
 import { Model } from 'mongoose';
+import { Neo4jService } from 'src/database/neo4j/neo4j.service';
+import { CreateCardNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
 
 @Injectable()
 export class CardService {
   private readonly logger = new Logger(CardService.name);
 
-  constructor(@InjectModel(Card.name) private readonly cardModel: Model<CardDocument>) { }
+  constructor(
+    @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
+    private neo4jService: Neo4jService
+  ) { }
 
   async create(createCardDto: CreateCardDto): Promise<CardResponse> {
     const cvv = await this.generateUniqueCvv();
@@ -21,7 +26,16 @@ export class CardService {
     };
 
     const createdCard = await new this.cardModel(newCard).save();
-
+    
+    try{
+      this.logger.log(`Creating card node`);
+      const q : CypherQuery<CardDocument> = new CreateCardNode(this.neo4jService, createdCard);
+      q.execute();
+      
+    }catch(err){
+      this.logger.log(`Error while creating card node err ${err}`);
+      
+    }
     return {
       id: createdCard._id?.toString(),
       cvv: createdCard.cvv,

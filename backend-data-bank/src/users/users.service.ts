@@ -34,15 +34,21 @@ export class UsersService {
     this.logger.log(`User ${savedUser.id} saved with no errors`);
 
     const userResponse = this.toResponseDto(savedUser);
+    try{
+      this.logger.log(`creaing user node`);
+      const q : CypherQuery<UserDocument> = new CreateUserNode(this.neo4jService, savedUser);
+      const records = q.execute();
+      this.logger.log(`records ${records.toString()}`);
 
-    const q : CypherQuery<UserDocument> = new CreateUserNode(this.neo4jService, savedUser);
-    q.execute();
+    }catch(err){
+      this.logger.warn(`Error while storing user in neo4j`);
+    }
 
     // Create default account for user
     await this.accountService.create({
       userId: savedUser.id,
       userNumber: savedUser.userNumber,
-      type: 'CHECKING' as AccountType,
+      type: 'DEBIT' as AccountType,
       bankBranch: userResponse.region
     });
 

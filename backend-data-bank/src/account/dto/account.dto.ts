@@ -31,6 +31,7 @@ export enum AccountType {
     SAVINGS = 'SAVINGS',
     CHECKING = 'CHECKING',
     BUSINESS = 'BUSINESS',
+    DEBIT  = 'DEBIT'
 
 }
 export enum AccountState{

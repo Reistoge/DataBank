@@ -171,6 +171,7 @@ function AddCard() {
       const response = await createCard({
         accountId: selectedAccount.id,
         password: password, // Use the extracted password
+        accountNumber: selectedAccount.accountNumber
       });
 
       console.log('Card Response:', response);

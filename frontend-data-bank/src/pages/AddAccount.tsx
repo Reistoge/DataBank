@@ -8,7 +8,7 @@ import {
   type CreateAccountDto,
   AccountType,
 } from '../services/dto/account.types';
-import { ANIMATION, RESOURCES } from '../utils/constants';
+import { ANIMATION, RESOURCES, ROUTES } from '../utils/constants';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 
 function AddAccount() {

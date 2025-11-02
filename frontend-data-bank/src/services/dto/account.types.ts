@@ -24,7 +24,9 @@ export type CreateAccountDto = {
 
 export type CreateCardDto = {
     accountId: string;
+    accountNumber:string;
     password: string;
+
 };
 
 
