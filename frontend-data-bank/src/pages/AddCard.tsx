@@ -1,14 +1,18 @@
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  FiCreditCard, FiArrowLeft, FiLock, FiCheckCircle, 
+  FiXCircle, FiLoader, FiEye, FiEyeOff 
+} from "react-icons/fi";
 import displayAccountResponseComponent from "../components/display-account.component";
 import displayCardResponseComponent from "../components/display-card.component";
 import { useAuth } from "../hooks/useAuth.hook";
 import { getUserAccounts, createCard } from "../services/api.service";
 import type { AccountResponse, CardResponse } from "../services/dto/account.types";
 import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
+import { colors, components } from "../utils/design-system";
 
- 
 function AddCard() {
   type FormDeleteState = 'form' | 'submit' | 'success' | 'error';
 
@@ -16,111 +20,37 @@ function AddCard() {
     accountNumber: '',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const { user } = useAuth();
-
-  const [accounts, setAccounts] = useState<AccountResponse[]>();
+  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<AccountResponse>();
-  const [cards, setCards] = useState<CardResponse[]>();
   const [creationState, setFormState] = useState<FormDeleteState>('form');
   const [createdCard, setCreatedCard] = useState<CardResponse>();
-
   const navigate = useNavigate();
-
   const rotation = useRef(0);
-
   const [creationError, setCreationError] = useState<Error>();
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const result = await getUserAccounts();
-        setAccounts(result);
+        setAccounts(result || []);
       } catch (err) {
         console.error('Failed to fetch accounts:', err);
       }
     };
-
     fetchAccounts();
-  }, []); // Only run once on mount
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const result = await getUserAccounts();
-        setAccounts(result);
-      } catch (err) {
-        console.error('Failed to fetch accounts:', err);
-      }
-    };
-
-    fetchAccounts();
-  }, [creationState]); // Only run once on mount
+  }, []);
 
   useEffect(() => {
     if (!accounts || !formData.accountNumber) return;
-
     const selectedAccount = accounts.find(
-      (account) => account.accountNumber === formData.accountNumber, // Fixed comparison
+      (account) => account.accountNumber === formData.accountNumber,
     );
-
     setSelectedAccount(selectedAccount);
-  }, [formData.accountNumber, accounts]); // Only depend on what you actually use
+  }, [formData.accountNumber, accounts]);
 
-  useEffect(() => {
-    setCreatedCard(undefined);
-  }, [selectedAccount]); // Fetch cards when selected account changes
-
-  function showFormSubmitLoad() {
-    return (
-      <>
-        <div className="w-16">
-          <img src="public/loading-gif-3262986532.gif" alt="" />
-        </div>
-      </>
-    );
-  }
-  function displaySuccess() {
-    return (
-      <div className="text-green-600 bg-green-50 p-4 rounded-lg">
-        <p className="font-semibold">Success!</p>
-        <p>Card created successfully</p>
-        <button
-          onClick={() => navigate(ROUTES.DASHBOARD)}
-          className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Go to Dashboard
-        </button>
-      </div>
-    );
-  }
-
-  function displayError() {
-    return (
-      <div className="text-red-600 bg-red-50 p-4 rounded-lg">
-        <p className="font-semibold">Error:</p>
-        <p>{creationError?.message || 'An unknown error occurred'}</p>
-      </div>
-    );
-  }
-
-  function displayDoingForm() {
-    return <></>;
-  }
-  function handleAddCardResponse() {
-    switch (creationState) {
-      case 'form':
-        return displayDoingForm();
-      case 'submit':
-        return showFormSubmitLoad();
-      case 'success':
-        return displaySuccess(); // Added success display
-      case 'error':
-        return displayError();
-      default:
-        return null;
-    }
-  }
   const handleRotate = () => {
     const img = document.getElementById('appLogo');
     if (img) {
@@ -129,7 +59,8 @@ function AddCard() {
       img.style.transition = `transform ${ANIMATION.TRANSITION_DURATION} ${ANIMATION.TRANSITION_EASING}`;
     }
   };
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -139,17 +70,6 @@ function AddCard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formElement = e.currentTarget as HTMLFormElement;
-    const f = new FormData(formElement);
-    const entries = Object.fromEntries(f);
-
-    // Extract password directly from FormData
-    const password = entries.password as string;
-
-    console.log('Form Data:', {
-      accountNumber: formData.accountNumber,
-      password: password,
-    });
 
     if (!selectedAccount?.id) {
       setFormState('error');
@@ -157,32 +77,23 @@ function AddCard() {
       return;
     }
 
-    if (!password) {
+    if (!formData.password) {
       setFormState('error');
       setCreationError(new Error('Password is required'));
       return;
     }
 
     setFormState('submit');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     try {
-      // Use the password variable directly, not formData.password
       const response = await createCard({
         accountId: selectedAccount.id,
-        password: password, // Use the extracted password
+        password: formData.password,
         accountNumber: selectedAccount.accountNumber
       });
 
-      console.log('Card Response:', response);
       setCreatedCard(response);
-
-      // Now update formData for display purposes if needed
-      setFormData({
-        accountNumber: '',
-        password: '',
-      });
-
+      setFormData({ accountNumber: '', password: '' });
       setFormState('success');
     } catch (err) {
       setFormState('error');
@@ -190,180 +101,249 @@ function AddCard() {
     }
   };
 
-  function AccountIdPicker() {
+  // Success Display Component
+  function SuccessDisplay() {
     return (
-      <div className="w-full">
-        <div className="fixed top-4 left-4 z-50">
-          <img 
-            id="go_back"
-            onClick={() => navigate(ROUTES.DASHBOARD)}
-            className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
-            src="../public/go-back.png"
-            alt="go_back"
-            title="Click to return"
-          />
-        </div>    
-        <label
-          htmlFor="AccountIdPicker"
-          className="block text-white font-semibold mb-2"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={`${components.card.gradient} text-center`}
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiCheckCircle className="text-4xl text-green-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-4">Card Created Successfully!</h2>
+        <button
+          onClick={() => navigate(ROUTES.DASHBOARD)}
+          className={`${components.button.primary} w-full`}
         >
-          Select Account
-        </label>
-        <select
-          className="w-full rounded p-3 bg-white text-black font-semibold border-2 border-transparent hover:border-gray-300 focus:outline-none focus:border-white transition-all"
-          value={formData.accountNumber}
-          onChange={handleChange}
-          name="accountNumber"
-          id="AccountIdPicker"
+          Go to Dashboard
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Error Display Component
+  function ErrorDisplay() {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-red-500/20 border border-red-400 rounded-xl p-6 text-center backdrop-blur-sm"
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiXCircle className="text-4xl text-red-400" />
+        </div>
+        <h2 className="text-xl font-bold text-red-200 mb-2">Error Creating Card</h2>
+        <p className="text-red-300 mb-4">{creationError?.message || 'An unknown error occurred'}</p>
+        <button
+          onClick={() => setFormState('form')}
+          className={`${components.button.secondary} w-full`}
         >
-          <option value="">Choose an account...</option>
-          {accounts && accounts.length > 0 ? (
-            accounts.map((account) => (
-              <option key={account.accountNumber} value={account.accountNumber}>
-                {account.accountNumber} - {account.type} (${account.balance})
-              </option>
-            ))
-          ) : (
-            <option disabled>No accounts available</option>
-          )}
-        </select>
-      </div>
+          Try Again
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Loading Display Component
+  function LoadingDisplay() {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={`${components.card.gradient} text-center`}
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiLoader className="text-4xl text-blue-400 animate-spin" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Creating Card...</h2>
+        <p className="text-gray-300">Please wait while we process your request</p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black flex flex-col">
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        {/* Form Section - Fixed Position */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+    <div className={`min-h-screen ${colors.gradients.primary} flex flex-col`}>
+      {/* Back Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={() => navigate(ROUTES.DASHBOARD)}
+          className="p-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
         >
-          <form
-            id="add-card-form"
-            onSubmit={handleSubmit}
-            className="flex flex-row justify-center"
-          >
-            <div className="flex flex-col items-center gap-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl p-8 shadow-2xl w-full max-w-sm">
-              {/* Rotating Logo */}
-              <img
-                id="appLogo"
-                onClick={handleRotate}
-                className="w-20 h-20 rounded-xl cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                src={RESOURCES.LOGO}
-                alt="App Logo"
-                title="Click to rotate!"
-              />
+          <FiArrowLeft />
+          Back
+        </button>
+      </div>
 
-              {/* Account Selector */}
-              {AccountIdPicker()}
-
-              {/* Password Input */}
-              <div className="w-full">
-                <label
-                  className="block text-white font-semibold mb-2"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <input
-                  className="w-full rounded p-2 bg-white text-black font-semibold border-2 hover:border-gray-400 transition-all focus:outline-none focus:border-white"
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="Enter password"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                type="submit"
-                disabled={creationState === 'submit'}
-              >
-                {creationState === 'submit' ? 'Creating...' : 'Create Card'}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-
-        {/* Account & Card Display - Below Form */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="w-full max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 px-4"
-        >
-          {/* Selected Account - Left */}
-          {selectedAccount && (
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              className="bg-white rounded-xl shadow-2xl p-6 h-fit"
-            >
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-blue-500">
-                📋 Selected Account
-              </h2>
-              {displayAccountResponseComponent(
-                selectedAccount,
-                'space-y-4',
-                'text-sm font-semibold text-gray-600 uppercase tracking-wide',
-                'text-lg font-bold text-gray-900',
-              )}
-            </motion.div>
-          )}
-
-          {/* New Card - Right */}
-          {createdCard ? (
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              className="bg-gradient-to-br from-green-400 via-emerald-500 to-blue-600 rounded-xl shadow-2xl p-6 h-fit text-white"
-            >
-              <h2 className="text-2xl font-bold mb-6 pb-4 border-b-2 border-white opacity-90">
-                ✨ New Card Created!
-              </h2>
-              {displayCardResponseComponent(
-                createdCard,
-                'space-y-4',
-                'text-sm font-semibold text-white opacity-80 uppercase tracking-wide',
-                'text-lg font-bold text-white',
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              className="bg-gray-800 rounded-xl shadow-2xl p-6 h-fit flex items-center justify-center min-h-48"
-            >
-              <p className="text-gray-400 text-lg text-center">
-                Create a card to see it here ✨
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Response Messages */}
-        {handleAddCardResponse() && (
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
+        {/* Main Content */}
+        {creationState === 'form' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-md mt-8 px-4"
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md"
           >
-            {handleAddCardResponse()}
+            <form onSubmit={handleSubmit}>
+              <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl`}>
+                {/* Logo Section */}
+                <div className="text-center mb-8">
+                  <img
+                    id="appLogo"
+                    onClick={handleRotate}
+                    className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                    src={RESOURCES.LOGO}
+                    alt="App Logo"
+                    title="Click to rotate!"
+                  />
+                  <h1 className="text-2xl font-bold text-white mb-2">Create New Card</h1>
+                  <p className="text-white/80">Add a card to your account</p>
+                </div>
+
+                {/* Form Fields */}
+                <div className="space-y-6">
+                  {/* Account Selector */}
+                  <div>
+                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                      <FiCreditCard />
+                      Select Account
+                    </label>
+                    <select
+                      className={components.input.primary}
+                      value={formData.accountNumber}
+                      onChange={handleChange}
+                      name="accountNumber"
+                      required
+                    >
+                      <option value="">Choose an account...</option>
+                      {accounts.length > 0 ? (
+                        accounts.map((account) => (
+                          <option key={account.accountNumber} value={account.accountNumber}>
+                            {account.accountNumber} - {account.type} (${account.balance})
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled>No accounts available</option>
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Password Input */}
+                  <div>
+                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                      <FiLock />
+                      Account Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        className={`${components.input.primary} pr-10`}
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Enter account password"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    className={`${components.button.primary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    type="submit"
+                    disabled={creationState.toString() === 'submit' || !selectedAccount}
+                  >
+                    <FiCreditCard />
+                    Create Card
+                  </button>
+                </div>
+              </div>
+            </form>
+          </motion.div>
+        )}
+
+        {/* State-based displays */}
+        {creationState === 'submit' && (
+          <div className="w-full max-w-md">
+            <LoadingDisplay />
+          </div>
+        )}
+
+        {creationState === 'success' && (
+          <div className="w-full max-w-md">
+            <SuccessDisplay />
+          </div>
+        )}
+
+        {creationState === 'error' && (
+          <div className="w-full max-w-md">
+            <ErrorDisplay />
+          </div>
+        )}
+
+        {/* Account & Card Display */}
+        {(selectedAccount || createdCard) && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="w-full max-w-6xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 px-4"
+          >
+            {/* Selected Account */}
+            {selectedAccount && (
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4 }}
+                className={components.card.primary}
+              >
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-blue-500 flex items-center gap-2">
+                  <FiCreditCard className="text-blue-600" />
+                  Selected Account
+                </h2>
+                {displayAccountResponseComponent(
+                  selectedAccount,
+                  'space-y-4',
+                  'text-sm font-semibold text-gray-600 uppercase tracking-wide',
+                  'text-lg font-bold text-gray-900',
+                )}
+              </motion.div>
+            )}
+
+            {/* New Card */}
+            {createdCard && (
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4 }}
+                className="bg-gradient-to-br from-green-400 via-emerald-500 to-blue-600 rounded-xl shadow-2xl p-6 h-fit text-white"
+              >
+                <h2 className="text-2xl font-bold mb-6 pb-4 border-b-2 border-white opacity-90 flex items-center gap-2">
+                  <FiCheckCircle />
+                  New Card Created!
+                </h2>
+                {displayCardResponseComponent(
+                  createdCard,
+                  'space-y-4',
+                  'text-sm font-semibold text-white opacity-80 uppercase tracking-wide',
+                  'text-lg font-bold text-white',
+                )}
+              </motion.div>
+            )}
           </motion.div>
         )}
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-4 border-t border-gray-700">
+      <footer className="text-center py-6">
         <a
           href="https://github.com/Reistoge"
           target="_blank"
@@ -376,4 +356,5 @@ function AddCard() {
     </div>
   );
 }
+
 export default AddCard;

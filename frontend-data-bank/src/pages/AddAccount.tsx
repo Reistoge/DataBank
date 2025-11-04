@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  FiPlus, FiArrowLeft, FiCreditCard, FiMapPin,
+  FiCheckCircle, FiXCircle, FiLoader
+} from 'react-icons/fi';
 import { useAuth } from '../hooks/useAuth.hook';
 import { createAccount } from '../services/api.service';
 import {
@@ -10,6 +14,7 @@ import {
 } from '../services/dto/account.types';
 import { ANIMATION, RESOURCES, ROUTES } from '../utils/constants';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
+import { colors, components } from '../utils/design-system';
 
 function AddAccount() {
   type CreateAccountState = 'form' | 'submit' | 'success' | 'error';
@@ -20,24 +25,18 @@ function AddAccount() {
   });
 
   const { user } = useAuth();
-
   const [createdAccount, setNewCreatedAccount] = useState<AccountResponse>();
-
-  const [creationState, setCreationState] =
-    useState<CreateAccountState>('form');
+  const [creationState, setCreationState] = useState<CreateAccountState>('form');
   const [country, setCountry] = useState('');
-
   const navigate = useNavigate();
-
   const rotation = useRef(0);
-
   const [creationError, setCreationError] = useState<Error>();
+
   const handleCountryChange = (value: string) => {
+    setCountry(value);
     setFormData((prev) => ({
       ...prev,
-      country: value,
-      // Reset region when country changes
-      region: '',
+      bankBranch: '', // Reset region when country changes
     }));
   };
 
@@ -47,71 +46,7 @@ function AddAccount() {
       bankBranch: value,
     }));
   };
-  function displayAccountPropertie(
-    key: string,
-    value: string | undefined,
-  ): React.ReactNode {
-    return (
-      <div>
-        <dt className="text-sm font-medium text-gray-500">{key}</dt>
-        <dd className=" text-sm text-gray-900">{value}</dd>
-      </div>
-    );
-  }
-  function showNewAccount() {
-    return (
-      <>
-        <div className="bg-white rounded-lg p-2">
-          <h2 className="text-xl font-bold text-gray-900 ">Cuenta Creada !</h2>
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-6">
-            {displayAccountPropertie(
-              'Numero de cuenta',
-              createdAccount?.accountNumber,
-            )}
-            {displayAccountPropertie('Cuenta: ', createdAccount?.type)}
-            {displayAccountPropertie(
-              'Saldo: ',
-              createdAccount?.balance?.toString(),
-            )}
-          </dl>
-        </div>
-      </>
-    );
-  }
-  function showFormSubmitLoad() {
-    return (
-      <>
-        <div className="w-16">
-          <img src="public/loading-gif-3262986532.gif" alt="" />
-        </div>
-      </>
-    );
-  }
-  function displayError() {
-    return <>{creationError}</>;
-  }
-  function displayDoingForm() {
-    return <></>;
-  }
 
-  function handleCreationResponse() {
-    switch (creationState) {
-      case 'form':
-        // Handle loading state
-        return displayDoingForm();
-      case 'submit':
-        return showFormSubmitLoad();
-      case 'success':
-        // Handle success state
-        return showNewAccount();
-      case 'error':
-        // Handle error state
-
-        return displayError();
-      default:
-        return null;
-    }
-  }
   const handleRotate = () => {
     const img = document.getElementById('appLogo');
     if (img) {
@@ -120,6 +55,7 @@ function AddAccount() {
       img.style.transition = `transform ${ANIMATION.TRANSITION_DURATION} ${ANIMATION.TRANSITION_EASING}`;
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -127,16 +63,14 @@ function AddAccount() {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreationState('submit');
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const userCreateAccountRequest: CreateAccountDto = {
-      ...formData,
-    };
+    
     try {
+      const userCreateAccountRequest: CreateAccountDto = { ...formData };
       const response = await createAccount(userCreateAccountRequest);
-
       setNewCreatedAccount(response);
       setCreationState('success');
     } catch (err) {
@@ -145,107 +79,210 @@ function AddAccount() {
     }
   };
 
-  function AccountTypePicker() {
+  // Success Display Component
+  function SuccessDisplay() {
     return (
-      <>
-        <div>
-          <label htmlFor="AccountTypeSelector">Select Account type</label>
-          <select
-            className="rounded w-full p-2"
-            value={formData.type}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-            name="type"
-            id="AccountTypeSelector"
-          >
-            {Object.entries(AccountType).map(([key, value]) => (
-              <option key={key} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={`${components.card.gradient} text-center`}
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiCheckCircle className="text-4xl text-green-400" />
         </div>
-      </>
+        <h2 className="text-2xl font-bold text-white mb-4">Cuenta Creada!</h2>
+        {createdAccount && (
+          <div className="space-y-3 mb-6">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <dt className="text-gray-300 font-medium">Numero de cuenta</dt>
+                <dd className="text-white font-bold">{createdAccount.accountNumber}</dd>
+              </div>
+              <div>
+                <dt className="text-gray-300 font-medium">Tipo</dt>
+                <dd className="text-white font-bold">{createdAccount.type}</dd>
+              </div>
+              <div className="col-span-2">
+                <dt className="text-gray-300 font-medium">Saldo</dt>
+                <dd className="text-2xl text-green-400 font-bold">${createdAccount.balance}</dd>
+              </div>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => navigate(ROUTES.DASHBOARD)}
+          className={`${components.button.primary} w-full`}
+        >
+          Ir al Dashboard
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Error Display Component
+  function ErrorDisplay() {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-red-500/20 border border-red-400 rounded-xl p-6 text-center backdrop-blur-sm"
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiXCircle className="text-4xl text-red-400" />
+        </div>
+        <h2 className="text-xl font-bold text-red-200 mb-2">Error al Crear Cuenta</h2>
+        <p className="text-red-300 mb-4">{creationError?.message || 'Ocurrió un error desconocido'}</p>
+        <button
+          onClick={() => setCreationState('form')}
+          className={`${components.button.secondary} w-full`}
+        >
+          Intentar de nuevo
+        </button>
+      </motion.div>
+    );
+  }
+
+  // Loading Display Component
+  function LoadingDisplay() {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={`${components.card.gradient} text-center`}
+      >
+        <div className="flex items-center justify-center mb-4">
+          <FiLoader className="text-4xl text-blue-400 animate-spin" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Creando Cuenta...</h2>
+        <p className="text-gray-300">Por favor espera mientras configuramos tu cuenta</p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen ${colors.gradients.primary} flex flex-col`}>
+      {/* Back Button */}
       <div className="fixed top-4 left-4 z-50">
-        <img 
-          id="go_back"
+        <button
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
-          src="../public/go-back.png"
-          alt="go_back"
-          title="Click to return"
-        />
+          className="p-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
+        >
+          <FiArrowLeft />
+          Volver
+        </button>
       </div>
-      <div className="flex flex-col items-center justify-center flex-1">
-        <form onSubmit={handleSubmit} className="flex flex-row">
-          <div
-            id="create-account-form"
-            className="flex flex-col items-center gap-[5vh] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 box-border drop-shadow-sm w-64 p-5 rounded-lg bg-shadow flex-shrink-0 h-4/5 md:w-75 md:gap-10"
+
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
+        {/* Main Content */}
+        {creationState === 'form' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md"
           >
-            {/* Rotating Logo */}
-            <img
-              id="appLogo"
-              onClick={handleRotate}
-              className=" w-1/2 mt-5 md:mt-3 md:mb-0 md:pb-0 rounded-xl cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={RESOURCES.LOGO}
-              alt="App Logo"
-              title="Click to rotate!"
-            />
-
-            {AccountTypePicker()}
-            <div className="flex flex-row gap-2">
-              <div>
-                <p>Sucursal bancaria</p>
-                <div className=" grid grid-cols-2 gap-2 h-8 ">
-                  <CountryDropdown
-                    className="center rounded border border-gray-300"
-                    onChange={setCountry}
-                    value={country}
+            <form onSubmit={handleSubmit}>
+              <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl`}>
+                {/* Logo Section */}
+                <div className="text-center mb-8">
+                  <img
+                    id="appLogo"
+                    onClick={handleRotate}
+                    className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                    src={RESOURCES.LOGO}
+                    alt="App Logo"
+                    title="Click to rotate!"
                   />
+                  <h1 className="text-2xl font-bold text-white mb-2">Crear Nueva Cuenta</h1>
+                  <p className="text-white/80">Agrega una nueva cuenta a tu perfil</p>
+                </div>
 
-                  <RegionDropdown
-                    className="center rounded border border-gray-300"
-                    onChange={handleRegionChange}
-                    value={formData.bankBranch as string}
-                    country={country}
-                  />
+                {/* Form Fields */}
+                <div className="space-y-6">
+                  {/* Account Type */}
+                  <div>
+                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                      <FiCreditCard />
+                      Tipo de Cuenta
+                    </label>
+                    <select
+                      className={components.input.primary}
+                      value={formData.type}
+                      onChange={handleChange}
+                      name="type"
+                      required
+                    >
+                      {Object.entries(AccountType).map(([key, value]) => (
+                        <option key={key} value={value}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Bank Branch Location */}
+                  <div>
+                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                      <FiMapPin />
+                      Ubicación de la Sucursal
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <CountryDropdown
+                        className={`${components.input.primary} cursor-pointer`}
+                        onChange={handleCountryChange}
+                        value={country}
+                      />
+                      <RegionDropdown
+                        className={`${components.input.primary} cursor-pointer`}
+                        onChange={handleRegionChange}
+                        value={formData.bankBranch as string}
+                        country={country}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    className={`${components.button.primary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    type="submit"
+                    disabled={creationState.toString() === 'submit' || !formData.bankBranch}
+                  >
+                    <FiPlus />
+                    Crear Cuenta
+                  </button>
                 </div>
               </div>
-            </div>
-            <button
-              className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              type="submit"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
+            </form>
+          </motion.div>
+        )}
+
+        {/* State-based displays */}
+        {creationState === 'submit' && (
+          <div className="w-full max-w-md">
+            <LoadingDisplay />
           </div>
-        </form>
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="p-3 mt-2"
-        >
-          {handleCreationResponse()}
-        </motion.div>
+        )}
+
+        {creationState === 'success' && (
+          <div className="w-full max-w-md">
+            <SuccessDisplay />
+          </div>
+        )}
+
+        {creationState === 'error' && (
+          <div className="w-full max-w-md">
+            <ErrorDisplay />
+          </div>
+        )}
       </div>
 
-      <footer className="text-center py-4">
+      {/* Footer */}
+      <footer className="text-center py-6">
         <a
           href="https://github.com/Reistoge"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
+          className="text-gray-400 hover:text-white transition-colors duration-200"
         >
           @Ferran Rojas
         </a>

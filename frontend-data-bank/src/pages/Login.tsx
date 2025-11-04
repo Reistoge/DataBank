@@ -1,20 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight } from "react-icons/fi";
 import { useAuth } from "../hooks/useAuth.hook";
 import type { LoginCredentials } from "../types/auth.types";
 import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
+import { colors, components } from "../utils/design-system";
 
- 
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login, isLoading, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
   const rotation = useRef(0);
-  
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,8 +26,6 @@ function Login() {
   useEffect(() => {
     return () => clearError();
   }, [clearError]);
-
-  console.log(`${rotation.current} app re-rendered`);
 
   const handleRotate = () => {
     const img = document.getElementById("appLogo");
@@ -51,90 +50,130 @@ function Login() {
       email: formData.email,
       password: formData.password,
     };
-    await login( userLoginRequest);
+    await login(userLoginRequest);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex flex-col items-center justify-center flex-1">
-        <form onSubmit={handleSubmit} className="flex flex-row">
-          <div
-            id="login-form"
-            className="flex flex-col items-center gap-[5vh] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 box-border drop-shadow-sm w-64 p-5 rounded-lg bg-shadow flex-shrink-0 h-4/5 md:w-75 md:gap-10"
-          >
-            {/* Rotating Logo */}
-            <img
-              id="appLogo"
-              onClick={handleRotate}
-              className="w-1/2 mt-5 md:mt-3 md:mb-0 md:pb-0 rounded-xl cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={RESOURCES.LOGO}
-              alt="App Logo"
-              title="Click to rotate!"
-            />
-
-            {/* Welcome Message */}
-            <h2 className="text-white text-xl font-bold text-center -mt-4">
-              Welcome Back!
-            </h2>
-
-            {/* Error Display */}
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm w-full text-center">
-                {error}
+    <div className={`min-h-screen flex flex-col ${colors.gradients.primary}`}>
+      <div className="flex flex-col items-center justify-center flex-1 px-4">
+        {/* Main Card */}
+        <div className="w-full max-w-md">
+          <form onSubmit={handleSubmit}>
+            <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300`}>
+              {/* Logo Section */}
+              <div className="text-center mb-8">
+                <img
+                  id="appLogo"
+                  onClick={handleRotate}
+                  className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                  src={RESOURCES.LOGO}
+                  alt="App Logo"
+                  title="Click to rotate!"
+                />
+                <h1 className="text-2xl font-bold text-white mb-2">Welcome Back!</h1>
+                <p className="text-white/80">Sign in to your account</p>
               </div>
-            )}
 
-            {/* Form Fields */}
-            <div className="flex flex-col gap-4 w-48 md:w-48 opacity-75">
-              <input
-                name="email"
-                className="p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                placeholder="Email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
-              <input
-                name="password"
-                className="p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                placeholder="Password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
+              {/* Error Display */}
+              {error && (
+                <div className="mb-6 p-4 bg-red-500/20 border border-red-400 rounded-lg text-red-200 text-sm backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <span>⚠️</span>
+                    {error}
+                  </div>
+                </div>
+              )}
 
-              <button
-                className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing In..." : "Sign In"}
-              </button>
+              {/* Form Fields */}
+              <div className="space-y-6">
+                {/* Email Field */}
+                <div>
+                  <label className="block text-white font-medium mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      name="email"
+                      className={`${components.input.primary} pl-10`}
+                      placeholder="Enter your email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
 
-              <p className="text-center text-white">
-                New here? <br />
-                <Link
-                  to={ROUTES.REGISTER}
-                  className="font-bold underline hover:text-gray-200 transition-colors duration-200"
+                {/* Password Field */}
+                <div>
+                  <label className="block text-white font-medium mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      name="password"
+                      className={`${components.input.primary} pl-10 pr-10`}
+                      placeholder="Enter your password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  className={`${components.button.primary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                  type="submit"
+                  disabled={isLoading}
                 >
-                  Register
-                </Link>
-              </p>
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      Sign In
+                      <FiArrowRight />
+                    </>
+                  )}
+                </button>
+
+                {/* Register Link */}
+                <div className="text-center pt-4">
+                  <p className="text-white/80">
+                    New here?{" "}
+                    <Link
+                      to={ROUTES.REGISTER}
+                      className="font-bold text-white hover:text-blue-200 transition-colors duration-200 underline"
+                    >
+                      Create Account
+                    </Link>
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
 
-      <footer className="text-center py-4">
+      {/* Footer */}
+      <footer className="text-center py-6">
         <a
           href="https://github.com/Reistoge"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
+          className="text-gray-400 hover:text-white transition-colors duration-200"
         >
           @Ferran Rojas
         </a>

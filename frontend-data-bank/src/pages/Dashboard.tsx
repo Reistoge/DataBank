@@ -1,5 +1,12 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { 
+  FiUser, FiSettings, FiLogOut, FiPlus, FiTrash2, 
+  FiCreditCard, FiEye, FiEyeOff, FiArrowRight,
+  FiRefreshCw, FiSearch, FiShield, FiActivity,
+  FiDollarSign, FiLock, FiSend, FiClock
+} from 'react-icons/fi';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth.hook';
 import {
   getUserAccounts,
@@ -10,34 +17,30 @@ import type {
   AccountResponse,
   CardResponse,
 } from '../services/dto/account.types';
-import type { User, UserRole } from '../types/auth.types';
+import type { User } from '../types/auth.types';
 import { RESOURCES, ROUTES } from '../utils/constants';
 import { tokenStorage } from '../utils/storage';
 import { translate, userTranslations } from '../utils/translations';
+import { colors, components } from '../utils/design-system';
 
 function Dashboard() {
   const { user, logout } = useAuth();
-
   const rotation = useRef(0);
   const [open, setOpen] = useState(false);
   const [showId, setShowId] = useState(false);
 
-  // accounts
+  // State management
   const [accountsData, setAccountsData] = useState<AccountResponse[]>([]);
-
-  //cards
   const [cardsData, setCardsData] = useState<CardResponse[]>([]);
-
-  const [selectedAccount, setSelectedAccount] =
-    useState<AccountResponse | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<AccountResponse | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardResponse>();
+  const [selectedAccountIndex, setSelectedAccountIndex] = useState<number>(0);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number>(0);
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAccountIndex, setSelectedAccountIndex] = useState<number>(0);
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number>(0);
-  const [selectedCard, setSelectedCard] = useState<CardResponse>();
 
-  // Add this useEffect to update selectedAccount when selectedAccountIndex changes
+  // Effects
   useEffect(() => {
     if (accountsData.length > 0 && selectedAccountIndex < accountsData.length) {
       setSelectedAccount(accountsData[selectedAccountIndex]);
@@ -50,18 +53,12 @@ function Dashboard() {
     }
   }, [selectedCardIndex, cardsData]);
 
-  // Add this useEffect to fetch accounts when component mounts
   useEffect(() => {
-    // make the requests
     const fetchAccounts = async () => {
       try {
-        // set loading state to await the fetch
         setIsLoadingAccounts(true);
         const accounts = await getUserAccounts();
-
         setAccountsData(accounts);
-
-        // Auto-select first account if available
         if (accounts.length > 0) {
           setSelectedAccount(accounts[0]);
         }
@@ -72,15 +69,12 @@ function Dashboard() {
         setIsLoadingAccounts(false);
       }
     };
-
     fetchAccounts();
-  }, []); // Empty dependency array means run once on mount
+  }, []);
 
-  // Add this useEffect to fetch cards when selectedAccountId changes
   useEffect(() => {
     const fetchCards = async () => {
       if (!selectedAccount) return;
-
       try {
         setIsLoadingCards(true);
         const cards = await getCards(selectedAccount.id);
@@ -93,9 +87,8 @@ function Dashboard() {
         setIsLoadingCards(false);
       }
     };
-
     fetchCards();
-  }, [selectedAccount]); // Run when selectedAccount changes
+  }, [selectedAccount]);
 
   const handleRotate = () => {
     const img = document.getElementById('dashboardLogo');
@@ -105,40 +98,65 @@ function Dashboard() {
       img.style.transition = 'transform 1s ease-in-out';
     }
   };
-  async function newSpentLimit(newLimit: number, accesPassword: string) {
-    if (selectedCard) {
-      await updateCardSpentLimit(selectedCard, newLimit, accesPassword);
-      setSelectedCard(selectedCard);
+
+  const loadNextAccount = () => {
+    setSelectedCardIndex(0);
+    if (selectedAccountIndex + 1 >= accountsData.length) {
+      setSelectedAccountIndex(0);
+    } else {
+      setSelectedAccountIndex(selectedAccountIndex + 1);
     }
-  }
+  };
 
-  function userData(label: string, data: string, key: string) {
-    return (
-      <div key={key}>
-        <dt className="underline text-m font-medium text-gray-500">
-          {translate<User>(label as keyof User, userTranslations)}
-        </dt>
-        <dd className="px-1 mt-1 text-sm text-gray-900">{data}</dd>
-      </div>
-    );
-  }
+  const loadNextCard = () => {
+    if (selectedCardIndex + 1 >= cardsData.length) {
+      setSelectedCardIndex(0);
+    } else {
+      setSelectedCardIndex(selectedCardIndex + 1);
+    }
+  };
 
-  function showUserData(user: User | null) {
+  // User Profile Component
+  function UserProfileCard() {
     return (
-      <div className="bg-white shadow rounded-lg p-6 m-2 h-fit">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">User Profile</h2>
-        <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-          {user
-            ? Object.entries(user)
-                .filter(([key]) => key !== 'id') // Filter out 'id' before mapping
-                .map(([key, value]) =>
-                  userData(String(key), String(value), key),
-                )
-            : null}
-          <div key="token">
-            <dt className="text-sm font-medium text-gray-500">BEARER TOKEN</dt>
-            <dd
-              className="mt-1 text-sm text-gray-900 break-all cursor-pointer hover:bg-gray-100 p-2 rounded"
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={components.card.primary}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FiUser className="text-blue-600" />
+            User Profile
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {user && Object.entries(user)
+            .filter(([key]) => key !== 'id')
+            .map(([key, value]) => (
+              <div key={key} className="space-y-1">
+                <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                  {translate<User>(key as keyof User, userTranslations)}
+                </dt>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {key === 'roles' && Array.isArray(value) 
+                    ? value.join(', ') 
+                    : String(value)
+                  }
+                </dd>
+              </div>
+            ))
+          }
+          
+          {/* Token Display */}
+          <div className="col-span-full space-y-1">
+            <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+              Bearer Token
+            </dt>
+            <dd 
+              className="text-sm text-gray-700 break-all cursor-pointer hover:bg-gray-100 p-3 rounded-lg border transition-colors duration-200"
               onClick={() => {
                 const token = tokenStorage.get();
                 if (token) {
@@ -151,134 +169,124 @@ function Dashboard() {
               ••••••••••••••••• (Click to copy)
             </dd>
           </div>
-        </dl>
-      </div>
-    );
-  }
-  function loadNextAccount() {
-    setSelectedCardIndex(0);
-    if (selectedAccountIndex + 1 >= accountsData.length) {
-      setSelectedAccountIndex(0);
-    } else {
-      setSelectedAccountIndex(selectedAccountIndex + 1);
-    }
-  }
-
-  function displayAccountProperties(): React.ReactNode {
-    return selectedAccount
-      ? Object.entries(selectedAccount)
-          .filter(([key]) => key !== 'id' && key !== 'userId')
-          .map(([key, value]) => (
-            <dd key={key} className="mt-1 text-2xl text-gray-900">
-              <dt className="text-lg font-medium text-gray-500">{key}</dt>
-              {String(key) ? String(value) : 'XXXXXXXXXXXXXXXXXXXXXXXX'}
-            </dd>
-          ))
-      : null;
-  }
-
-  function displayAccountPropertie(
-    key: string,
-    value: string | undefined,
-  ): React.ReactNode {
-    // add a stable key on the outer wrapper to satisfy React when children are rendered in sequence
-    return (
-      <div key={key}>
-        <dt className="text-lg font-medium text-gray-500">{key}</dt>
-        <dd className="mt-1 text-2xl text-gray-900">
-          {showId ? value : 'XXXXXXXXXXXXXXXXX'}
-        </dd>
-      </div>
-    );
-  }
-
-  function AccountSection(): React.ReactNode {
-    console.log(`accounts ${accountsData}`);
-
-    return (
-      <div className="relative m-20">
-        {/* Recuadro blanco */}
-
-        <div className="bg-white shadow rounded-3xl p-5">
-          <span
-            id="showInfo"
-            className="absolute right-5 top-5 cursor-pointer hover:shadow-lg transition-shadow duration-200 text-2xl"
-            title="Show Info"
-            onClick={loadNextAccount}
-          >
-            ➡️
-          </span>
-
-          {/* MiCuenta */}
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Mi Cuenta</h2>
-          <img
-            id="showInfo"
-            onClick={() => setShowId(!showId)}
-            className=" w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-            src={'../public/warning-circle.png'}
-            alt="Warning"
-            title="Show Info"
-          />
-          <dl className="grid grid-cols-1 gap-x-4 gap-y-6">
-            {displayAccountPropertie(
-              'Numero de cuenta',
-              selectedAccount?.accountNumber,
-            )}
-            {displayAccountPropertie('Cuenta: ', selectedAccount?.type)}
-            {displayAccountPropertie(
-              'Saldo: ',
-              selectedAccount?.balance?.toString(),
-            )}
-            {displayAccountPropertie(
-              'Sucursal Bancaria: ',
-              selectedAccount?.bankBranch?.toString(),
-            )}
-          </dl>
         </div>
-        {/* Ícono afuera del recuadro */}
-      </div>
+      </motion.div>
     );
   }
 
-  function showLogo(): React.ReactNode {
+  // Account Card Component
+  function AccountCard() {
     return (
-      <div className="flex items-center">
-        <img
-          id="dashboardLogo"
-          onClick={handleRotate}
-          className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-          src={RESOURCES.LOGO}
-          alt="App Logo"
-          title="Click to rotate!"
-        />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className={components.card.primary}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FiCreditCard className="text-green-600" />
+            Mi Cuenta
+            {accountsData.length > 1 && (
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                {selectedAccountIndex + 1} of {accountsData.length}
+              </span>
+            )}
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowId(!showId)}
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Toggle ID visibility"
+            >
+              {showId ? <FiEyeOff /> : <FiEye />}
+            </button>
+            {accountsData.length > 1 && (
+              <button
+                onClick={loadNextAccount}
+                className="p-2 text-blue-600 hover:text-blue-800 rounded-lg hover:bg-blue-50 transition-colors"
+                title="Next account"
+              >
+                <FiArrowRight />
+              </button>
+            )}
+            <button
+              onClick={() => window.location.reload()}
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Refresh"
+            >
+              <FiRefreshCw />
+            </button>
+          </div>
+        </div>
+
+        {isLoadingAccounts ? (
+          <div className="text-center py-8">
+            <FiRefreshCw className="animate-spin text-2xl text-blue-600 mx-auto mb-2" />
+            <p className="text-gray-500">Loading accounts...</p>
+          </div>
+        ) : selectedAccount ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Numero de cuenta
+              </dt>
+              <dd className="text-xl font-bold text-gray-900">
+                {showId ? selectedAccount.accountNumber : 'XXXXXXXXXXXXXXXXX'}
+              </dd>
+            </div>
+            
+            <div className="space-y-1">
+              <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Cuenta
+              </dt>
+              <dd className="text-xl font-semibold text-blue-600">
+                {selectedAccount.type}
+              </dd>
+            </div>
+            
+            <div className="space-y-1">
+              <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Saldo
+              </dt>
+              <dd className="text-2xl font-bold text-green-600">
+                ${selectedAccount.balance.toLocaleString()}
+              </dd>
+            </div>
+            
+            <div className="space-y-1">
+              <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Sucursal Bancaria
+              </dt>
+              <dd className="text-lg font-semibold text-gray-900">
+                {selectedAccount.bankBranch}
+              </dd>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <FiCreditCard className="text-4xl mx-auto mb-2 opacity-50" />
+            <p>No accounts available</p>
+            <Link 
+              to={ROUTES.ADD_ACCOUNT}
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Create your first account
+            </Link>
+          </div>
+        )}
+      </motion.div>
     );
-  }
-  function loadNextCard() {
-    if (selectedCardIndex + 1 >= cardsData.length) {
-      setSelectedCardIndex(0);
-    } else {
-      setSelectedCardIndex(selectedCardIndex + 1);
-    }
   }
 
-  function showCardPropertie(
-    key: string,
-    value: string | undefined,
-  ): React.ReactNode {
-    return (
-      <div key={key}>
-        <dt className="text-m underline text-gray-500 font-semibold">{key}</dt>
-        <dd className=" px-1 mt-1 text-sm text-gray-900">{value}</dd>
-      </div>
-    );
-  }
-  function showCards(): React.ReactNode {
+  // Cards Component
+  function CardsSection() {
     const [newSpentLimit, setNewSpentLimit] = useState('');
     const [accessPassword, setAccessPassword] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
     const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleUpdateSpentLimit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -333,328 +341,435 @@ function Dashboard() {
       }
     };
 
-    console.log(`cards: ${cardsData}`);
-
     return (
-      <div className="bg-white shadow rounded-lg p-6 m-2">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Cards</h2>
-          <button
-            className="hover:bg-gray-300 text-gray-900 px-3 py-1 rounded-lg text-xl transition duration-200"
-            onClick={loadNextCard}
-            disabled={cardsData.length === 0}
-          >
-            ➡️
-          </button>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className={components.card.primary}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FiCreditCard className="text-purple-600" />
+            Cards
+            {cardsData.length > 1 && (
+              <span className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                {selectedCardIndex + 1} of {cardsData.length}
+              </span>
+            )}
+          </h2>
+          <div className="flex items-center gap-2">
+            {cardsData.length > 1 && (
+              <button
+                onClick={loadNextCard}
+                className="p-2 text-purple-600 hover:text-purple-800 rounded-lg hover:bg-purple-50 transition-colors"
+                title="Next card"
+              >
+                <FiArrowRight />
+              </button>
+            )}
+          </div>
         </div>
 
         {cardsData.length === 0 ? (
-          <p className="text-gray-500">No cards for this account</p>
+          <div className="text-center py-8 text-gray-500">
+            <FiCreditCard className="text-4xl mx-auto mb-2 opacity-50" />
+            <p>No cards for this account</p>
+            {selectedAccount && (
+              <Link 
+                to={ROUTES.ADD_CARD}
+                className="text-purple-600 hover:text-purple-800 underline"
+              >
+                Create your first card
+              </Link>
+            )}
+          </div>
         ) : (
           <>
             {/* Card Display */}
-            <div className="m-5 border-2 p-5 rounded">
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            <div className="border border-gray-200 p-4 rounded-lg mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {selectedCard && (
                   <>
-                    {showCardPropertie(
-                      'Numero de Tarjeta',
-                      selectedCard?.number,
-                    )}
-                    {showCardPropertie('CVV', selectedCard?.cvv.toString())}
-                    {showCardPropertie(
-                      'Sanciones',
-                      selectedCard?.penalties.toString(),
-                    )}
-                    {selectedCard?.spentLimit &&
-                    selectedCard.spentLimit >= Number.MAX_VALUE
-                      ? showCardPropertie('Limite de gasto', 'Indefinido')
-                      : showCardPropertie(
-                          'Limite de gasto',
-                          selectedCard?.spentLimit?.toString(),
-                        )}
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        Numero de Tarjeta
+                      </dt>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        {selectedCard.number}
+                      </dd>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        CVV
+                      </dt>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        {selectedCard.cvv}
+                      </dd>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        Sanciones
+                      </dt>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        {selectedCard.penalties}
+                      </dd>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        Limite de gasto
+                      </dt>
+                      <dd className="text-lg font-semibold text-green-600">
+                        {selectedCard.spentLimit >= Number.MAX_VALUE
+                          ? 'Indefinido'
+                          : `$${selectedCard.spentLimit.toLocaleString()}`
+                        }
+                      </dd>
+                    </div>
                   </>
                 )}
-              </dl>
+              </div>
             </div>
 
             {/* Update Spent Limit Form */}
-            <form
-              onSubmit={handleUpdateSpentLimit}
-              className="border-t-2 mt-3 pt-4 space-y-4"
-            >
-              <h3 className="text-lg font-semibold text-gray-900">
+            <form onSubmit={handleUpdateSpentLimit} className="border-t pt-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <FiDollarSign className="text-green-600" />
                 Actualizar Limite de Gasto
               </h3>
 
               {/* Error Message */}
               {updateError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  {updateError}
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span>⚠️</span>
+                    {updateError}
+                  </div>
                 </div>
               )}
 
               {/* Success Message */}
               {updateSuccess && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                  ✓ Limite de gasto actualizado exitosamente
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span>✓</span>
+                    Limite de gasto actualizado exitosamente
+                  </div>
                 </div>
               )}
 
               {/* Amount Input */}
               <div>
-                <label
-                  htmlFor="newSpentLimit"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="newSpentLimit" className="block text-sm font-medium text-gray-700 mb-2">
                   Nuevo Limite
                 </label>
-                <input
-                  type="number"
-                  id="newSpentLimit"
-                  name="newSpentLimit"
-                  value={newSpentLimit}
-                  onChange={(e) => setNewSpentLimit(e.target.value)}
-                  className="text-gray-900 w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Ingrese cantidad"
-                  min="0"
-                  step="0.01"
-                  disabled={isUpdating}
-                />
+                <div className="relative">
+                  <FiDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="number"
+                    id="newSpentLimit"
+                    name="newSpentLimit"
+                    value={newSpentLimit}
+                    onChange={(e) => setNewSpentLimit(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Ingrese cantidad"
+                    min="0"
+                    step="0.01"
+                    disabled={isUpdating}
+                  />
+                </div>
               </div>
 
               {/* Password Input */}
               <div>
-                <label
-                  htmlFor="accessPassword"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="accessPassword" className="block text-sm font-medium text-gray-700 mb-2">
                   Contraseña
                 </label>
-                <input
-                  type="password"
-                  id="accessPassword"
-                  name="accessPassword"
-                  value={accessPassword}
-                  onChange={(e) => setAccessPassword(e.target.value)}
-                  className="text-gray-900 w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Ingrese contraseña"
-                  disabled={isUpdating}
-                />
+                <div className="relative">
+                  <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="accessPassword"
+                    name="accessPassword"
+                    value={accessPassword}
+                    onChange={(e) => setAccessPassword(e.target.value)}
+                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Ingrese contraseña"
+                    disabled={isUpdating}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isUpdating || !selectedCard}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold"
+                className={`${components.button.success} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {isUpdating ? 'Actualizando...' : 'Actualizar'}
+                {isUpdating ? (
+                  <>
+                    <FiRefreshCw className="animate-spin" />
+                    Actualizando...
+                  </>
+                ) : (
+                  <>
+                    <FiActivity />
+                    Actualizar
+                  </>
+                )}
               </button>
             </form>
           </>
         )}
-      </div>
+      </motion.div>
+    );
+  }
+
+  // Transaction Form Component
+  function TransactionForm() {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className={components.card.primary}
+      >
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <FiSend className="text-blue-600" />
+          New Transaction
+        </h3>
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="recipient">
+              Recipient
+            </label>
+            <input
+              type="text"
+              id="recipient"
+              name="recipient"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              placeholder="Enter recipient username or ID"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="amount">
+              Amount
+            </label>
+            <div className="relative">
+              <FiDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="Enter amount"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
+              Description
+            </label>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              placeholder="Optional description"
+            />
+          </div>
+          <button
+            type="submit"
+            className={`${components.button.primary} w-full flex items-center justify-center gap-2`}
+          >
+            <FiSend />
+            Send Transaction
+          </button>
+        </form>
+      </motion.div>
+    );
+  }
+
+  // History Component
+  function HistorySection() {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className={components.card.primary}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <FiClock className="text-orange-600" />
+              History
+            </h2>
+          <button
+            className="p-2 text-orange-600 hover:text-orange-800 rounded-lg hover:bg-orange-50 transition-colors"
+            onClick={() => alert('Show full history')}
+            title="Show full history"
+          >
+            <FiSearch />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <div key={num} className="space-y-1 p-3 bg-gray-50 rounded-lg">
+              <dt className="text-sm font-medium text-gray-600">
+                Transaction {num}
+              </dt>
+              <dd className="text-sm text-gray-900">info{num}</dd>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black">
-      {/* First barra */}
-      <nav className="bg-gradient-to-r from-pinks-500 via-purple-500 to-indigo-500 shadow-lg">
+    <div className={`min-h-screen ${colors.gradients.primary}`}>
+      {/* Navigation Bar */}
+      <nav className={`${colors.gradients.card} shadow-lg`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 items-center h-16">
-            {showLogo()}
-
-            {/* Centro */}
-            <h1 className="text-xl font-bold text-white text-center">
-              DataBank
-            </h1>
-
-            {/* Usuario */}
-
-            <div className="flex justify-end items-center space-x-4 relative">
-              <span className="text-white">Welcome, {user?.username}! 👋</span>
-
-              {/* Icono de Configuración */}
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
               <img
-                id="showInfo"
-                onClick={() => setOpen(!open)}
-                className="w-8 h-8 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                src={'../public/configIMG.png'}
-                alt="Configuracion"
-                title="Configuracion"
+                id="dashboardLogo"
+                onClick={handleRotate}
+                className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-all duration-200"
+                src={RESOURCES.LOGO}
+                alt="App Logo"
+                title="Click to rotate!"
               />
+              <h1 className="text-xl font-bold text-white">DataBank</h1>
+            </div>
 
-              {/* Dropdown */}
-              {open && (
-                <div className="absolute right-0 top-12 bg-white rounded-md shadow-lg py-2 w-40 z-50">
-                  <button
-                    onClick={logout}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                  <Link
-                    to={ROUTES.ADD_ACCOUNT}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
-                  >
-                    Add Account
-                  </Link>
-                  <Link
-                    to={ROUTES.DELETE_ACCOUNT}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
-                  >
-                    Delete Account
-                  </Link>
-                  <Link
-                    to={ROUTES.ADD_CARD}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
-                  >
-                    Add Card
-                  </Link>
-                  <Link
-                    to={ROUTES.DELETE_CARD}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
-                  >
-                    Delete Card
-                  </Link>
-                  {user?.roles.includes('ADMIN')?<Link
-                    to={ROUTES.ADMIN_PANEL}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
-                  >
-                    Admin
-                  </Link> : <></>}
-                  
+            {/* User Menu */}
+            <div className="flex items-center space-x-4 relative">
+              <span className="text-white flex items-center gap-2">
+                <FiUser />
+                Welcome, {user?.username}! 👋
+              </span>
 
+              <div className="relative">
+                <button
+                  onClick={() => setOpen(!open)}
+                  className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
+                >
+                  <FiSettings className="w-5 h-5" />
+                </button>
 
-                </div>
-              )}
+                {open && (
+                  <div className="absolute right-0 top-12 bg-white rounded-lg shadow-xl py-2 w-48 z-50 border">
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiLogOut /> Logout
+                    </button>
+                    <Link
+                      to={ROUTES.ADD_ACCOUNT}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiPlus /> Add Account
+                    </Link>
+                    <Link
+                      to={ROUTES.DELETE_ACCOUNT}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiTrash2 /> Delete Account
+                    </Link>
+                    <Link
+                      to={ROUTES.ADD_CARD}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiCreditCard /> Add Card
+                    </Link>
+                    <Link
+                      to={ROUTES.DELETE_CARD}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiTrash2 /> Delete Card
+                    </Link>
+                    {user?.roles?.includes('ADMIN') && (
+                      <Link
+                        to={ROUTES.ADMIN_PANEL}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <FiShield /> Admin Panel
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-20">
-        <div className="grid grid-cols-2">
-          {AccountSection()}
-          {showUserData(user)}
-          {showCards()}
-          {/* Transaction form */}
-          <div className=" bg-white shadow rounded-lg p-6 m-2">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              New Transaction
-            </h3>
-            <form className="space-y-4">
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700"
-                  htmlFor="recipient"
-                >
-                  Recipient
-                </label>
-                <input
-                  type="text"
-                  id="recipient"
-                  name="recipient"
-                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter recipient username or ID"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700"
-                  htmlFor="amount"
-                >
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  name="amount"
-                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter amount"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium text-gray-700"
-                  htmlFor="description"
-                >
-                  Description
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  name="description"
-                  className="text-gray-900 mt-1 block w-full border bg-white border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Optional description"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+      {/* Error Display */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="bg-red-500/20 border border-red-400 rounded-lg p-4 text-red-200">
+            <div className="flex items-center gap-2">
+              <span>⚠️</span>
+              {error}
+              <button 
+                onClick={() => setError(null)}
+                className="ml-auto text-red-300 hover:text-red-100"
               >
-                Send Transaction
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2">
-          {/* Cards */}
-
-          {/* History */}
-          <div className="bg-white shadow rounded-lg p-6 m-2   ">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">History</h2>
-              <button
-                className="hover:bg-gray-300 text-white px-0 py-0 rounded-lg text-xl transition duration-200"
-                onClick={() => alert('Show full history')}
-              >
-                🔍
+                ✕
               </button>
             </div>
-
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Transaction 1
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">info1</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Transaction 2
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">info2</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Transaction 3
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">info3</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Transaction 4
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">info4</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Transaction 5
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">info5</dd>
-              </div>
-            </dl>
           </div>
         </div>
+      )}
 
-        {/* Transaction form section */}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* First Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <AccountCard />
+          <UserProfileCard />
+        </div>
+
+        {/* Second Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CardsSection />
+          <TransactionForm />
+        </div>
+
+        {/* Third Row */}
+        <div className="grid grid-cols-1 mt-6">
+          <HistorySection />
+        </div>
       </main>
+
+      {/* Footer */}
+      <footer className="text-center py-6">
+        <a
+          href="https://github.com/Reistoge"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-white transition-colors duration-200"
+        >
+          @Ferran Rojas
+        </a>
+      </footer>
     </div>
   );
 }
