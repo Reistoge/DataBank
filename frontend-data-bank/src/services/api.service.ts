@@ -1,6 +1,8 @@
-import { ACCOUNT_ROUTES, API_BASE_URL, CARD_ROUTES } from "../utils/constants";
+import type { Account } from "../types/auth.types";
+import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES } from "../utils/constants";
 import { createAuthHeaders, tokenStorage } from "../utils/storage";
 import type {
+  AccountAdminResponse,
   AccountResponse,
   CardResponse,
   CreateAccountDto,
@@ -49,7 +51,17 @@ export const getCards = async (accountId: string): Promise<CardResponse[]> => {
   if (!response.ok) throw new Error("getCards failed");
   return await response.json();
 };
-
+// Update an existing account for Admin
+export const updateAccount = async (dto: Account): Promise<Account> => {
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.UPDATE_ACCOUNT, {
+    method: "PATCH",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(dto),
+  });
+  if (!response.ok) throw new Error("updateAccount failed");
+  const result = await response.json();
+  return result;
+};
 // Create a new account for the authenticated user
 export const createAccount = async (dto: CreateAccountDto): Promise<AccountResponse> => {
   const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.CREATE_ACCOUNT, {
@@ -111,9 +123,18 @@ export const deleteCard = async (cardId: string, accessPassword: string) => {
   return await response.json();
 };
 
+
 export const updateCardSpentLimit = async (dto: CardResponse, newLimit: number, accessPassword: string) => {
   const copy = { ...dto };
   copy.spentLimit = newLimit;
 
   return await updateCard(copy, accessPassword);
 }
+export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => {
+  const response = await fetch(API_BASE_URL + ADMIN_ROUTES.FIND_ALL_ACCOUNTS, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getAllAccountsAdmin failed");
+  return await response.json();
+};

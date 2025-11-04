@@ -24,7 +24,17 @@ export class UpdateAccountDto {
     balance?: number;
     type?: AccountType;
     isActive?: boolean;
+    
     // Add other fields as needed for updating an account
+}
+export class AccountAdminResponse{
+    account: AccountResponseDto;
+    state: string;
+    createdAt: string;
+    createdAtHours: number;
+    createdAtSeconds: number;
+
+
 }
 
 export enum AccountType {

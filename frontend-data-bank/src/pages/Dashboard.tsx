@@ -10,7 +10,7 @@ import type {
   AccountResponse,
   CardResponse,
 } from '../services/dto/account.types';
-import type { User } from '../types/auth.types';
+import type { User, UserRole } from '../types/auth.types';
 import { RESOURCES, ROUTES } from '../utils/constants';
 import { tokenStorage } from '../utils/storage';
 import { translate, userTranslations } from '../utils/translations';
@@ -519,6 +519,15 @@ function Dashboard() {
                   >
                     Delete Card
                   </Link>
+                  {user?.roles.includes('ADMIN')?<Link
+                    to={ROUTES.ADMIN_PANEL}
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 block"
+                  >
+                    Admin
+                  </Link> : <></>}
+                  
+
+
                 </div>
               )}
             </div>

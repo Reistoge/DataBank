@@ -1,4 +1,5 @@
 
+export type UserRole = 'ADMIN' | 'CLIENT' | 'EXEC';
 
 export interface User {
     id: string;
@@ -9,8 +10,11 @@ export interface User {
     birthday: Date;
     country: string;
     region: string;
+    roles: UserRole[];
     
 }
+
+
 export interface Account {
     id: string
     userId: string; // referencia al User

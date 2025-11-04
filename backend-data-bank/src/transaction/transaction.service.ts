@@ -94,11 +94,11 @@ export class TransactionService {
       };
     }
   }
-  handleInvalidAccountTransaction(txRequestDto: TransactionRequestDto) {
-    
+  async handleInvalidAccountTransaction(tx: TransactionRequestDto) {
+    //
   }
   async handleInvalidAmountTransaction(tx: TransactionRequestDto){
-
+    //
   }
 
 

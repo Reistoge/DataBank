@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Account, AccountDocument } from './schemas/account.schema';
 import { Model } from 'mongoose';
 import { CardService } from 'src/card/card.service';
-import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType, AccountState } from './dto/account.dto';
+import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType, AccountState, AccountAdminResponse } from './dto/account.dto';
 import { UsersService } from 'src/users/users.service';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
@@ -11,6 +11,38 @@ import { CreateAccountNode, CypherQuery } from 'src/fraud-system/queries/cypher-
 
 @Injectable()
 export class AccountService {
+
+  async findAllAdminResponse(): Promise<AccountAdminResponse[]> {
+    try {
+      const accounts: AccountDocument[] = (await this.accountModel.find({}).lean<AccountDocument[]>().exec()) ?? [];
+      return accounts.map((a: AccountDocument) => {
+      const createdAt = a.createdAt ?? "No date";
+      return {
+        account: this.toResponseDto(a),
+        state: a.state,
+        createdAt: createdAt.toString(),
+        createdAtHours: Math.floor((a.createdAt ? a.createdAt.getTime() : 0) / (1000 * 60 * 60)) % 24,
+        createdAtSeconds: Math.floor((a.createdAt ? a.createdAt.getTime() : 0) / 1000) % 60,
+      }
+      });
+    } catch(err) {
+      this.logger.error('Error fetching admin accounts', err);
+      throw err instanceof Error ? err : new Error('Error parsing accounts data');
+    }
+
+  }
+  toResponseDto(a: AccountDocument): AccountResponseDto {
+    return {
+      id: a._id?.toString(),
+      userId: a.userId,
+      accountNumber: a.accountNumber,
+      balance: a.balance,
+      type: a.type,
+      isActive: a.isActive,
+      bankBranch: a.bankBranch
+    }
+  }
+
 
   private readonly logger = new Logger(AccountService.name);
 
@@ -49,7 +81,7 @@ export class AccountService {
       throw err instanceof Error ? err : new Error('Error creating node account');
     }
 
- 
+
     return {
       ...newAccount,
       id: savedAccount._id.toString(),
@@ -164,10 +196,29 @@ export class AccountService {
       isActive: account.isActive,
       bankBranch: account.bankBranch
     }));
-  }
+  }as
+d;
+  async update(updateAccountDto: UpdateAccountDto) : Promise<AccountResponseDto>{
+    const updatedAccount = await this.accountModel.findOneAndUpdate(
+        { _id: updateAccountDto.id }, 
+        updateAccountDto,
+        { new: true } // Return the updated document, not the original
+    ).lean<AccountDocument>().exec();
 
-  async update(updateAccountDto: UpdateAccountDto) {
-    await this.accountModel.findOneAndUpdate({ _id: updateAccountDto.id }, updateAccountDto).exec();
+    if (!updatedAccount) {
+        throw new NotFoundException(`Account with id ${updateAccountDto.id} not found`);
+    }
+
+    // Convert AccountDocument to AccountResponseDto
+    return {
+        id: updatedAccount._id.toString(),
+        userId: updatedAccount.userId,
+        accountNumber: updatedAccount.accountNumber,
+        balance: updatedAccount.balance,
+        type: updatedAccount.type,
+        isActive: updatedAccount.isActive,
+        bankBranch: updatedAccount.bankBranch
+    };
   }
 
   async deleteAccount(accountId: string) {

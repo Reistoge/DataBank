@@ -5,6 +5,8 @@ import { User, UserSchema } from './schemas/user.schema';
 import { UsersController } from './users.controller';
 import { AccountModule } from 'src/account/account.module';
 import { DatabaseModule } from 'src/database/database.module';
+import { AdminService } from './admin/admin.service';
+import { AdminController } from './admin/admin.controller';
 
 @Module({
   imports: [
@@ -13,8 +15,8 @@ import { DatabaseModule } from 'src/database/database.module';
   DatabaseModule
   ],
   
-  providers: [UsersService],
-  controllers: [UsersController],
+  providers: [UsersService, AdminService],
+  controllers: [UsersController, AdminController],
   exports: [UsersService],
 })
 export class UsersModule {}

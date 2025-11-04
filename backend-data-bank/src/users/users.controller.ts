@@ -1,11 +1,17 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Patch, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { ConfigService } from '@nestjs/config';
+import { UserRole } from './schemas/user.schema';
 
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private configService: ConfigService,
+
+  ) { }
 
   @Get('allUsers')
   async findAll() {
@@ -21,4 +27,25 @@ export class UsersController {
       };
     }
   }
-}
+
+  @Patch('giveAdmin/:userRut')
+  async giveAdmin(@Param('userRut') userRut: string, @Query('adminValidator') adminValidator: string) {
+    try {
+      if (adminValidator === this.configService.get<string>('ADMIN_ACCESS')) {
+        const user = await this.userService.getUserDocumentByRut(userRut);
+        const roles = user?.roles;
+        if (!roles?.includes(UserRole.ADMIN)) {
+          roles?.push(UserRole.ADMIN);
+          const newUser = await this.userService.updateUserById(user?.id, user);
+          return { statusCode: 200, message: `User data successfully updated ${newUser}` };
+        } else {
+          return { statusCode: 200, message: `User already has admin role ${user}` };
+        }
+      }
+      return { statusCode: 403, message: 'Unauthorized' };
+    } catch (err) {
+      this.logger.error('Error updating user role', err);
+      return { statusCode: 500, message: 'Failed to update user role' };
+      }
+    }
+  }

@@ -11,6 +11,16 @@ import { Neo4jService } from 'src/database/neo4j/neo4j.service';
   
 @Injectable()
 export class UsersService {
+  async updateUserById(id: string, user: UserDocument | null) {
+      const u = await this.getUserById(id);
+      this.logger.warn(`Updating ${u} with new data: ${user}`);
+      await this.userModel.findByIdAndUpdate(id,{...user}).exec();
+      const newSavedUser = await this.getUserById(id);
+
+      this.logger.log(`data updated succesfully ${newSavedUser}`);
+      return newSavedUser;
+
+  }
 
   private readonly logger = new Logger(UsersService.name);
 
@@ -108,6 +118,7 @@ export class UsersService {
       country: user.country,
       region: user.region,
       birthday: user.birthday,
+      roles: user.roles,
     };
   }
 }

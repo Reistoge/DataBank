@@ -6,10 +6,12 @@ import type { User } from "../types/auth.types";
 type Translations<T> = Partial<Record<keyof T, string>>;
 
 export const accountTranslations: Translations<AccountResponse> = {
+    id: 'id',
+    userId:' id Usuario',
     accountNumber: 'Número de Cuenta',
     balance: 'Saldo',
     type: 'Tipo de Cuenta',
-    isActive: 'Estado',
+    isActive: 'Activa',
     bankBranch: 'Sucursal Bancaria'
 } satisfies Translations<AccountResponse>;
 
@@ -36,7 +38,7 @@ export const AccountTypeLabels: Record<AccountType, string> = {
 export function formatAccountValue(key: keyof AccountResponse, value: any): string {
     switch (key) {
         case 'balance':
-            return `$${Number(value).toFixed(2)}`;
+            return `$${(value).toFixed(2)}`;
         case 'isActive':
             return value ? 'Activa' : 'Inactiva';
         case "type": {

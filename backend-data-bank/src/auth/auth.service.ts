@@ -4,14 +4,17 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
-import { UserDocument } from 'src/users/schemas/user.schema';
+import { UserDocument, UserRole } from 'src/users/schemas/user.schema';
 import { UserResponse } from 'src/users/dto/user.dto';
+
 export class AuthPayloadDto {
   id: string;
   username: string;
   userNumber:string;
   email: string;
   rut: string;
+  roles: UserRole[];
+  
 }
 @Injectable()
 export class AuthService {
@@ -91,6 +94,7 @@ export class AuthService {
         email: user.email,
         rut: user.rut,
         userNumber:user.userNumber,
+        roles: user.roles
       };
     }
     return null;
@@ -110,6 +114,7 @@ export class AuthService {
       birthday: doc.birthday,
       country: doc.country,
       region: doc.region,
+      roles: doc.roles
     };
 
   }

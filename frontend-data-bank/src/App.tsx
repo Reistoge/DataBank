@@ -5,7 +5,6 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-
 import { AuthProvider } from './contexts/auth.context';
 import { CARD_ROUTES, ROUTES as CONSTANT_ROUTES } from './utils/constants';
 import ProtectedRoute from './components/protectedRoute.component';
@@ -16,6 +15,7 @@ import DeleteAccount from './pages/DeleteAccount';
 import DeleteCard from './pages/DeleteCard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (
@@ -67,6 +67,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DeleteCard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={CONSTANT_ROUTES.ADMIN_PANEL}
+              element={
+                <ProtectedRoute>
+                  <AdminPanel />
                 </ProtectedRoute>
               }
             />

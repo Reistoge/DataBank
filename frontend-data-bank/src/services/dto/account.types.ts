@@ -21,6 +21,14 @@ export type CreateAccountDto = {
     bankBranch?: string;
 
 };
+export type AccountAdminResponse = {
+    account: AccountResponse;
+    state: string;
+    createdAt: string;
+    createdAtHours: number;
+    createdAtSeconds: number;
+
+}
 
 export type CreateCardDto = {
     accountId: string;

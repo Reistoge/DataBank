@@ -8,6 +8,14 @@ Content-Type: application/json
   "email": "testuser@email.com",
   "password": "password123"
 }
+### Request admin
+PATCH http://localhost:5000/api/users/giveAdmin/123456789?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Content-Type: application/json
+
+###
+
+GET http://localhost:5000/api/account/findAll
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MDk0OTRiYjljNTRiYTQ1ODVkMGJmYyIsImlhdCI6MTc2MjIxNjI2NywiZXhwIjoxNzYyMjE3MTY3fQ.XlGY-Namft-X_pkRObz8WrpyjDOy59UqhkT-wigDWPo
 
 ### Login
 POST http://localhost:5000/api/auth/login
@@ -29,7 +37,7 @@ Content-Type: application/json
 
 ### Get profile (requires JWT)
 GET http://localhost:5000/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MDk0OTRiYjljNTRiYTQ1ODVkMGJmYyIsImlhdCI6MTc2MjIxNjI2NywiZXhwIjoxNzYyMjE3MTY3fQ.XlGY-Namft-X_pkRObz8WrpyjDOy59UqhkT-wigDWPo
 
 ### Logout (requires JWT)
 POST http://localhost:5000/api/auth/logout
