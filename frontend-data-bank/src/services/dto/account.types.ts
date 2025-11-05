@@ -41,7 +41,8 @@ export type CreateCardDto = {
 export const AccountType = {
     CHECKING: 'CHECKING' ,
     SAVINGS: 'SAVINGS',
-    BUSINESS: 'BUSINESS'
+    BUSINESS: 'BUSINESS',
+    DEBIT: 'DEBIT',
 
 } as const;
 

@@ -59,18 +59,18 @@ function Login() {
         {/* Main Card */}
         <div className="w-full max-w-md">
           <form onSubmit={handleSubmit}>
-            <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300`}>
+            <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 `}>
               {/* Logo Section */}
               <div className="text-center mb-8">
                 <img
                   id="appLogo"
                   onClick={handleRotate}
-                  className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                  className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-1"
                   src={RESOURCES.LOGO}
                   alt="App Logo"
                   title="Click to rotate!"
                 />
-                <h1 className="text-2xl font-bold text-white mb-2">Welcome Back!</h1>
+                <h1 className="text-2xl font-bold text-white mb-0">Welcome Back!</h1>
                 <p className="text-white/80">Sign in to your account</p>
               </div>
 
@@ -85,7 +85,7 @@ function Login() {
               )}
 
               {/* Form Fields */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Email Field */}
                 <div>
                   <label className="block text-white font-medium mb-2">

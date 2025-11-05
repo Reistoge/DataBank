@@ -89,6 +89,7 @@ export class AccountService {
     };
   }
   async settleTransaction(senderId: string, receiverId: string, amount: number) {
+    this.logger.log(`Updating users balance`);
     if (amount <= 0) {
       throw new Error('Amount must be greater than zero');
     }

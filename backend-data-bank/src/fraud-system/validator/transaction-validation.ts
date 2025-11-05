@@ -4,7 +4,7 @@ import { SuspiciousBehaviour } from "../dto/fraud.dto";
 
 @Injectable()
 export abstract class TransactionValidation {
-
+    
     abstract validate(tx: TransactionDocument): Promise<SuspiciousBehaviour[]>;
 
 }

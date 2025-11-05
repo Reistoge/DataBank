@@ -86,26 +86,26 @@ function Register() {
     <div className={`min-h-screen flex flex-col ${colors.gradients.primary}`}>
       <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
         {/* Main Card */}
-        <div className="w-full max-w-lg">
-          <form onSubmit={handleSubmit}>
+        <div className=" text-sm w-full max-w-lg ">
+          <form  onSubmit={handleSubmit}>
             <div className={`${colors.gradients.card} rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300`}>
               {/* Logo Section */}
               <div className="text-center mb-8">
-                <img
+                {/* <img
                   id="appLogo"
                   onClick={handleRotate}
                   className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
                   src={RESOURCES.LOGO}
                   alt="App Logo"
                   title="Click to rotate!"
-                />
+                /> */}
                 <h1 className="text-3xl font-bold text-white mb-2">Join DataBank!</h1>
                 <p className="text-white/80">Create your account today</p>
               </div>
 
               {/* Error Display */}
               {error && (
-                <div className="mb-6 p-4 bg-red-500/20 border border-red-400 rounded-lg text-red-200 text-sm backdrop-blur-sm">
+                <div className="mb-6 p-2 bg-red-500/20 border border-red-400 rounded-lg text-red-200 text-sm backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <span>⚠️</span>
                     {error}
@@ -114,9 +114,9 @@ function Register() {
               )}
 
               {/* Form Fields */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {/* Name and RUT Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div>
                     <label className="block text-white font-medium mb-2">
                       Username
@@ -125,7 +125,7 @@ function Register() {
                       <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         name="username"
-                        className={`${components.input.primary} pl-10`}
+                        className={`${components.input.primary} pl-10 py-2`}
                         placeholder="Enter username"
                         type="text"
                         value={formData.username}
@@ -142,7 +142,7 @@ function Register() {
                     </label>
                     <input
                       name="rut"
-                      className={components.input.primary}
+                      className={`${components.input.primary} py-2`}
                       placeholder="Enter RUT"
                       type="text"
                       value={formData.rut}
@@ -163,7 +163,7 @@ function Register() {
                       <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         name="email"
-                        className={`${components.input.primary} pl-10`}
+                        className={`${components.input.primary} py-2 pl-10`}
                         placeholder="Enter email"
                         type="email"
                         value={formData.email}
@@ -182,7 +182,7 @@ function Register() {
                       <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         name="password"
-                        className={`${components.input.primary} pl-10 pr-10`}
+                        className={`${components.input.primary} py-2 pl-10 pr-10`}
                         placeholder="Enter password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
@@ -210,7 +210,7 @@ function Register() {
                     <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       name="birthday"
-                      className={`${components.input.primary} pl-10`}
+                      className={`${components.input.primary} pl-10 py-2`}
                       type="date"
                       value={formData.birthday}
                       onChange={handleChange}
@@ -228,13 +228,13 @@ function Register() {
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CountryDropdown
-                      className={`${components.input.primary} cursor-pointer`}
+                      className={`${components.input.primary} cursor-pointer py-2`}
                       onChange={handleCountryChange}
                       value={formData.country}
                       disabled={isLoading}
                     />
                     <RegionDropdown
-                      className={`${components.input.primary} cursor-pointer`}
+                      className={`${components.input.primary} cursor-pointer py-2`}
                       onChange={handleRegionChange}
                       country={formData.country}
                       value={formData.region}

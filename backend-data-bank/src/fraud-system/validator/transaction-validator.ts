@@ -1,5 +1,5 @@
 // backend-data-bank/src/fraud-system/validator/transaction-validator.ts
-import { Inject, Injectable } from '@nestjs/common'; // <-- ADD @Injectable
+import { Inject, Injectable, Logger } from '@nestjs/common'; // <-- ADD @Injectable
 import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
 import { SuspiciousBehaviour } from "../dto/fraud.dto";
 import { TransactionValidation } from "./transaction-validation";
@@ -7,14 +7,16 @@ import { TransactionValidation } from "./transaction-validation";
 
 @Injectable() // <-- MAKE IT INJECTABLE
 export class TransactionValidator {
+    private readonly logger = new Logger(TransactionValidation.name);
     constructor(
-        // This is magic: Nest will find all providers
-        // that extend TransactionValidation and inject them as an array.
-        @Inject(TransactionValidation) private readonly v: TransactionValidation[],
+        @Inject('TRANSACTION_VALIDATIONS') 
+        private validations: TransactionValidation[]
     ) { }
 
     async runAll(tx: TransactionDocument): Promise<SuspiciousBehaviour[]> {
-        const results = await Promise.all(this.v.map(s => s.validate(tx)));
+        this.logger.log(`Running all validations`);
+        const results = await Promise.all(this.validations.map(s => s.validate(tx)));
+        this.logger.log(`finished`);
         return results.flat();
     }
 }

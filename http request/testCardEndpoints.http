@@ -1,4 +1,8 @@
  ### Register a new user
+
+
+
+
 POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
@@ -9,7 +13,7 @@ Content-Type: application/json
   "password": "password123"
 }
 ### Request admin
-PATCH http://localhost:5000/api/users/giveAdmin/123456789?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+PATCH http://localhost:5000/api/users/giveAdmin/216426681?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 Content-Type: application/json
 
 ###
@@ -41,14 +45,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ### Logout (requires JWT)
 POST http://localhost:5000/api/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
 
 ### Get all users
 GET http://localhost:5000/api/users/allUsers
 
 ### Create account (requires JWT)
 POST http://localhost:5000/api/account
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
 Content-Type: application/json
 
 {
@@ -65,7 +69,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ### Update account (requires JWT)
 PATCH http://localhost:5000/api/account/updateAccount
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
 Content-Type: application/json
 
 {
@@ -81,7 +85,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ### Create card (requires JWT)
 POST http://localhost:5000/api/card
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
 Content-Type: application/json
 
 {
@@ -95,7 +99,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ### Update card (requires JWT)
 PATCH http://localhost:5000/api/card/updateCard
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
 Content-Type: application/json
 
 {
@@ -109,4 +113,24 @@ Content-Type: application/json
 
 ### Delete card (requires JWT)
 DELETE http://localhost:5000/api/card/68d99221cabf2dde826ed1d5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZWRjZThlMGFhOWEwZTZjYzc2NzgyMSIsImlhdCI6MTc2MDQ2ODc2MywiZXhwIjoxNzYwNDY5NjYzfQ.I7SOcAuqmfDLIeEtwLhhymFfP6YfATkPyueBzP4mRpw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+
+###
+POST http://localhost:5000/api/transaction
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Content-Type: application/json
+
+{
+    "senderAccountNumber": 6479284889,
+    "receiverAccountNumber":7883959153,
+    "amount": 100 ,
+    "type": "PAYMENT" ,
+    "merchantCategory": "GROCERIES" ,
+    "location": "MIAMI",
+    "currency": "USD",
+    "description": "lorem ipsum",
+    "receiverContact": "lorem ipsum",
+    "receiverEmail": "lorem ipsum",
+    "device": "lorem ipsum",
+    "ipAddress":"lorem ipsum" 
+}

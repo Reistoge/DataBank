@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Account } from "src/account/schemas/account.schema"
-import { PredictionInput, PredictionOutput } from "src/fraud-system/dto/prediction.dto"
+import { FraudResult } from 'src/fraud-system/dto/fraud.dto';
+import { PredictionInput } from "src/fraud-system/dto/prediction.dto"
 
 /**
  * @Def
@@ -16,8 +17,9 @@ export class TransactionSnapshot {
     senderAccount : Account
     receiverAccount: Account
     request: TransactionRequestDto  
+    
     predictionInput?: PredictionInput
-    predictionOutput?: PredictionOutput
+    fraudResult?: FraudResult
 
 
 }

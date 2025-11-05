@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, UseGuards, Logger, HttpStatus } fro
 import { TransactionService } from './transaction.service';
 import { TransactionRequestDto, TransactionResponseDto } from './dto/transaction.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RoleGuard } from 'src/auth/roles/roles.guard';
 
 @Controller('transaction')
 export class TransactionController {
@@ -22,8 +23,14 @@ export class TransactionController {
     };
   }
 
-
   @UseGuards(JwtAuthGuard)
+  @Get(':accountNumber/history')
+  async getTransactionHistory(@Param('accountNumber') accountNumber: string) {
+    return this.transactionService.getTransactionHistory(accountNumber);
+  }
+
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     this.logger.log(`Fetching transaction ${id}`);
@@ -35,7 +42,7 @@ export class TransactionController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
   async findAll() {
     this.logger.log('Fetching all transactions');

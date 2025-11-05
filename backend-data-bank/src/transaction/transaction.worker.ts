@@ -22,16 +22,21 @@ export class TransactionWorker {
       const pendingTx = await this.txModel.findOne({ status: TransactionStatus.PENDING }).exec();
 
       if (!pendingTx) {
+        
         return;
       }
+      else if(pendingTx.invalidDetails){
+        await this.fraudSystemService.createInvalidTransactionNode(pendingTx);
+      }
+
 
       this.logger.log(`Processing transaction ${pendingTx._id}`);
-
+ 
       // 1. Validate with fraud system
       const fraudResult = await this.fraudSystemService.validate(pendingTx);
 
       // 2. Update snapshot with fraud results
-      pendingTx.snapshot.predictionOutput = fraudResult.predictionOutput;
+      pendingTx.snapshot.fraudResult = fraudResult;
       pendingTx.snapshot.isFraud = fraudResult.isFraud;
 
       if (fraudResult.isFraud) {
@@ -48,6 +53,10 @@ export class TransactionWorker {
       // 4. Create Neo4j node for analysis
       try {
         await this.fraudSystemService.createTransactionNode(pendingTx);
+        if(pendingTx.snapshot.fraudResult.behaviours.length > 0){
+          await this.fraudSystemService.updateUserSuspiciousBehaviour(pendingTx);
+        }
+ 
       } catch (neo4jError) {
         this.logger.error(`Neo4j node creation failed for ${pendingTx._id}:`, neo4jError);
         // Don't fail the transaction for Neo4j errors

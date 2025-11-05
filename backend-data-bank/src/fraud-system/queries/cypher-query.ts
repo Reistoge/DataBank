@@ -58,7 +58,7 @@ export abstract class CypherQuery<T> {
         this.service = neo4jService;
         this.dto = dto;
     }
-    async execute() {
+    async execute(): Promise<any> {
         this.records = await this.service.query(this.cypher, this.params);
         return this.records;
     }
@@ -149,7 +149,7 @@ export class UpdateAccountNode extends CypherQuery<AccountDocument> {
     }
 
 }
- 
+
 
 export class CreateCardNode extends CypherQuery<CardDocument> {
     protected get cypher(): string {
@@ -157,7 +157,7 @@ export class CreateCardNode extends CypherQuery<CardDocument> {
         MATCH (a: Account)
         WHERE a.accountNumber = $accountNumber
         CREATE (c: Card {number: $number,type: $type} )
-        CREATE (a)-[h:HAS]->(c)
+        CREATE (c)-[h:BELONGS]->(a)
         return h`
     }
     protected get params(): any {
@@ -169,7 +169,7 @@ export class CreateCardNode extends CypherQuery<CardDocument> {
         }
     }
 }
- 
+
 export class UpdateCardNode extends CypherQuery<CardDocument> {
     protected get cypher(): string {
         return `
@@ -193,111 +193,187 @@ export class UpdateCardNode extends CypherQuery<CardDocument> {
 export class CreateTransactionNode extends CypherQuery<TransactionDocument> {
 
     get cypher() {
-        return ``
-        // return `
-        //     // First, find or create User nodes based on account ownership
-        //     MERGE (senderUser:User {id: $senderUserId})
-        //     ON CREATE SET 
-        //         senderUser.createdAt = datetime(),
-        //         senderUser.type = 'USER'
+        return `
+            MATCH (sender:Account) WHERE sender.accountNumber = $senderAccountNumber
+            MATCH (receiver:Account) WHERE receiver.accountNumber = $receiverAccountNumber
+
+            CREATE (sender)-[tx:TRANSACTION {
+                transactionId: $transactionId,
+                snapshot: $snapshot,
+                status: $status,
+                invalidDetails: $invalidDetails,
+                createdAt: $createdAt,
             
-        //     MERGE (receiverUser:User {id: $receiverUserId}) 
-        //     ON CREATE SET 
-        //         receiverUser.createdAt = datetime(),
-        //         receiverUser.type = 'USER'
-            
-        //     // Find or create Account nodes
-        //     MERGE (senderAccount:Account {
-        //         accountNumber: $senderAccountNumber,
-        //         userId: $senderUserId
-        //     })
-        //     ON CREATE SET 
-        //         senderAccount.createdAt = datetime(),
-        //         senderAccount.type = $senderAccountType,
-        //         senderAccount.bankBranch = $senderBankBranch
-            
-        //     MERGE (receiverAccount:Account {
-        //         accountNumber: $receiverAccountNumber,
-        //         userId: $receiverUserId
-        //     })
-        //     ON CREATE SET 
-        //         receiverAccount.createdAt = datetime(),
-        //         receiverAccount.type = $receiverAccountType,
-        //         receiverAccount.bankBranch = $receiverBankBranch
-            
-        //     // Create the Transaction node
-        //     CREATE (transaction:Transaction {
-        //         id: $transactionId,
-        //         amount: $amount,
-        //         type: $transactionType,
-        //         status: $status,
-        //         description: $description,
-        //         merchantCategory: $merchantCategory,
-        //         location: $location,
-        //         currency: $currency,
-        //         device: $device,
-        //         createdAt: datetime($createdAt),
-        //         date: $transactionDate,
-        //         time: $transactionTime
-        //     })
-            
-        //     // Create relationships
-        //     CREATE (senderUser)-[:OWNS]->(senderAccount)
-        //     CREATE (receiverUser)-[:OWNS]->(receiverAccount)
-        //     CREATE (senderAccount)-[:SENT {
-        //         amount: $amount,
-        //         timestamp: datetime($createdAt),
-        //         status: $status,
-        //         transactionType: $transactionType
-        //     }]->(transaction)
-        //     CREATE (transaction)-[:RECEIVED_BY {
-        //         amount: $amount,
-        //         timestamp: datetime($createdAt),
-        //         status: $status
-        //     }]->(receiverAccount)
-        //     CREATE (senderUser)-[:INITIATED {
-        //         amount: $amount,
-        //         timestamp: datetime($createdAt)
-        //     }]->(transaction)
-        //     CREATE (transaction)-[:BENEFITED]->(receiverUser)
-            
-        //     // Return the created transaction and related nodes
-        //     RETURN transaction, senderAccount, receiverAccount, senderUser, receiverUser
-        // `;
+            }]->(receiver)
+
+            RETURN sender, tx, receiver;
+        `
     }
 
     get params() {
         const snapshot = this.dto.snapshot;
-        const request = snapshot.request;
 
         return {
-            // // Transaction data
-            // transactionId: this.dto.id.toString(),
-            // amount: request.amount,
-            // transactionType: request.type,
-            // status: this.dto.status,
-            // description: request.description,
-            // merchantCategory: request.merchantCategory,
-            // location: request.location,
-            // currency: request.currency,
-            // device: request.device,
-            // createdAt: new Date().toISOString(),
-            // transactionDate: new Date().toISOString(),
-            // transactionTime: new Date().toTimeString().split(' ')[0],
+            // Core transaction properties from schema
+            transactionId: this.dto.id.toString(),
+            snapshot: snapshot, // Complete snapshot object
+            status: this.dto.status, // TransactionStatus enum value
+            invalidDetails: this.dto.invalidDetails || null, // Optional InvalidDetails object
 
-            // // Sender data
-            // senderUserId: snapshot.senderAccount.userId,
-            // senderAccountNumber: snapshot.senderAccount.accountNumber,
-            // senderAccountType: snapshot.senderAccount.type,
-            // senderBankBranch: snapshot.senderAccount.bankBranch,
+            // Metadata
+            createdAt: new Date().toISOString(),
 
-            // // Receiver data
-            // receiverUserId: snapshot.receiverAccount.userId,
-            // receiverAccountNumber: snapshot.receiverAccount.accountNumber,
-            // receiverAccountType: snapshot.receiverAccount.type,
-            // receiverBankBranch: snapshot.receiverAccount.bankBranch,
+            // Account identifiers for relationship matching
+            senderAccountNumber: snapshot.senderAccount.accountNumber,
+            receiverAccountNumber: snapshot.receiverAccount.accountNumber,
         };
     }
 }
 
+export class CreateInvalidTransactionNode extends CypherQuery<TransactionDocument> {
+
+    get cypher() {
+        return `
+            MATCH (sender:Account) WHERE sender.accountNumber = $senderAccountNumber
+            MATCH (receiver:Account) WHERE receiver.accountNumber = $receiverAccountNumber
+
+            CREATE (sender)-[tx:INVALID_TRANSACTION {
+                transactionId: $transactionId,
+                snapshot: $snapshot,
+                status: $status,
+                invalidDetails: $invalidDetails,
+                createdAt: $createdAt,
+             }]->(receiver)
+
+            RETURN sender, tx, receiver;
+        `
+    }
+
+    get params() {
+        const snapshot = this.dto.snapshot;
+
+        return {
+            // Core transaction properties from schema
+            transactionId: this.dto.id.toString(),
+            snapshot: snapshot, // Complete snapshot object
+            status: this.dto.status, // TransactionStatus enum value
+            invalidDetails: this.dto.invalidDetails, // InvalidDetails object (required for invalid transactions)
+
+            // Metadata
+            createdAt: new Date().toISOString(),
+            // Account identifiers for relationship matching
+            senderAccountNumber: snapshot.senderAccount?.accountNumber || null,
+            receiverAccountNumber: snapshot.receiverAccount?.accountNumber || null,
+        };
+    }
+}
+
+export class UpdateUserBehaviour extends CypherQuery<TransactionDocument> {
+
+    get cypher() {
+        return `
+            MATCH (u:User)-[o:OWNS]->(a:Account)
+            WHERE a.accountNumber = $accountNumber
+            FOREACH (behaviour IN $behaviours |
+                MERGE (b:SuspiciousBehaviour {
+                    code: behaviour.code,
+                    type: behaviour.code,
+                    description: behaviour.description,
+                    weight: behaviour.weight,
+                    severity: behaviour.severity
+                })
+                CREATE (u)-[r:EXHIBITS {
+                    detectedAt: behaviour.detectedAt,
+                    weight: behaviour.weight,
+                    severity: behaviour.severity,
+                    context: behaviour.context,
+                    explanation: behaviour.explanation
+                }]->(b)
+            )
+            RETURN u, collect(b) as behaviours
+        `
+    }
+
+    get params() {
+        const snapshot = this.dto.snapshot;
+        const fraudResult = snapshot.fraudResult;
+
+        // Extract and format suspicious behaviours
+        const behaviours = fraudResult?.behaviours?.map(behaviour => ({
+            code: behaviour.code,
+            description: behaviour.description,
+            weight: behaviour.weight,
+            severity: behaviour.severity,
+            detectedAt: behaviour.detectedAt.toISOString(),
+            context: behaviour.context || {},
+            explanation: behaviour.getExplanation()
+        })) || [];
+
+        return {
+            accountNumber: snapshot.senderAccount.accountNumber,
+            behaviours: behaviours,
+            detectedAt: new Date().toISOString()
+        };
+    }
+}
+
+export class TransactionHistoryResponseDto {
+    tx: {
+        amount: number;
+        transactionType: string;
+        transactionId: string;
+        location: string;
+        status: string;
+        createdAt: string;
+        description: string;
+        device: string;
+        merchantCategory: string;
+        currency: string;
+    }
+    direction: string
+}
+export class QueryTransactionHistory extends CypherQuery<string> {
+
+
+
+    protected get cypher(): string {
+        return `
+        CALL {
+            MATCH (target:Account {accountNumber:100002})-[out:TRANSACTION]->(other)
+            RETURN out.createdAt AS date, properties(out) AS tx, "OUT: " + other.accountNumber AS direction
+
+            UNION ALL
+
+            MATCH (other)-[gain:TRANSACTION]->(target:Account {accountNumber:100002})
+            RETURN gain.createdAt AS date, properties(gain) AS tx, "GAIN: " + other.accountNumber AS direction
+        }
+        RETURN tx, direction
+        ORDER BY date DESC;
+
+        `
+    }
+    protected get params(): any {
+        return {
+            accountNumber: this.dto
+
+        }
+    }
+
+    // Transform raw Neo4j result to DTO
+    transformResult(records: any[]): TransactionHistoryResponseDto[] {
+        return records.map(record => {
+            const tx = record.get('tx');
+            const direction = record.get('direction');
+            return {
+                tx,
+                direction
+            } as TransactionHistoryResponseDto;
+        });
+    }
+
+    async execute(): Promise<TransactionHistoryResponseDto[]> {
+        const records = await super.execute();
+        return this.transformResult(records);
+    }
+}
 
