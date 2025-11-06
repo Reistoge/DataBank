@@ -45,17 +45,19 @@ export class TransactionWorker {
         this.logger.warn(`Transaction ${pendingTx._id} flagged as FRAUD`);
       } else {
         // 3b. Process settlement if clean
-        await this.accountService.settleTransaction(pendingTx.receiverId, pendingTx.senderId, pendingTx.snapshot.request.amount);
+        await this.accountService.settleTransaction(pendingTx.senderId, pendingTx.receiverId, pendingTx.snapshot.request.amount);
         pendingTx.status = TransactionStatus.COMPLETED;
         this.logger.log(`Transaction ${pendingTx._id} COMPLETED`);
       }
 
       // 4. Create Neo4j node for analysis
       try {
-        await this.fraudSystemService.createTransactionNode(pendingTx);
+        const records = await this.fraudSystemService.createTransactionNode(pendingTx);
+        
         if(pendingTx.snapshot.fraudResult.behaviours.length > 0){
           await this.fraudSystemService.updateUserSuspiciousBehaviour(pendingTx);
         }
+        
  
       } catch (neo4jError) {
         this.logger.error(`Neo4j node creation failed for ${pendingTx._id}:`, neo4jError);

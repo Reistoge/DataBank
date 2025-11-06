@@ -13,6 +13,7 @@ export const ROUTES = Object.freeze({
   DELETE_ACCOUNT: '/deleteAccount',
   DELETE_CARD: '/deleteCard',
   ADMIN_PANEL: '/adminPanel',
+  TRANSFER: '/transfer',
 
   HOME: '/',
 } as const);
@@ -48,6 +49,13 @@ export const ACCOUNT_ROUTES = Object.freeze({
 })
 export const ADMIN_ROUTES = Object.freeze({ 
   FIND_ALL_ACCOUNTS :'/account/findAll'
+
+
+})
+export const TRANSACTION_ROUTES = Object.freeze({ 
+  TRANSACTION:'/transaction',
+  MAKE_TRANSACTION :'/transaction',
+  HISTORY :'/history'
 
 
 })

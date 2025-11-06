@@ -13,21 +13,21 @@ Content-Type: application/json
   "password": "password123"
 }
 ### Request admin
-PATCH http://localhost:5000/api/users/giveAdmin/216426681?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+PATCH http://localhost:5000/api/users/giveAdmin/777777777?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 Content-Type: application/json
 
 ###
 
 GET http://localhost:5000/api/account/findAll
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MDk0OTRiYjljNTRiYTQ1ODVkMGJmYyIsImlhdCI6MTc2MjIxNjI2NywiZXhwIjoxNzYyMjE3MTY3fQ.XlGY-Namft-X_pkRObz8WrpyjDOy59UqhkT-wigDWPo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 
 ### Login
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "testuser@email.com",
-  "password": "password123"
+  "email": "user1@gmail.com",
+  "password": "1234"
 }
 
 ### Login
@@ -41,18 +41,18 @@ Content-Type: application/json
 
 ### Get profile (requires JWT)
 GET http://localhost:5000/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MDk0OTRiYjljNTRiYTQ1ODVkMGJmYyIsImlhdCI6MTc2MjIxNjI2NywiZXhwIjoxNzYyMjE3MTY3fQ.XlGY-Namft-X_pkRObz8WrpyjDOy59UqhkT-wigDWPo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 
 ### Logout (requires JWT)
 POST http://localhost:5000/api/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 
 ### Get all users
 GET http://localhost:5000/api/users/allUsers
 
 ### Create account (requires JWT)
 POST http://localhost:5000/api/account
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 Content-Type: application/json
 
 {
@@ -61,15 +61,15 @@ Content-Type: application/json
 
 ### Get user's accounts (requires JWT)
 GET http://localhost:5000/api/account/myAccounts
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZjQ1OGRlZDhmY2FlZmU5ODZhZWRlMSIsImlhdCI6MTc2MDkyNzMwNSwiZXhwIjoxNzYwOTI4MjA1fQ.h0PFKe1OkZL-yhQEgyCStCzNIdqZQTiKAv7hDWWerqA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM3OTczMCwiZXhwIjoxNzYyMzgyMTMwfQ.g16wHCeRXjRhCMgZ-0IMZlW8b82IttLKuaKpvvHM0hs
 
 GET http://localhost:5000/api/account/myAccounts
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZjQ1OGRlZDhmY2FlZmU5ODZhZWRlMSIsImlhdCI6MTc2MDkyNzMwNSwiZXhwIjoxNzYwOTI4MjA1fQ.h0PFKe1OkZL-yhQEgyCStCzNIdqZQTiKAv7hDWWerqA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM3OTczMCwiZXhwIjoxNzYyMzgyMTMwfQ.g16wHCeRXjRhCMgZ-0IMZlW8b82IttLKuaKpvvHM0hs
 
 
 ### Update account (requires JWT)
 PATCH http://localhost:5000/api/account/updateAccount
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 Content-Type: application/json
 
 {
@@ -85,7 +85,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ### Create card (requires JWT)
 POST http://localhost:5000/api/card
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 Content-Type: application/json
 
 {
@@ -95,11 +95,11 @@ Content-Type: application/json
 
 ### Get account's cards (requires JWT)
 GET http://localhost:5000/api/card/myCards?accountId=68f458ded8fcaefe986aede4
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY4ZjQ1OGRlZDhmY2FlZmU5ODZhZWRlMSIsImlhdCI6MTc2MDkyNzMwNSwiZXhwIjoxNzYwOTI4MjA1fQ.h0PFKe1OkZL-yhQEgyCStCzNIdqZQTiKAv7hDWWerqA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM3OTczMCwiZXhwIjoxNzYyMzgyMTMwfQ.g16wHCeRXjRhCMgZ-0IMZlW8b82IttLKuaKpvvHM0hs
 
 ### Update card (requires JWT)
 PATCH http://localhost:5000/api/card/updateCard
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 Content-Type: application/json
 
 {
@@ -113,17 +113,17 @@ Content-Type: application/json
 
 ### Delete card (requires JWT)
 DELETE http://localhost:5000/api/card/68d99221cabf2dde826ed1d5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGJjNGU1Mzg1YTEzYWVmODI3NWU3NyIsImlhdCI6MTc2MjM4MDYwOCwiZXhwIjoxNzYyMzgzMDA4fQ.a56E3jL6oAJ8UyhsrQRIXdRRKozx5KS3_lGio7Xjpc8
 
 ###
 POST http://localhost:5000/api/transaction
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGIwMTNmMjA5YTYzODUwMDgyOTFmOSIsImlhdCI6MTc2MjMyOTE5NCwiZXhwIjoxNzYyMzMxNTk0fQ.b7MQqck-aPgqJ0I9RymBKYKHJIwlxRyJwhagMlAWn-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGMwMjkzZWIyNGRjZTcyYmIyYzc2OSIsImlhdCI6MTc2MjM5NDkyMCwiZXhwIjoxNzYyMzk3MzIwfQ.CBBfwbUDzhrRZNRd7jI4iuugNkCek9jEDe9Xz6xELpA
 Content-Type: application/json
 
 {
-    "senderAccountNumber": 6479284889,
-    "receiverAccountNumber":7883959153,
-    "amount": 100 ,
+    "senderAccountNumber":9634869521,
+    "receiverAccountNumber":6675860922,
+    "amount": 1000 ,
     "type": "PAYMENT" ,
     "merchantCategory": "GROCERIES" ,
     "location": "MIAMI",
@@ -134,3 +134,9 @@ Content-Type: application/json
     "device": "lorem ipsum",
     "ipAddress":"lorem ipsum" 
 }
+###
+
+GET http://localhost:5000/api/transaction/9634869521/history
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGMwMjkzZWIyNGRjZTcyYmIyYzc2OSIsImlhdCI6MTc2MjM5NDkyMCwiZXhwIjoxNzYyMzk3MzIwfQ.CBBfwbUDzhrRZNRd7jI4iuugNkCek9jEDe9Xz6xELpA
+Content-Type: application/json
+ 

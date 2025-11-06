@@ -15,8 +15,8 @@ export class Neo4jService {
 
   async query(cypher: string, params: Record<string, any> = {}) {
     try {
-      this.logger.debug(`Executing query: ${cypher}`);
-      
+      this.logger.log(`Executing query: ${cypher}`);
+  
       const result = await this.neo4jService.write(cypher, params);
       return result.records;
     } catch (error) {

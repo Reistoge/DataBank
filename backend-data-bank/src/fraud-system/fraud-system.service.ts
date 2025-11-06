@@ -55,6 +55,7 @@ export class FraudSystemService {
             const result = await query.execute();
 
             this.logger.log(`Transaction node created: ${txDocument._id}`);
+            this.logger.log(` query result: ${result}`);
             return result;
         } catch (err) {
             this.logger.error(`Error creating transaction node:`, err);

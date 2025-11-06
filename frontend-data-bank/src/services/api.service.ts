@@ -1,5 +1,6 @@
 import type { Account } from "../types/auth.types";
-import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES } from "../utils/constants";
+import type { TransactionRequest, StartTransactionResponse, TransactionHistory } from "../types/transaction.types";
+import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES, TRANSACTION_ROUTES } from "../utils/constants";
 import { createAuthHeaders, tokenStorage } from "../utils/storage";
 import type {
   AccountAdminResponse,
@@ -137,4 +138,49 @@ export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => 
   });
   if (!response.ok) throw new Error("getAllAccountsAdmin failed");
   return await response.json();
+};
+
+export const transaction = async (tx:TransactionRequest) : Promise<StartTransactionResponse>=> {
+  const response = await fetch(`${API_BASE_URL}${TRANSACTION_ROUTES.MAKE_TRANSACTION}`, {
+    method: "POST",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(tx),
+  });
+  const result = await response.json();
+  console.log(`request transaction api response ${JSON.stringify(result)}`)
+  if (!response.ok) throw new Error("start transaction failed");
+  return result.data;
+
+
+}
+export const getTransactionHistory = async (
+  accountNumber: string,
+): Promise<TransactionHistory> => {
+  const response = await fetch(
+    `${API_BASE_URL}${TRANSACTION_ROUTES.TRANSACTION}/${accountNumber}${TRANSACTION_ROUTES.HISTORY}`,
+    {
+      method: 'GET',
+      headers: createAuthHeaders(),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch transaction history');
+  }
+
+  const result = await response.json();
+  
+  // Debug logging
+  console.log('Transaction history response:', result);
+  
+  // Handle nested response if backend wraps it
+  const data = result.data || result;
+  
+  // Validate data structure
+  if (!Array.isArray(data)) {
+    console.error('Invalid transaction history format:', data);
+    return [];
+  }
+  
+  return data;
 };

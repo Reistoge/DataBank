@@ -16,6 +16,7 @@ import DeleteCard from './pages/DeleteCard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
+import Transfer from './pages/Transfer';
 
 function App() {
   return (
@@ -67,6 +68,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DeleteCard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={CONSTANT_ROUTES.TRANSFER}
+              element={
+                <ProtectedRoute>
+                  <Transfer />
                 </ProtectedRoute>
               }
             />

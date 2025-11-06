@@ -192,7 +192,7 @@ export class UpdateCardNode extends CypherQuery<CardDocument> {
 
 export class CreateTransactionNode extends CypherQuery<TransactionDocument> {
 
-    get cypher() {
+    protected get cypher(): string {
         return `
             MATCH (sender:Account) WHERE sender.accountNumber = $senderAccountNumber
             MATCH (receiver:Account) WHERE receiver.accountNumber = $receiverAccountNumber
@@ -202,23 +202,22 @@ export class CreateTransactionNode extends CypherQuery<TransactionDocument> {
                 snapshot: $snapshot,
                 status: $status,
                 invalidDetails: $invalidDetails,
-                createdAt: $createdAt,
-            
+                createdAt: $createdAt
             }]->(receiver)
-
+            
             RETURN sender, tx, receiver;
         `
     }
 
-    get params() {
+    protected get params(): any {
         const snapshot = this.dto.snapshot;
 
         return {
             // Core transaction properties from schema
             transactionId: this.dto.id.toString(),
-            snapshot: snapshot, // Complete snapshot object
-            status: this.dto.status, // TransactionStatus enum value
-            invalidDetails: this.dto.invalidDetails || null, // Optional InvalidDetails object
+            snapshot: JSON.stringify(snapshot), // Complete snapshot object
+            status: this.dto.status.toString(), // TransactionStatus enum value
+            invalidDetails: JSON.stringify(this.dto.invalidDetails) || null, // Optional InvalidDetails object
 
             // Metadata
             createdAt: new Date().toISOString(),
@@ -232,8 +231,9 @@ export class CreateTransactionNode extends CypherQuery<TransactionDocument> {
 
 export class CreateInvalidTransactionNode extends CypherQuery<TransactionDocument> {
 
-    get cypher() {
+    protected get cypher(): string {
         return `
+
             MATCH (sender:Account) WHERE sender.accountNumber = $senderAccountNumber
             MATCH (receiver:Account) WHERE receiver.accountNumber = $receiverAccountNumber
 
@@ -249,15 +249,15 @@ export class CreateInvalidTransactionNode extends CypherQuery<TransactionDocumen
         `
     }
 
-    get params() {
+    protected get params(): any {
         const snapshot = this.dto.snapshot;
 
         return {
             // Core transaction properties from schema
             transactionId: this.dto.id.toString(),
-            snapshot: snapshot, // Complete snapshot object
-            status: this.dto.status, // TransactionStatus enum value
-            invalidDetails: this.dto.invalidDetails, // InvalidDetails object (required for invalid transactions)
+            snapshot: JSON.stringify(snapshot), // Complete snapshot object
+            status: this.dto.status.toString(), // TransactionStatus enum value
+            invalidDetails: JSON.stringify(this.dto.invalidDetails), // InvalidDetails object (required for invalid transactions)
 
             // Metadata
             createdAt: new Date().toISOString(),
@@ -270,7 +270,7 @@ export class CreateInvalidTransactionNode extends CypherQuery<TransactionDocumen
 
 export class UpdateUserBehaviour extends CypherQuery<TransactionDocument> {
 
-    get cypher() {
+    protected get cypher(): string {
         return `
             MATCH (u:User)-[o:OWNS]->(a:Account)
             WHERE a.accountNumber = $accountNumber
@@ -294,7 +294,7 @@ export class UpdateUserBehaviour extends CypherQuery<TransactionDocument> {
         `
     }
 
-    get params() {
+    protected get params(): any {
         const snapshot = this.dto.snapshot;
         const fraudResult = snapshot.fraudResult;
 
@@ -339,12 +339,12 @@ export class QueryTransactionHistory extends CypherQuery<string> {
     protected get cypher(): string {
         return `
         CALL {
-            MATCH (target:Account {accountNumber:100002})-[out:TRANSACTION]->(other)
+            MATCH (target:Account {accountNumber:$accountNumber})-[out:TRANSACTION]->(other)
             RETURN out.createdAt AS date, properties(out) AS tx, "OUT: " + other.accountNumber AS direction
 
             UNION ALL
 
-            MATCH (other)-[gain:TRANSACTION]->(target:Account {accountNumber:100002})
+            MATCH (other)-[gain:TRANSACTION]->(target:Account {accountNumber:$accountNumber})
             RETURN gain.createdAt AS date, properties(gain) AS tx, "GAIN: " + other.accountNumber AS direction
         }
         RETURN tx, direction

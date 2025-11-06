@@ -30,27 +30,27 @@ export class TransactionController {
   }
 
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    this.logger.log(`Fetching transaction ${id}`);
-    const transaction = await this.transactionService.findOne(id);
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Get(':id')
+  // async findOne(@Param('id') id: string) {
+  //   this.logger.log(`Fetching transaction ${id}`);
+  //   const transaction = await this.transactionService.findOne(id);
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: transaction,
-    };
-  }
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     data: transaction,
+  //   };
+  // }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Get()
-  async findAll() {
-    this.logger.log('Fetching all transactions');
-    const transactions = await this.transactionService.findAll();
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Get()
+  // async findAll() {
+  //   this.logger.log('Fetching all transactions');
+  //   const transactions = await this.transactionService.findAll();
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: transactions,
-    };
-  }
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     data: transactions,
+  //   };
+  // }
 }
