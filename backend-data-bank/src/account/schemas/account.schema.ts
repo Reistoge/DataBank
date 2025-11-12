@@ -4,6 +4,7 @@ import { AccountState, AccountType } from "../dto/account.dto";
 export type AccountDocument = Account & Document;
 @Schema({ timestamps: true })
 export class Account {
+
   _id: Types.ObjectId;
 
   @Prop({ required: true })

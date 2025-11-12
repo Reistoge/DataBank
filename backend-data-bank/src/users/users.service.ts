@@ -5,7 +5,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, UserResponse } from './dto/user.dto';
 import { AccountService } from 'src/account/account.service';
 import { AccountType } from 'src/account/dto/account.dto';
-import { AuthPayloadDto } from 'src/auth/auth.service';
+import { AuthUserPayloadDto } from 'src/auth/auth.service';
 import { CreateUserNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
   
@@ -64,7 +64,7 @@ export class UsersService {
 
     return userResponse;
   }
-  async logoutUser(user: AuthPayloadDto) {
+  async logoutUser(user: AuthUserPayloadDto) {
     await this.userModel.findOneAndUpdate({email:user.email}, {lastLogin: (new Date(Date.now()))});
   }
   async getUserByUsername(username: string): Promise<UserResponse | null> {

@@ -12,38 +12,6 @@ import { CreateAccountNode, CypherQuery } from 'src/fraud-system/queries/cypher-
 @Injectable()
 export class AccountService {
 
-  async findAllAdminResponse(): Promise<AccountAdminResponse[]> {
-    try {
-      const accounts: AccountDocument[] = (await this.accountModel.find({}).lean<AccountDocument[]>().exec()) ?? [];
-      return accounts.map((a: AccountDocument) => {
-      const createdAt = a.createdAt ?? "No date";
-      return {
-        account: this.toResponseDto(a),
-        state: a.state,
-        createdAt: createdAt.toString(),
-        createdAtHours: Math.floor((a.createdAt ? a.createdAt.getTime() : 0) / (1000 * 60 * 60)) % 24,
-        createdAtSeconds: Math.floor((a.createdAt ? a.createdAt.getTime() : 0) / 1000) % 60,
-      }
-      });
-    } catch(err) {
-      this.logger.error('Error fetching admin accounts', err);
-      throw err instanceof Error ? err : new Error('Error parsing accounts data');
-    }
-
-  }
-  toResponseDto(a: AccountDocument): AccountResponseDto {
-    return {
-      id: a._id?.toString(),
-      userId: a.userId,
-      accountNumber: a.accountNumber,
-      balance: a.balance,
-      type: a.type,
-      isActive: a.isActive,
-      bankBranch: a.bankBranch
-    }
-  }
-
-
   private readonly logger = new Logger(AccountService.name);
 
   constructor(
@@ -88,6 +56,7 @@ export class AccountService {
       bankBranch: savedAccount.bankBranch,
     };
   }
+
   async settleTransaction(senderId: string, receiverId: string, amount: number) {
     this.logger.log(`Updating users balance`);
     if (amount <= 0) {
@@ -197,28 +166,28 @@ export class AccountService {
       isActive: account.isActive,
       bankBranch: account.bankBranch
     }));
-  }as
-d;
-  async update(updateAccountDto: UpdateAccountDto) : Promise<AccountResponseDto>{
+  } as
+  d;
+  async update(updateAccountDto: UpdateAccountDto): Promise<AccountResponseDto> {
     const updatedAccount = await this.accountModel.findOneAndUpdate(
-        { _id: updateAccountDto.id }, 
-        updateAccountDto,
-        { new: true } // Return the updated document, not the original
+      { _id: updateAccountDto.id },
+      updateAccountDto,
+      { new: true } // Return the updated document, not the original
     ).lean<AccountDocument>().exec();
 
     if (!updatedAccount) {
-        throw new NotFoundException(`Account with id ${updateAccountDto.id} not found`);
+      throw new NotFoundException(`Account with id ${updateAccountDto.id} not found`);
     }
 
     // Convert AccountDocument to AccountResponseDto
     return {
-        id: updatedAccount._id.toString(),
-        userId: updatedAccount.userId,
-        accountNumber: updatedAccount.accountNumber,
-        balance: updatedAccount.balance,
-        type: updatedAccount.type,
-        isActive: updatedAccount.isActive,
-        bankBranch: updatedAccount.bankBranch
+      id: updatedAccount._id.toString(),
+      userId: updatedAccount.userId,
+      accountNumber: updatedAccount.accountNumber,
+      balance: updatedAccount.balance,
+      type: updatedAccount.type,
+      isActive: updatedAccount.isActive,
+      bankBranch: updatedAccount.bankBranch
     };
   }
 
@@ -241,5 +210,36 @@ d;
       exists = await this.accountModel.exists({ accountNumber });
     } while (exists);
     return accountNumber;
+  }
+  toResponseDto(a: AccountDocument): AccountResponseDto {
+    return {
+      id: a._id?.toString(),
+      userId: a.userId,
+      accountNumber: a.accountNumber,
+      balance: a.balance,
+      type: a.type,
+      isActive: a.isActive,
+      bankBranch: a.bankBranch
+    }
+  }
+
+  async findAllAdminResponse(): Promise<AccountAdminResponse[]> {
+    try {
+      const accounts: AccountDocument[] = (await this.accountModel.find({}).lean<AccountDocument[]>().exec()) ?? [];
+      return accounts.map((a: AccountDocument) => {
+
+        const createdAt = a.createdAt ?? "No date";
+        const responseDto = this.toResponseDto(a);
+        return {
+          ...responseDto,
+          state: a.state,
+          createdAt: a.createdAt?.toISOString() ?? "No date",
+        }
+      });
+    } catch (err) {
+      this.logger.error('Error fetching admin accounts', err);
+      throw err instanceof Error ? err : new Error('Error parsing accounts data');
+    }
+
   }
 }

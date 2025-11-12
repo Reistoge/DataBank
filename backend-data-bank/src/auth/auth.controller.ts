@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Get, Request, Logger } from '@nestjs/common';
-import { AuthPayloadDto, AuthService } from './auth.service';
+import { AuthUserPayloadDto, AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 
@@ -30,7 +30,7 @@ export class AuthController {
   
   @UseGuards(JwtAuthGuard)
   @Post(`logout`)
-  logout(@Request() req: { user: AuthPayloadDto}){
+  logout(@Request() req: { user: AuthUserPayloadDto}){
     this.logger.log(`Logout request from user: ${req.user.email}`);
     this.authService.logout(req.user);
     return {message: `Logged out succesfully`}; // messages always return as a object or document data

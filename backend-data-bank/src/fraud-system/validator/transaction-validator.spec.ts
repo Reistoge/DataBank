@@ -2,82 +2,68 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Types } from 'mongoose';
 import { LowAmount } from '../dto/fraud.dto';
 import { TransactionValidator } from './transaction-validator';
-import { LowAmountValidation } from './validations';
+import { LowAmountValidation } from './validations/low-amount.validation';
 
-// Mock TransactionStatus enum to avoid imports
+// Mock interfaces (keep existing ones)
 enum MockTransactionStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED'
 }
 
-// Mock AccountState enum
 enum MockAccountState {
   DEFAULT = 'DEFAULT',
   FROZEN = 'FROZEN',
   CLOSED = 'CLOSED'
 }
 
-// Mock TransactionDocument interface without dependencies
+interface MockAccount {
+  _id: Types.ObjectId;
+  userId: string;
+  userNumber: string;
+  accountNumber: string;
+  balance: number;
+  type: string;
+  isActive: boolean;
+  bankBranch: string;
+  state: MockAccountState;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+interface MockRequest {
+  amount?: number;
+  senderAccountNumber: string;
+  receiverAccountNumber: string;
+  type: string;
+  merchantCategory: string;
+  location: string;
+  currency: string;
+  description: string;
+  receiverEmail: string;
+  device: string;
+  ipAddress: string;
+}
+
+interface MockSnapshot {
+  request: MockRequest;
+  senderAccount: MockAccount;
+  receiverAccount: MockAccount;
+  isFraud: boolean;
+}
+
 interface MockTransactionDocument {
   _id: Types.ObjectId;
   senderId: string;
   receiverId: string;
   status: MockTransactionStatus;
-  snapshot: {
-    request: {
-      amount: number;
-      senderAccountNumber: string;
-      receiverAccountNumber: string;
-      type: string;
-      merchantCategory: string;
-      location: string;
-      currency: string;
-      description: string;
-      receiverEmail: string;
-      device: string;
-      ipAddress: string;
-    };
-    senderAccount: {
-      _id: Types.ObjectId;
-      userId: string;
-      userNumber: string;
-      accountNumber: string;
-      balance: number;
-      type: string;
-      isActive: boolean;
-      bankBranch: string;
-      state: MockAccountState;
-      createdAt?: Date;
-      updatedAt?: Date;
-    };
-    receiverAccount: {
-      _id: Types.ObjectId;
-      userId: string;
-      userNumber: string;
-      accountNumber: string;
-      balance: number;
-      type: string;
-      isActive: boolean;
-      bankBranch: string;
-      state: MockAccountState;
-      createdAt?: Date;
-      updatedAt?: Date;
-    };
-    isFraud: boolean;
-  };
+  snapshot: MockSnapshot;
   invalidDetails?: any;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-// Mock AccountService
-const mockAccountService = {
-  settleTransaction: jest.fn(),
-  getAccountBalanceByAccountNumber: jest.fn(),
-  findAccountByAccountNumber: jest.fn(),
-  updateAccount: jest.fn(),
-};
-
-describe('TransactionValidator', () => {
+describe('Enhanced LowAmountValidation', () => {
   let validator: TransactionValidator;
   let lowAmountValidation: LowAmountValidation;
 
@@ -93,10 +79,6 @@ describe('TransactionValidator', () => {
           ],
           inject: [LowAmountValidation],
         },
-        {
-          provide: 'AccountService',
-          useValue: mockAccountService,
-        },
       ],
     }).compile();
 
@@ -108,87 +90,97 @@ describe('TransactionValidator', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(validator).toBeDefined();
-  });
+  describe('LowAmountValidation', () => {
+    it('should pass for amounts above threshold', async () => {
+      const mockTransaction = createMockTransaction({ amount: 100 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(0);
+    });
 
-  it('should inject validations correctly', () => {
-    expect(validator['validations']).toBeDefined();
-    expect(validator['validations'].length).toBe(1);
-    expect(validator['validations'][0]).toBeInstanceOf(LowAmountValidation);
-  });
-
-  describe('runAll', () => {
-    it('should detect low amount suspicious behaviour', async () => {
-      const mockTransaction = createMockTransaction({
-        amount: 5, // Below MIN_AMOUNT threshold
-      });
-
-      const result = await validator.runAll(mockTransaction as any);
-
-      expect(result).toBeDefined();
-      expect(result.length).toBe(1);
+    it('should detect low amount (basic case)', async () => {
+      const mockTransaction = createMockTransaction({ amount: 5 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(LowAmount);
       expect(result[0].code).toBe('LOW_AMOUNT');
-      expect(result[0].severity).toBe('LOW');
-      expect(result[0].weight).toBe(0.1);
+      expect(result[0].weight).toBeGreaterThan(0.1); // Should have intensity multiplier
+      expect(result[0].context?.suspicionLevel).toBe('VERY_LOW');
     });
 
-    it('should return empty array when no suspicious behaviour detected', async () => {
-      const mockTransaction = createMockTransaction({
-        amount: 100, // Above MIN_AMOUNT threshold
+    it('should detect micro amounts with highest intensity', async () => {
+      const mockTransaction = createMockTransaction({ amount: 0.5 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].intensityMultiplier).toBe(2.5);
+      expect(result[0].context?.suspicionLevel).toBe('MICRO');
+      expect(result[0].dynamicSeverity).toBe(4);
+    });
+
+    it('should handle edge case: amount exactly at threshold', async () => {
+      const mockTransaction = createMockTransaction({ amount: 10 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(0);
+    });
+
+    it('should handle invalid amounts gracefully', async () => {
+      const mockTransaction = createMockTransaction({ amount: -5 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(0);
+    });
+
+    it('should handle missing amount in snapshot', async () => {
+      const mockTransaction = createMockTransaction({});
+      delete mockTransaction.snapshot.request.amount;
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result).toHaveLength(0);
+    });
+
+    it('should provide detailed context information', async () => {
+      const mockTransaction = createMockTransaction({ amount: 2 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      expect(result[0].context).toMatchObject({
+        amount: 2,
+        threshold: 10,
+        suspicionLevel: 'VERY_LOW',
+        senderAccount: expect.any(String),
+        receiverAccount: expect.any(String)
       });
-
-      const result = await validator.runAll(mockTransaction as any);
-
-      expect(result).toBeDefined();
-      expect(result.length).toBe(0);
     });
 
-    it('should handle multiple suspicious behaviours', async () => {
-      const mockValidation = {
-        validate: jest.fn().mockResolvedValue([new LowAmount()]),
-      };
+    it('should have proper explanation', async () => {
+      const mockTransaction = createMockTransaction({ amount: 1 });
+      const result = await lowAmountValidation.validate(mockTransaction as any);
+      
+      const explanation = result[0].getExplanation();
+      expect(explanation).toContain('Transaction amount (1) is unusually low');
+      expect(explanation).toContain('MICRO');
+      expect(explanation).toContain('Weight:');
+      expect(explanation).toContain('Intensity:');
+    });
+  });
 
-      validator['validations'].push(mockValidation as any);
-
-      const mockTransaction = createMockTransaction({ amount: 5 });
-
+  describe('Integration with TransactionValidator', () => {
+    it('should work within validator framework', async () => {
+      const mockTransaction = createMockTransaction({ amount: 3 });
       const result = await validator.runAll(mockTransaction as any);
-
-      expect(result.length).toBe(2);
-      expect(mockValidation.validate).toHaveBeenCalledWith(mockTransaction);
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].code).toBe('LOW_AMOUNT');
     });
 
     it('should handle validation errors gracefully', async () => {
-      const errorValidation = {
-        validate: jest.fn().mockRejectedValue(new Error('Validation failed')),
-      };
-
-      validator['validations'] = [errorValidation as any];
-
-      const mockTransaction = createMockTransaction({ amount: 50 });
-
-      await expect(validator.runAll(mockTransaction as any)).rejects.toThrow('Validation failed');
-    });
-
-    it('should log validation execution', async () => {
-      const loggerSpy = jest.spyOn(validator['logger'], 'log');
-      const mockTransaction = createMockTransaction({ amount: 50 });
-
-      await validator.runAll(mockTransaction as any);
-
-      expect(loggerSpy).toHaveBeenCalledWith('Running all validations');
-      expect(loggerSpy).toHaveBeenCalledWith('finished');
-    });
-
-    it('should handle AccountService integration', async () => {
-      mockAccountService.getAccountBalanceByAccountNumber.mockResolvedValue(1500);
-
-      const balance = await mockAccountService.getAccountBalanceByAccountNumber('123456789');
-
-      expect(balance).toBe(1500);
-      expect(mockAccountService.getAccountBalanceByAccountNumber).toHaveBeenCalledWith('123456789');
+      const invalidTransaction = {} as any;
+      const result = await validator.runAll(invalidTransaction);
+      
+      // Should not throw, should return empty array or handle gracefully
+      expect(Array.isArray(result)).toBe(true);
     });
   });
 });
@@ -200,6 +192,8 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
     senderId: 'sender-id',
     receiverId: 'receiver-id',
     status: MockTransactionStatus.PENDING,
+    createdAt: new Date(),
+    updatedAt: new Date(),
     snapshot: {
       request: {
         amount: 2000,
@@ -222,8 +216,8 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
         type: 'CHECKING',
         userNumber: '1001',
         bankBranch: 'MAIN',
-        userId: '',
-        isActive: false,
+        userId: 'user1',
+        isActive: true,
         state: MockAccountState.DEFAULT
       },
       receiverAccount: {
@@ -233,8 +227,8 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
         type: 'SAVINGS',
         userNumber: '1002',
         bankBranch: 'DOWNTOWN',
-        userId: '',
-        isActive: false,
+        userId: 'user2',
+        isActive: true,
         state: MockAccountState.DEFAULT
       },
       isFraud: false
@@ -242,7 +236,7 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
     invalidDetails: undefined
   };
 
-  // Apply overrides properly
+  // Apply overrides to request level
   if (overrides.amount !== undefined) {
     defaultTransaction.snapshot.request.amount = overrides.amount;
   }

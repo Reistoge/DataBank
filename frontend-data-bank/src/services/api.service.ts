@@ -63,6 +63,8 @@ export const updateAccount = async (dto: Account): Promise<Account> => {
   const result = await response.json();
   return result;
 };
+
+
 // Create a new account for the authenticated user
 export const createAccount = async (dto: CreateAccountDto): Promise<AccountResponse> => {
   const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.CREATE_ACCOUNT, {
@@ -131,16 +133,9 @@ export const updateCardSpentLimit = async (dto: CardResponse, newLimit: number, 
 
   return await updateCard(copy, accessPassword);
 }
-export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => {
-  const response = await fetch(API_BASE_URL + ADMIN_ROUTES.FIND_ALL_ACCOUNTS, {
-    method: "GET",
-    headers: createAuthHeaders(),
-  });
-  if (!response.ok) throw new Error("getAllAccountsAdmin failed");
-  return await response.json();
-};
 
-export const transaction = async (tx:TransactionRequest) : Promise<StartTransactionResponse>=> {
+
+export const transaction = async (tx: TransactionRequest): Promise<StartTransactionResponse> => {
   const response = await fetch(`${API_BASE_URL}${TRANSACTION_ROUTES.MAKE_TRANSACTION}`, {
     method: "POST",
     headers: createAuthHeaders(),
@@ -169,18 +164,44 @@ export const getTransactionHistory = async (
   }
 
   const result = await response.json();
-  
+
   // Debug logging
   console.log('Transaction history response:', result);
-  
+
   // Handle nested response if backend wraps it
   const data = result.data || result;
-  
+
   // Validate data structure
   if (!Array.isArray(data)) {
     console.error('Invalid transaction history format:', data);
     return [];
   }
-  
+
   return data;
+};
+
+
+/**
+ * 
+ * ADMIN 
+ *  
+ */
+export const updateAccountAdmin = async (dto: AccountAdminResponse): Promise<AccountAdminResponse> => {
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.UPDATE_ACCOUNT, {
+    method: "PATCH",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(dto),
+  });
+  if (!response.ok) throw new Error("updateAccount failed");
+  const result = await response.json();
+  return result;
+};
+
+export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => {
+  const response = await fetch(API_BASE_URL + ADMIN_ROUTES.FIND_ALL_ACCOUNTS, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getAllAccountsAdmin failed");
+  return await response.json();
 };

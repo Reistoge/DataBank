@@ -1,13 +1,9 @@
 import { Neo4jService } from "src/database/neo4j/neo4j.service";
-import { TransactionRequestDto } from "src/transaction/dto/transaction.dto";
-import { FraudResult, SuspiciousBehaviour } from "../dto/fraud.dto";
 import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
-import { UserResponse } from "src/users/dto/user.dto";
-import { AccountResponseDto, AccountType } from "src/account/dto/account.dto";
 import { UserDocument } from "src/users/schemas/user.schema";
 import { AccountDocument } from "src/account/schemas/account.schema";
 import { CardDocument } from "src/card/schemas/card.schema";
-import { Result } from "nest-neo4j/dist";
+
 /**
  * Abstract base class for executing parameterized Cypher queries against a Neo4j service.
  *
@@ -242,7 +238,7 @@ export class CreateInvalidTransactionNode extends CypherQuery<TransactionDocumen
                 snapshot: $snapshot,
                 status: $status,
                 invalidDetails: $invalidDetails,
-                createdAt: $createdAt,
+                createdAt: $createdAt   
              }]->(receiver)
 
             RETURN sender, tx, receiver;
@@ -332,12 +328,13 @@ export class TransactionHistoryResponseDto {
     }
     direction: string
 }
-export class QueryTransactionHistory extends CypherQuery<string> {
+export class QueryTransactionHistory extends CypherQuery<{ accountNumber: string, limit?: number }> {
 
 
 
     protected get cypher(): string {
-        return `
+        
+         return `
         CALL {
             MATCH (target:Account {accountNumber:$accountNumber})-[out:TRANSACTION]->(other)
             RETURN out.createdAt AS date, properties(out) AS tx, "OUT: " + other.accountNumber AS direction
@@ -348,13 +345,14 @@ export class QueryTransactionHistory extends CypherQuery<string> {
             RETURN gain.createdAt AS date, properties(gain) AS tx, "GAIN: " + other.accountNumber AS direction
         }
         RETURN tx, direction
-        ORDER BY date DESC;
-
+        ORDER BY date DESC
+        LIMIT toInteger($limit)
         `
     }
     protected get params(): any {
         return {
-            accountNumber: this.dto
+            accountNumber: this.dto.accountNumber,
+            limit: (this.dto.limit ?? 10) 
 
         }
     }
@@ -362,6 +360,7 @@ export class QueryTransactionHistory extends CypherQuery<string> {
     // Transform raw Neo4j result to DTO
     transformResult(records: any[]): TransactionHistoryResponseDto[] {
         return records.map(record => {
+
             const tx = record.get('tx');
             const direction = record.get('direction');
             return {

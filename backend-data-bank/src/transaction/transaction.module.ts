@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
@@ -13,7 +13,7 @@ import { ScheduleModule } from '@nestjs/schedule';
   imports: [
     ScheduleModule.forRoot(),
     MongooseModule.forFeature([{ name: Transaction.name, schema: TransactionSchema }]),
-    FraudSystemModule,
+    forwardRef(()=>FraudSystemModule) ,
     AccountModule,
     DatabaseModule
 

@@ -3,8 +3,8 @@ import type { IconType } from 'react-icons';
 // Color palette
 export const colors = {
   gradients: {
-    primary: 'bg-gradient-to-br from-gray-900 via-blue-900 to-black',
-    card: 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500',
+    primary: 'bg-gradient-to-br from-slate-900 via-sky-700 to-blue-500',
+    card: 'bg-gradient-to-r from-blue-300 to-sky-400',
     success: 'bg-gradient-to-br from-green-400 via-emerald-500 to-blue-600',
     danger: 'bg-gradient-to-r from-red-500 via-pink-500 to-orange-500',
     warning: 'bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500',

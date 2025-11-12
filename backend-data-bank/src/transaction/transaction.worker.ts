@@ -18,16 +18,25 @@ export class TransactionWorker {
 
   @Cron(CronExpression.EVERY_5_SECONDS)
   async handlePendingTransactions() {
+    // atomically change the status of the transaction 
     try {
-      const pendingTx = await this.txModel.findOne({ status: TransactionStatus.PENDING }).exec();
-
+      const pendingTx = await this.txModel.findOneAndUpdate(
+        { status: TransactionStatus.PENDING },
+        { $set: { status: TransactionStatus.PROCESSING } },
+        { new: true, sort: { createdAt: 1 } } // pick oldest pending
+      ).exec();
+      
       if (!pendingTx) {
         
         return;
       }
       else if(pendingTx.invalidDetails){
+        pendingTx.status = TransactionStatus.FAILED;
         await this.fraudSystemService.createInvalidTransactionNode(pendingTx);
+        await pendingTx.save();
+        return;
       }
+      
 
 
       this.logger.log(`Processing transaction ${pendingTx._id}`);
@@ -54,7 +63,7 @@ export class TransactionWorker {
       try {
         const records = await this.fraudSystemService.createTransactionNode(pendingTx);
         
-        if(pendingTx.snapshot.fraudResult.behaviours.length > 0){
+        if(pendingTx.snapshot.fraudResult?.behaviours?.length > 0){
           await this.fraudSystemService.updateUserSuspiciousBehaviour(pendingTx);
         }
         

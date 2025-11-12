@@ -48,7 +48,7 @@ export class AccountController {
   update(@Body() updateAccountDto: UpdateAccountDto) {
     return this.accountService.update(updateAccountDto);
   }
-
+  // fetch (ip + account/1273)
   @UseGuards(JwtAuthGuard)
   @Delete(':accountId')
   async remove(@Param('accountId') accountId: string) {

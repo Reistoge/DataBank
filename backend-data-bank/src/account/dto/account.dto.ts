@@ -24,15 +24,14 @@ export class UpdateAccountDto {
     balance?: number;
     type?: AccountType;
     isActive?: boolean;
+    state?: AccountState
     
     // Add other fields as needed for updating an account
 }
-export class AccountAdminResponse{
-    account: AccountResponseDto;
+export class AccountAdminResponse extends AccountResponseDto {
+    
     state: string;
     createdAt: string;
-    createdAtHours: number;
-    createdAtSeconds: number;
 
 
 }

@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AccountService } from 'src/account/account.service';
+import { AccountService } from '../account/account.service';
 import { TransactionDocument, TransactionStatus, Transaction } from './schemas/transaction.schema';
 import { TransactionRequestDto, TransactionResponseDto, TransactionSnapshot } from './dto/transaction.dto';
 import { PredictionInput } from 'src/fraud-system/dto/prediction.dto';
@@ -12,8 +12,10 @@ import { Neo4jService } from 'src/database/neo4j/neo4j.service';
 export enum INVALID_REASON {
   INVALID_ACCOUNT = "INVALID_ACCOUNT",
   INVALID_AMOUNT = "INVALID_AMOUNT",
+  INVALID_AUTH = "INVALID_AUTH",
 
 }
+
 export enum INVALID_ACCOUNT_REASON {
   INVALID_SENDER = "INVALID_SENDER",
   INVALID_RECEIVER = "INVALID_RECEIVER",
@@ -40,8 +42,16 @@ const validationError: TransactionResponseDto = {
   message: 'Invalid account(s)',
 };
 
+const authenticationError: TransactionResponseDto = {
+  transactionId: '-1',
+  status: TransactionStatus.FAILED,
+  message: 'Invalid authentication',
+};
+
+
 @Injectable()
 export class TransactionService {
+
 
 
   private readonly logger = new Logger(TransactionService.name);
@@ -52,8 +62,12 @@ export class TransactionService {
     private neo4jService: Neo4jService,
   ) { }
 
-  async create(txRequestDto: TransactionRequestDto): Promise<TransactionResponseDto> {
+  async create(userNumber: string, txRequestDto: TransactionRequestDto): Promise<TransactionResponseDto> {
     try {
+
+
+
+
       // 1. Validate both accounts
       const validSenderAccount = await this.accountService.isAccountValid(txRequestDto.senderAccountNumber);
       const validReceiverAccount = await this.accountService.isAccountValid(txRequestDto.receiverAccountNumber);
@@ -62,11 +76,21 @@ export class TransactionService {
 
         this.logger.warn(`Invalid accounts: sender=${validSenderAccount}, receiver=${validReceiverAccount}`);
         // save the error 
-        // this.handleInvalidAccountTransaction(txRequestDto, isReceiverValid, isSenderValid);
+        this.handleInvalidAccountTransaction(txRequestDto, validReceiverAccount, validSenderAccount);
 
 
         return { ...validationError };
       }
+
+
+      const userFromSender = await this.accountService.getUserByAccountNumber(txRequestDto.senderAccountNumber);
+      if (userFromSender.userNumber !== userNumber) {
+        this.logger.warn(`User number from req payload: ${userNumber} doesnt match with sender account user: ${userFromSender}`);
+
+        this.handleInvalidAuthentication(txRequestDto, userNumber, userFromSender.userNumber);
+        return { ...authenticationError }
+      }
+
 
       // 2. Check balance
       const accountBalance = await this.accountService.getAccountBalanceByAccountNumber(txRequestDto.senderAccountNumber);
@@ -100,7 +124,8 @@ export class TransactionService {
     }
   }
 
-  private async buildTransactionDetails(txRequestDto: TransactionRequestDto) :Promise<TransactionDocument>{
+
+  private async buildTransactionDetails(txRequestDto: TransactionRequestDto): Promise<TransactionDocument> {
     const receiver = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.receiverAccountNumber);
     const sender = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.senderAccountNumber);
 
@@ -125,22 +150,45 @@ export class TransactionService {
     return newTransaction;
   }
 
-  async getTransactionHistory(accountNumber: string) : Promise<TransactionHistoryResponseDto> {
+  async getTransactionHistory(accountNumber: string,limit?:number): Promise<TransactionHistoryResponseDto[]> {
 
- 
-    try{
+
+    try {
       this.logger.log(`invoking transaction history query for account ${accountNumber}`);
-      const q : CypherQuery<string> =  new QueryTransactionHistory(this.neo4jService, accountNumber);
-      const records = await q.execute() ;
+      const q : QueryTransactionHistory = new QueryTransactionHistory(this.neo4jService, { accountNumber: accountNumber, limit: limit});
+      const records = await q.execute();
       return records;
-      
+
 
     }
-    catch(err){
-     
+    catch (err) {
+
       this.logger.warn(`History Transaction query error`);
       throw err instanceof Error ? err : new Error(`QueryTransactionHistory error`);
-     
+
+    }
+  }
+
+  async getTransactionsForAccount(senderAcc: string, arg1: { limit: number; since: string; }): Promise<TransactionDocument[]> {
+    try {
+      const history = await this.getTransactionHistory(senderAcc, arg1.limit);
+
+      // Extract ids from history (preserve order)
+      const ids = history.map(h => h.tx.transactionId).filter(Boolean);
+
+      if (ids.length === 0) return [];
+
+      // Fetch all docs in one query
+      const docs = await this.txModel.find({ _id: { $in: ids } }).lean<TransactionDocument[]>().exec();
+
+      // Reorder to match ids order returned by Neo4j (history)
+      const docsById = new Map(docs.map(d => [String(d._id), d]));
+      const ordered = ids.map(id => docsById.get(String(id))).filter(Boolean) as TransactionDocument[];
+
+      return ordered;
+    } catch (err) {
+      this.logger.error(`Failed to get transactions for account ${senderAcc}`, err);
+      throw err;
     }
   }
 
@@ -172,7 +220,37 @@ export class TransactionService {
     this.logger.warn(`Invalid transaction saved: ${failureReason}`, { transactionId: newTransaction._id });
   }
 
+  private async handleInvalidAuthentication(txRequestDto: TransactionRequestDto, userNumber: string, senderNumber: string) {
 
+    // Get account documents
+    const receiver = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.receiverAccountNumber);
+    const sender = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.senderAccountNumber);
+
+    // Create snapshot
+    const snapshot: TransactionSnapshot = {
+      isFraud: false,
+      request: txRequestDto,
+      receiverAccount: receiver,
+      senderAccount: sender,
+    };
+
+    // Save to DB as PENDING
+    const newTransaction = new this.txModel({
+      receiverId: receiver._id,
+      senderId: sender._id,
+      snapshot: snapshot,
+      status: TransactionStatus.PENDING,
+      invalidDetails: {
+        failureType: INVALID_REASON.INVALID_AUTH,
+        failureReason: userNumber + "!=" + senderNumber,
+
+      }
+
+    });
+
+    await newTransaction.save();
+    this.logger.log(`Transaction ${newTransaction._id} created with PENDING status`);
+  }
 
   async handleInvalidAmountTransaction(tx: TransactionRequestDto) {
 

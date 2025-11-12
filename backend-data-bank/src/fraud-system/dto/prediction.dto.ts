@@ -1,4 +1,5 @@
-import { SuspiciousBehaviour } from "./fraud.dto"
+import { SuspiciousBehaviour } from "../suspicious-behaviours/suspicious-behaviour"
+
 
 export class PredictionInput{
  

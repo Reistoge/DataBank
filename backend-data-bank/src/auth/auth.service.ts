@@ -7,7 +7,7 @@ import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserDocument, UserRole } from 'src/users/schemas/user.schema';
 import { UserResponse } from 'src/users/dto/user.dto';
 
-export class AuthPayloadDto {
+export class AuthUserPayloadDto {
   id: string;
   username: string;
   userNumber:string;
@@ -85,7 +85,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(userEmail: string, sub: string): Promise<AuthPayloadDto | null> {
+  async validateUser(userEmail: string, sub: string): Promise<AuthUserPayloadDto | null> {
     const user = await this.usersService.getUserByEmail(userEmail);
     if (user && user._id.toString() === sub.toString()) {
       return {
@@ -99,7 +99,7 @@ export class AuthService {
     }
     return null;
   }
-  async logout(user: AuthPayloadDto) {
+  async logout(user: AuthUserPayloadDto) {
     await this.usersService.logoutUser(user);
   }
 

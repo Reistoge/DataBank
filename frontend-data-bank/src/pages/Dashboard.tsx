@@ -188,6 +188,7 @@ function Dashboard() {
       setIsLoadingHistory(false);
     }
   };
+  
   const formatDirection = (
     direction: string,
     accountNumber: string,
@@ -632,7 +633,7 @@ function Dashboard() {
   }
 
   return (
-    <div className={`min-h-screen ${colors.gradients.primary}`}>
+    <div className={`min-h-screen  ${colors.gradients.primary} `}>
       {/* Navigation Bar */}
       <nav className={`${colors.gradients.card} shadow-lg`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

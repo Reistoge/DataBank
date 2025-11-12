@@ -1,7 +1,9 @@
-import { Controller, Get, Logger, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ConfigService } from '@nestjs/config';
 import { UserRole } from './schemas/user.schema';
+import { RoleGuard, Roles } from 'src/auth/roles/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -13,6 +15,9 @@ export class UsersController {
 
   ) { }
 
+  
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
   @Get('allUsers')
   async findAll() {
     try {

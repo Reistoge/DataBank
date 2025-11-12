@@ -23,7 +23,11 @@ export interface Account {
     type: string; // tipo de cuenta
     bankBranch: string;
     isActive: boolean;
+
+    
 }
+
+
 export interface Card {
     id: string | undefined;
     cvv: Number;

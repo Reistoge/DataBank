@@ -6,9 +6,10 @@ import { InvalidDetails } from '../transaction.service';
  
 
 
-export type TransactionDocument = Transaction & Document;
+export type TransactionDocument = Transaction & Document & { createdAt?: Date; updatedAt?: Date };
 export enum TransactionStatus {
     PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING',
     COMPLETED = 'COMPLETED',
     FAILED = 'FAILED',
 }

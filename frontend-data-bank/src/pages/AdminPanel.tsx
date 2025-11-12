@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.hook';
-import { createAccount, getAllAccountsAdmin, deleteAccount, updateAccount } from '../services/api.service';
+import { createAccount, getAllAccountsAdmin, deleteAccount, updateAccount, updateAccountAdmin } from '../services/api.service';
 import {
   type AccountResponse,
   type CreateAccountDto,
@@ -12,7 +12,10 @@ import {
 import { ANIMATION } from '../utils/constants';
 import {
   displayAllAccountResponseComponentInput,
+  displayAllAccountResponseComponentInputAdmin,
 } from '../components/display-account.component';
+
+
 
 function AdminPanel() {
  
@@ -40,12 +43,12 @@ function AdminPanel() {
   //  Filter accounts when search term changes
   useEffect(() => {
     const filtered = allAccounts.filter(accountAdmin => {
-      const account = accountAdmin.account;
+      const account = accountAdmin;
       return (
-        account.accountNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.bankBranch.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.userId.toLowerCase().includes(searchTerm.toLowerCase())
+        account.accountNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        account.bankBranch?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        account.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        account.userId?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     });
     setFilteredAccounts(filtered);
@@ -75,7 +78,7 @@ function AdminPanel() {
   const currentAccounts = filteredAccounts.slice(startIndex, endIndex);
 
   //  Handle account deletion
-  const handleDeleteAccount = async (account: AccountResponse) => {
+  const handleDeleteAccount = async (account: AccountAdminResponse) => {
     if (!confirm(`Are you sure you want to delete account ${account.accountNumber}?`)) {
       return;
     }
@@ -92,12 +95,12 @@ function AdminPanel() {
   };
 
   // Handle account update
-  const handleUpdateAccount = async (account: AccountResponse) => {
+  const handleUpdateAccount = async (account: AccountAdminResponse) => {
     try {
        console.log('Update account:', account);
        
      
-      const results =await updateAccount(account);
+      const results =await updateAccountAdmin(account);
       await fetchAllAccounts();
       alert('Account updated successfully');
     } catch (err) {
@@ -109,15 +112,15 @@ function AdminPanel() {
   //  Create AccountRow component
   interface AccountRowProps {
     accountAdmin: AccountAdminResponse;
-    onDelete?: (account: AccountResponse) => void;
-    onUpdate?: (account: AccountResponse) => void;
+    onDelete?: (account: AccountAdminResponse) => void;
+    onUpdate?: (account: AccountAdminResponse) => void;
   }
 
   function AccountRow({ accountAdmin, onDelete, onUpdate }: AccountRowProps) {
-    const [temp, setTemp] = useState<AccountResponse>(accountAdmin.account);
+    const [temp, setTemp] = useState<AccountAdminResponse>(accountAdmin);
 
     const handleReset = () => {
-      setTemp({ ...accountAdmin.account });
+      setTemp({ ...accountAdmin });
     };
 
      
@@ -135,7 +138,7 @@ function AdminPanel() {
           <div className="text-xs text-gray-300 mb-1">
             Created: {`${new Date(accountAdmin.createdAt).toLocaleDateString() } `}
           </div>
-          {displayAllAccountResponseComponentInput(
+          {displayAllAccountResponseComponentInputAdmin(
             temp,
             '',
             'text-xs font-bold text-gray-400 uppercase tracking-wide',
@@ -144,6 +147,7 @@ function AdminPanel() {
             handleValueChange,
           )}
         </div>
+
 
         {/*  Action Buttons */}
         <div className="grid grid-cols-3 gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -283,7 +287,7 @@ function AdminPanel() {
                 {currentAccounts.length > 0 ? (
                   currentAccounts.map((accountAdmin) => (
                     <AccountRow
-                      key={accountAdmin.account.id}
+                      key={accountAdmin.id}
                       accountAdmin={accountAdmin}
                       onDelete={handleDeleteAccount}
                       onUpdate={handleUpdateAccount}

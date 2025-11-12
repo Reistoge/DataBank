@@ -1,11 +1,13 @@
 // backend-data-bank/src/fraud-system/fraud-system.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Transaction, TransactionDocument } from 'src/transaction/schemas/transaction.schema';
-import { FraudResult, LowAmount, SuspiciousBehaviour, SuspiciousBehaviourAnalyzer } from './dto/fraud.dto';
-import { Neo4jService } from 'src/database/neo4j/neo4j.service';
+ import { Neo4jService } from 'src/database/neo4j/neo4j.service';
 import { CreateInvalidTransactionNode, CreateTransactionNode } from './queries/cypher-query';
 import { TransactionValidator } from './validator/transaction-validator';
 import { Document } from 'mongoose';
+import { FraudResult } from './dto/fraud.dto';
+import { SuspiciousBehaviour } from './suspicious-behaviours/suspicious-behaviour';
+import { SuspiciousBehaviourAnalyzer } from './suspicious-behaviours/suspicious-behaviour-analyzer';
 
 @Injectable()
 export class FraudSystemService {

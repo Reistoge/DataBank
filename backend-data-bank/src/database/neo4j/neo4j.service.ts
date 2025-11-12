@@ -4,7 +4,7 @@ import { Neo4jService as Neo4jLibService } from 'nest-neo4j';
 @Injectable()
 export class Neo4jService {
   private readonly logger = new Logger(Neo4jService.name);
-
+  
   constructor(private readonly neo4jService: Neo4jLibService) {
     this.logger.log('Neo4j service injected from nest-neo4j');
   }

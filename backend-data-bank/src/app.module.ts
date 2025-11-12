@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config'; // Add this import
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
@@ -13,10 +13,12 @@ import { Neo4jService } from './database/neo4j/neo4j.service';
 import { GeolocationService } from './geolocation/geolocation.service';
 import { RepositoryService } from './repository/repository.service';
 import { UsersModule } from './users/users.module';
+import { HttpModule, HttpService } from '@nestjs/axios';
  
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), 
+    HttpModule,
     AccountModule, 
     UsersModule, 
     CardModule, 
@@ -28,6 +30,6 @@ import { UsersModule } from './users/users.module';
     
   ],
   controllers: [AppController],
-  providers: [AppService, GeolocationService, RepositoryService],
+  providers: [AppService],
 })
 export class AppModule {}

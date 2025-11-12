@@ -13,7 +13,7 @@ Content-Type: application/json
   "password": "password123"
 }
 ### Request admin
-PATCH http://localhost:5000/api/users/giveAdmin/777777777?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+PATCH http://localhost:5000/api/users/giveAdmin/123456789?adminValidator=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 Content-Type: application/json
 
 ###
@@ -117,13 +117,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 
 ###
 POST http://localhost:5000/api/transaction
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsInN1YiI6IjY5MGMwMjkzZWIyNGRjZTcyYmIyYzc2OSIsImlhdCI6MTc2MjM5NDkyMCwiZXhwIjoxNzYyMzk3MzIwfQ.CBBfwbUDzhrRZNRd7jI4iuugNkCek9jEDe9Xz6xELpA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGdtYWlsLmNvbSIsInN1YiI6IjY5MTI0YzQxZTZkNjdiOTI1ZDU2YjdiNCIsImlhdCI6MTc2MjgxMTAwMCwiZXhwIjoxNzYyODEzNDAwfQ.eBFAefVFHsOIisBEf-2SybOR9CSwEILKmXlKc6MTMx4
 Content-Type: application/json
 
 {
-    "senderAccountNumber":9634869521,
-    "receiverAccountNumber":6675860922,
-    "amount": 1000 ,
+    "senderAccountNumber":1886240121,
+    "receiverAccountNumber":7336060345,
+    "amount": 3000 ,
     "type": "PAYMENT" ,
     "merchantCategory": "GROCERIES" ,
     "location": "MIAMI",

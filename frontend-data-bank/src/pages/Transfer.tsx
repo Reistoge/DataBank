@@ -404,24 +404,24 @@ function Transfer() {
                         <FiCreditCard />
                         From Account
                       </label>
-                      <select
-                        className={components.input.primary}
-                        value={formData.senderAccountNumber}
-                        onChange={handleChange}
-                        name="senderAccountNumber"
-                        required
-                      >
-                        <option value="">Select sender account...</option>
-                        {accounts.map((account) => (
-                          <option
-                            key={account.accountNumber}
-                            value={account.accountNumber}
-                          >
-                            {account.accountNumber} - {account.type} ($
-                            {account.balance.toFixed(2)})
-                          </option>
-                        ))}
-                      </select>
+                        <select
+                          className={components.input.primary}
+                          value={formData.senderAccountNumber}
+                          onChange={handleChange}
+                          name="senderAccountNumber"
+                          required
+                        >
+                          <option value="">Select sender account...</option>
+                          {accounts.map((account) => (
+                            <option
+                              key={account.accountNumber}
+                              value={account.accountNumber}
+                            >
+                              {account.accountNumber} - {account.type} ($
+                              {account.balance.toFixed(2)})
+                            </option>
+                          ))}
+                        </select>
                     </div>
 
                     {/* Receiver Account */}

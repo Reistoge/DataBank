@@ -1,0 +1,5 @@
+#
+GET https://nominatim.openstreetmap.org/search?city=La Serena&country=Chile&street=Alfonso campusano&format=json&limit=1
+
+
+

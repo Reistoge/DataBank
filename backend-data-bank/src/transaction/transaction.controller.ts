@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Logger, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Request, UseGuards, Logger, HttpStatus, BadRequestException } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { TransactionRequestDto, TransactionResponseDto } from './dto/transaction.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RoleGuard } from 'src/auth/roles/roles.guard';
+import { AuthUserPayloadDto } from 'src/auth/auth.service';
+import { User } from 'src/users/decorator/user.guard';
 
 @Controller('transaction')
 export class TransactionController {
@@ -12,15 +14,33 @@ export class TransactionController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createTransactionDto: TransactionRequestDto) {
+  async create(@User() user : AuthUserPayloadDto, @Body() createTransactionDto: TransactionRequestDto) {
+
     this.logger.log(`Creating transaction: ${createTransactionDto.senderAccountNumber} -> ${createTransactionDto.receiverAccountNumber}, amount: ${createTransactionDto.amount}`);
+    try {
+      // extract user number
+      if (user.userNumber) {
+        // extract user number to check if tx sender and user are valid
+        const result = await this.transactionService.create(user.userNumber, createTransactionDto);
+        return {
+          statusCode: result.status === 'PENDING' ? HttpStatus.ACCEPTED : HttpStatus.BAD_REQUEST,
+          data: result,
+        };
 
-    const result = await this.transactionService.create(createTransactionDto);
+      }
+      else {
+        throw new BadRequestException()
+      }
 
-    return {
-      statusCode: result.status === 'PENDING' ? HttpStatus.ACCEPTED : HttpStatus.BAD_REQUEST,
-      data: result,
-    };
+    } catch (err) {
+
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        data: null
+      }
+    }
+
+
   }
 
   @UseGuards(JwtAuthGuard)
