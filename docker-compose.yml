@@ -35,7 +35,11 @@ services:
             start_period: 30s
             retries: 30
 
+
     backend-data-bank-service:
+    # mongosh --host localhost --port 27017 --db your_database_name
+    # show dbs
+    # use db
         build: ./backend-data-bank
         container_name: backend-data-bank
         restart: unless-stopped
