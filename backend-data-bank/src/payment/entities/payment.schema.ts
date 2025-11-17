@@ -6,17 +6,17 @@ export type PaymentDocument = Payment & Document;
 
 @Schema({ timestamps: true })
 export class Payment {
-    @Prop({ required: true })
-    merchantId: string
-    
-    @Prop({ required: true })
-    product: Product;
-    
-    @Prop({ required: true })
-    orderNumber: string;
+  @Prop({ required: true })
+  merchantId: string;
 
-    @Prop({required:true})
-    txId: string;
+  @Prop({ required: true })
+  product: Product;
+
+  @Prop({ required: true })
+  orderNumber: string;
+
+  @Prop({ required: true })
+  txId: string;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

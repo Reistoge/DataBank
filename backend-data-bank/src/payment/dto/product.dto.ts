@@ -1,19 +1,17 @@
-export class ProductResponseDto  {
-   
+export class ProductResponseDto {
+  name: string;
 
-    name: string;
+  description: string;
 
-    description: string;
+  price: number;
 
-    price: number;
+  quantity: number;
 
-    quantity: number;
+  sku: string;
 
-    sku: string;
+  category: string;
 
-    category: string;
+  isActive: boolean;
 
-    isActive: boolean;
-
-    merchantName:string;
+  merchantName: string;
 }

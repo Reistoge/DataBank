@@ -1,11 +1,11 @@
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  HttpCode, 
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
   HttpStatus,
   UseGuards,
-  Get
+  Get,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -15,20 +15,16 @@ import { User } from 'src/users/decorator/user.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('payment')
- export class PaymentController {
+export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @User() user: AuthUserPayloadDto, 
-    @Body() createPaymentDto: CreatePaymentDto
+    @User() user: AuthUserPayloadDto,
+    @Body() createPaymentDto: CreatePaymentDto,
   ) {
     return await this.paymentService.create(createPaymentDto, user);
   }
-
-
-
-  
 }

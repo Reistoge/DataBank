@@ -1,12 +1,8 @@
-import { SuspiciousBehaviour } from "../suspicious-behaviours/suspicious-behaviour"
+import { SuspiciousBehaviour } from '../suspicious-behaviours/suspicious-behaviour';
 
-
-export class PredictionInput{
- 
-
+export class PredictionInput {}
+export class PredictionOutput {
+  prediction: number;
+  probabilitySuspicious: number;
+  behaviours: SuspiciousBehaviour[];
 }
-export class PredictionOutput{
-    prediction: number  
-    probabilitySuspicious: number
-    behaviours: SuspiciousBehaviour[]
- }   

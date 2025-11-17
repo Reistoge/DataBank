@@ -1,10 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
-import { AccountState, AccountType } from "../dto/account.dto";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
+import { AccountState, AccountType } from '../dto/account.dto';
 export type AccountDocument = Account & Document;
 @Schema({ timestamps: true })
 export class Account {
-
   _id: Types.ObjectId;
 
   @Prop({ required: true })
@@ -33,8 +32,6 @@ export class Account {
 
   createdAt?: Date;
   updatedAt?: Date;
-
-
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);

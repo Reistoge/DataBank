@@ -1,7 +1,15 @@
-import { IsDate, IsString, IsTimeZone, Length, MinLength, isEmail, isString } from "class-validator";
-import { Types } from "mongoose";
- 
-import { CreateUserDto, UserResponse } from "src/users/dto/user.dto";
+import {
+  IsDate,
+  IsString,
+  IsTimeZone,
+  Length,
+  MinLength,
+  isEmail,
+  isString,
+} from 'class-validator';
+import { Types } from 'mongoose';
+
+import { CreateUserDto, UserResponse } from 'src/users/dto/user.dto';
 // LOGIN DATA TRANSFER OBJECT
 export class LoginDto {
   @IsString()
@@ -36,10 +44,6 @@ export class RegisterDto {
 
   @IsString()
   region: string;
-
-
-
-
 }
 
 // AUTH RESPONSE DATA TRANSFER OBJECT

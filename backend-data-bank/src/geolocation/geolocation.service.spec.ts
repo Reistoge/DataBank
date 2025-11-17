@@ -3,19 +3,17 @@ import { GeolocationService } from './geolocation.service';
 import { HttpService, HttpModule } from '@nestjs/axios';
 
 enum MockUserRole {
-  
   CLIENT = 'CLIENT',
   ADMIN = 'ADMIN',
   EXEC = 'EXEC',
- 
 }
 interface MockUser {
   _id: string;
   username: string;
 
-  userNumber: string
+  userNumber: string;
 
-  password: string;  
+  password: string;
 
   email: string;
 
@@ -41,34 +39,31 @@ describe('GeolocationService', () => {
       imports: [HttpModule],
       providers: [GeolocationService],
     }).compile();
-      
+
     service = module.get<GeolocationService>(GeolocationService);
   });
   describe('runAll', () => {
     it('distance between { lat: -29, lon: -70 } and { lat: 30, lon: 10 } ', async () => {
-
-      const d = await service.calculateDistanceBetweenPoints({ lat: -29, lon: -70 }, { lat: 30, lon: 10 });
+      const d = await service.calculateDistanceBetweenPoints(
+        { lat: -29, lon: -70 },
+        { lat: 30, lon: 10 },
+      );
       expect(d).toBeDefined();
-      expect(d.toFixed(0)).toBe("10715");
-
+      expect(d.toFixed(0)).toBe('10715');
     });
-    it('Test distance between cities', async ()=>{
+    it('Test distance between cities', async () => {
       const result = await service.calculateDistanceBetween(
-      {
-        country: "Chile",
-        city: "La Serena"
-      },
-      {
-        country:"Chile",
-        city: "Ovalle"
-      })
+        {
+          country: 'Chile',
+          city: 'La Serena',
+        },
+        {
+          country: 'Chile',
+          city: 'Ovalle',
+        },
+      );
       expect(result).toBeDefined();
       expect(result).toBeCloseTo(84.8);
-
-
-    })
-
-
+    });
   });
-
 });

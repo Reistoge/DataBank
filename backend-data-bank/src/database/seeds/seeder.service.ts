@@ -11,7 +11,10 @@ import * as path from 'path';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from 'src/payment/entities/product.schema';
-import { Merchant, MerchantDocument } from 'src/payment/entities/merchant.schema';
+import {
+  Merchant,
+  MerchantDocument,
+} from 'src/payment/entities/merchant.schema';
 import { CardService } from 'src/card/card.service';
 
 @Injectable()
@@ -25,15 +28,20 @@ export class SeederService implements OnModuleInit {
     private readonly merchantService: MerchantService,
     private readonly cardService: CardService,
     private readonly configService: ConfigService,
-    @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
-    @InjectModel(Merchant.name) private readonly merchantModel: Model<MerchantDocument>,
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
+    @InjectModel(Merchant.name)
+    private readonly merchantModel: Model<MerchantDocument>,
   ) {
     this.loadData();
   }
 
   private loadData() {
     try {
-      const filePath = path.join(process.cwd(), 'src/database/seeds/seed-data.json');
+      const filePath = path.join(
+        process.cwd(),
+        'src/database/seeds/seed-data.json',
+      );
       const fileContent = fs.readFileSync(filePath, 'utf8');
       this.data = JSON.parse(fileContent);
     } catch (error) {
@@ -72,17 +80,23 @@ export class SeederService implements OnModuleInit {
           password: await bcrypt.hash(rawUser.password, 10),
         };
 
-        const existingUser = await this.userService.getUserByEmail(userData.email);
+        const existingUser = await this.userService.getUserByEmail(
+          userData.email,
+        );
 
         if (existingUser) {
           this.logger.log(`User ${userData.email} already exists, skipping...`);
-          const userDoc = await this.userService.getUserDocumentByRut(userData.rut);
+          const userDoc = await this.userService.getUserDocumentByRut(
+            userData.rut,
+          );
           if (userDoc) {
             createdUsers.push({
               user: existingUser,
               userDoc,
               userData: userData,
-              accounts: await this.accountService.findAccountsByUserId(existingUser.id),
+              accounts: await this.accountService.findAccountsByUserId(
+                existingUser.id,
+              ),
             });
           }
           continue;
@@ -99,7 +113,9 @@ export class SeederService implements OnModuleInit {
         });
 
         if (userData.roles?.includes(UserRole.ADMIN)) {
-          const userDoc = await this.userService.getUserDocumentByRut(userData.rut);
+          const userDoc = await this.userService.getUserDocumentByRut(
+            userData.rut,
+          );
           if (userDoc) {
             userDoc.roles = userData.roles;
             await this.userService.updateUserById(userDoc.id, userDoc);
@@ -108,7 +124,11 @@ export class SeederService implements OnModuleInit {
 
         this.logger.log(`✅ Created user: ${user.email}`);
 
-        const accounts = await this.seedAccountsForUser(user.id, user.username, userData.accountTypes);
+        const accounts = await this.seedAccountsForUser(
+          user.id,
+          user.username,
+          userData.accountTypes,
+        );
         const userDoc = await this.userService.getUserDocumentById(user.id);
 
         createdUsers.push({
@@ -128,7 +148,7 @@ export class SeederService implements OnModuleInit {
   private async seedAccountsForUser(
     userId: string,
     username: string,
-    accountTypes: AccountType[]
+    accountTypes: AccountType[],
   ) {
     try {
       const userDoc = await this.userService.getUserDocumentById(userId);
@@ -136,13 +156,14 @@ export class SeederService implements OnModuleInit {
 
       for (const accountType of accountTypes) {
         try {
-          const existingAccount = await this.accountService.findAccountsByUserIdAndType(
-            userId,
-            accountType
-          );
+          const existingAccount =
+            await this.accountService.findAccountsByUserIdAndType(
+              userId,
+              accountType,
+            );
           if (existingAccount && existingAccount.length > 0) {
             this.logger.log(
-              `Account type ${accountType} already exists for ${username}, skipping...`
+              `Account type ${accountType} already exists for ${username}, skipping...`,
             );
             createdAccounts.push(...existingAccount);
             continue;
@@ -157,32 +178,38 @@ export class SeederService implements OnModuleInit {
 
           const account = await this.accountService.create(accountData);
           this.logger.log(
-            `✅ Created ${accountType} account for ${username}: ${account.accountNumber}`
+            `✅ Created ${accountType} account for ${username}: ${account.accountNumber}`,
           );
 
           if (accountType === AccountType.BUSINESS) {
             await this.seedBusinessCardsForAccount(
-              account.accountNumber!,
-              account.id!,
-              'business-card-password'
+              account.accountNumber,
+              account.id,
+              'business-card-password',
             );
           } else {
             await this.seedCardsForAccount(
-              account.accountNumber!,
-              account.id!,
-              'default-card-password'
+              account.accountNumber,
+              account.id,
+              'default-card-password',
             );
           }
 
           createdAccounts.push(account);
         } catch (error) {
-          this.logger.error(`Failed to create ${accountType} account for ${username}:`, error);
+          this.logger.error(
+            `Failed to create ${accountType} account for ${username}:`,
+            error,
+          );
         }
       }
 
       return createdAccounts;
     } catch (error) {
-      this.logger.error(`Failed to create accounts for user ${username}:`, error);
+      this.logger.error(
+        `Failed to create accounts for user ${username}:`,
+        error,
+      );
       return [];
     }
   }
@@ -190,7 +217,7 @@ export class SeederService implements OnModuleInit {
   private async seedCardsForAccount(
     accountNumber: string,
     accountId: string,
-    cardPassword: string
+    cardPassword: string,
   ) {
     try {
       const cardData = {
@@ -202,14 +229,17 @@ export class SeederService implements OnModuleInit {
       const card = await this.cardService.create(cardData);
       this.logger.log(`✅ Created DEBIT card: ${card.number}`);
     } catch (error) {
-      this.logger.error(`Failed to create cards for account ${accountNumber}:`, error);
+      this.logger.error(
+        `Failed to create cards for account ${accountNumber}:`,
+        error,
+      );
     }
   }
 
   private async seedBusinessCardsForAccount(
     accountNumber: string,
     accountId: string,
-    cardPassword: string
+    cardPassword: string,
   ) {
     try {
       const cardTypes = ['BUSINESS_DEBIT', 'BUSINESS_CREDIT'];
@@ -224,13 +254,16 @@ export class SeederService implements OnModuleInit {
           const card = await this.cardService.create(cards[i]);
           this.logger.log(`✅ Created ${cardTypes[i]} card: ${card.number}`);
         } catch (error) {
-          this.logger.error(`Failed to create business card ${cardTypes[i]}:`, error);
+          this.logger.error(
+            `Failed to create business card ${cardTypes[i]}:`,
+            error,
+          );
         }
       }
     } catch (error) {
       this.logger.error(
         `Failed to create business cards for account ${accountNumber}:`,
-        error
+        error,
       );
     }
   }
@@ -241,13 +274,13 @@ export class SeederService implements OnModuleInit {
     const businessUsers = createdUsers.filter(
       (u) =>
         u.userData.merchantData &&
-        u.accounts.some((acc: any) => acc.type === AccountType.BUSINESS)
+        u.accounts.some((acc: any) => acc.type === AccountType.BUSINESS),
     );
 
     for (const businessUser of businessUsers) {
       try {
         const businessAccount = businessUser.accounts.find(
-          (acc: any) => acc.type === AccountType.BUSINESS
+          (acc: any) => acc.type === AccountType.BUSINESS,
         );
         if (!businessAccount) continue;
 
@@ -266,12 +299,15 @@ export class SeederService implements OnModuleInit {
           roles: businessUser.userDoc.roles,
         };
 
-        const merchant = await this.merchantService.create(merchantData, userPayload);
+        const merchant = await this.merchantService.create(
+          merchantData,
+          userPayload,
+        );
         this.logger.log(`✅ Created merchant: ${merchant.name}`);
       } catch (error) {
         this.logger.error(
           `Failed to create merchant for user ${businessUser.user.email}:`,
-          error
+          error,
         );
       }
     }
@@ -281,7 +317,7 @@ export class SeederService implements OnModuleInit {
 
   private async createSystemMerchants(createdUsers: any[]) {
     const adminUser = createdUsers.find((u) =>
-      u.userData.roles?.includes(UserRole.ADMIN)
+      u.userData.roles?.includes(UserRole.ADMIN),
     );
     if (!adminUser) {
       this.logger.warn('No admin user found for system merchants');
@@ -289,10 +325,12 @@ export class SeederService implements OnModuleInit {
     }
 
     const adminBusinessAccount = adminUser.accounts.find(
-      (acc: any) => acc.type === AccountType.BUSINESS
+      (acc: any) => acc.type === AccountType.BUSINESS,
     );
     if (!adminBusinessAccount) {
-      this.logger.warn('Admin user has no business account for system merchants');
+      this.logger.warn(
+        'Admin user has no business account for system merchants',
+      );
       return;
     }
 
@@ -312,10 +350,16 @@ export class SeederService implements OnModuleInit {
           accountNumber: adminBusinessAccount.accountNumber,
         };
 
-        const merchant = await this.merchantService.create(merchantData, adminPayload);
+        const merchant = await this.merchantService.create(
+          merchantData,
+          adminPayload,
+        );
         this.logger.log(`✅ Created system merchant: ${merchant.name}`);
       } catch (error) {
-        this.logger.error(`Failed to create system merchant ${rawMerchant.name}:`, error);
+        this.logger.error(
+          `Failed to create system merchant ${rawMerchant.name}:`,
+          error,
+        );
       }
     }
   }
@@ -324,10 +368,14 @@ export class SeederService implements OnModuleInit {
     this.logger.log('📦 Seeding products...');
 
     const merchants = await this.merchantModel.find().lean().exec();
-    const merchantMap = new Map(merchants.map((m: any) => [m.name, m._id.toString()]));
+    const merchantMap = new Map(
+      merchants.map((m: any) => [m.name, m._id.toString()]),
+    );
 
     if (merchantMap.size === 0) {
-      this.logger.warn('⚠️ No merchants found. Please seed merchants first before products.');
+      this.logger.warn(
+        '⚠️ No merchants found. Please seed merchants first before products.',
+      );
       return;
     }
 
@@ -337,14 +385,18 @@ export class SeederService implements OnModuleInit {
 
         if (!merchantId) {
           this.logger.warn(
-            `⚠️ Merchant '${productData.merchantName}' not found for product '${productData.name}'. Skipping...`
+            `⚠️ Merchant '${productData.merchantName}' not found for product '${productData.name}'. Skipping...`,
           );
           continue;
         }
 
-        const existing = await this.productModel.findOne({ sku: productData.sku }).exec();
+        const existing = await this.productModel
+          .findOne({ sku: productData.sku })
+          .exec();
         if (existing) {
-          this.logger.log(`✓ Product already exists: ${productData.name}, skipping...`);
+          this.logger.log(
+            `✓ Product already exists: ${productData.name}, skipping...`,
+          );
           continue;
         }
 
@@ -360,10 +412,13 @@ export class SeederService implements OnModuleInit {
         });
 
         this.logger.log(
-          `✅ Created product: ${product.name} (Merchant: ${productData.merchantName}, ID: ${merchantId})`
+          `✅ Created product: ${product.name} (Merchant: ${productData.merchantName}, ID: ${merchantId})`,
         );
       } catch (error) {
-        this.logger.error(`Failed to create product ${productData.name}:`, error);
+        this.logger.error(
+          `Failed to create product ${productData.name}:`,
+          error,
+        );
       }
     }
   }
