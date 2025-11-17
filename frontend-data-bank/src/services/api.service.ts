@@ -1,7 +1,7 @@
-import type { Account } from "../types/auth.types";
+import type { Account, Contact } from "../types/auth.types";
 import type { Product, Merchant } from "../types/payment.types";
 import type { TransactionRequest, StartTransactionResponse, TransactionHistory } from "../types/transaction.types";
-import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES, TRANSACTION_ROUTES } from "../utils/constants";
+import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES, TRANSACTION_ROUTES, USER_ROUTES } from "../utils/constants";
 import { createAuthHeaders, tokenStorage } from "../utils/storage";
 import type {
   AccountAdminResponse,
@@ -26,6 +26,56 @@ export const getUserAccounts = async (): Promise<AccountResponse[]> => {
   console.log(`result ${result}`);
   return result;
 };
+
+export const addContact = async (contact: Contact) => {
+  const headers = createAuthHeaders();
+  console.log("headers:", headers);
+
+  const response = await fetch(API_BASE_URL + USER_ROUTES.ADD_CONTACT, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(contact),
+  });
+
+  if (!response.ok) throw new Error("add contacts failed");
+  const result = await response.json();
+  console.log(`result ${result}`);
+  return result;
+
+}
+
+export const getContacts = async () : Promise<Contact[]> => {
+  const headers = createAuthHeaders();
+  console.log("headers:", headers);
+
+  const response = await fetch(API_BASE_URL + USER_ROUTES.GET_CONTACTS, {
+    method: "GET",
+    headers: headers,
+  });
+
+  if (!response.ok) throw new Error("fetch contacts failed");
+  const result = await response.json();
+  console.log(`result ${result}`);
+  return result;
+
+}
+
+export const updateContacts = async (contacts:Contact[]) => {
+  const headers = createAuthHeaders();
+  console.log("headers:", headers);
+
+  const response = await fetch(API_BASE_URL + USER_ROUTES.UPDATE_CONTACT, {
+    method: "GET",
+    headers: headers,
+    body: JSON.stringify(contacts)
+  });
+
+  if (!response.ok) throw new Error("patch contacts failed");
+  const result = await response.json();
+  console.log(`result ${result}`);
+  return result;
+
+}
 export const deleteAccount = async (accountId: string | undefined) => {
   if (!accountId) throw new Error("accountId no provided ");
   const headers = createAuthHeaders();
@@ -198,6 +248,7 @@ export const makePayment = async (paymentDto: any): Promise<StartTransactionResp
 
 
 
+
 /**
  * 
  * ADMIN 
@@ -232,7 +283,7 @@ export const getProducts = async (): Promise<Product[]> => {
   return await response.json();
 };
 
- export const getMerchants = async (): Promise<Merchant[]> => {
+export const getMerchants = async (): Promise<Merchant[]> => {
   const response = await fetch(`${API_BASE_URL}/merchant/merchants`, {
     method: "GET",
     headers: createAuthHeaders(),
@@ -240,7 +291,7 @@ export const getProducts = async (): Promise<Product[]> => {
   if (!response.ok) throw new Error("getMerchants failed");
   return await response.json();
 };
- 
+
 export const getMerchant = async (name: string): Promise<Merchant> => {
   const response = await fetch(`${API_BASE_URL}/merchant/merchants/${name}`, {
     method: "GET",
@@ -250,4 +301,3 @@ export const getMerchant = async (name: string): Promise<Merchant> => {
   return await response.json();
 };
 
- 

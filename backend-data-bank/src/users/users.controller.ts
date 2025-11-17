@@ -1,9 +1,12 @@
-import { Controller, Get, Logger, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
 import { ConfigService } from '@nestjs/config';
-import { UserRole } from './schemas/user.schema';
+import { Contact, UserRole } from './schemas/user.schema';
 import { RoleGuard, Roles } from 'src/auth/roles/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthUserPayloadDto } from 'src/auth/auth.service';
+import { User } from './decorator/user.guard';
+import { get } from 'axios';
 
 @Controller('users')
 export class UsersController {
@@ -15,7 +18,7 @@ export class UsersController {
 
   ) { }
 
-  
+
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @Get('allUsers')
@@ -31,6 +34,31 @@ export class UsersController {
         message: error instanceof Error ? error.message : 'Failed to fetch users',
       };
     }
+  }
+
+
+  @Post('contacts')
+  @UseGuards(JwtAuthGuard)
+  async addContact(@User() user: AuthUserPayloadDto, @Body() contact: Contact) {
+
+    this.logger.log(`Adding contact for user ${user.userNumber}`);
+    await this.userService.addContact(user.userNumber, contact);
+
+
+  }
+
+  @Get('contacts')
+  @UseGuards(JwtAuthGuard)
+  async getContacts(@User() user: AuthUserPayloadDto) {
+    this.logger.log(`getting contacts for user ${user.userNumber}`);
+    return await this.userService.getContacts(user.userNumber);
+  }
+
+  @Patch('contacts')
+  @UseGuards(JwtAuthGuard)
+  async updateContacts(@User() user: AuthUserPayloadDto, contacts: Contact[]) {
+    this.logger.log(`update for user ${user.userNumber} contacts ${JSON.stringify(contacts)}`);
+    return await this.userService.updateContacts(user.userNumber,contacts);
   }
 
   @Patch('giveAdmin/:userRut')
@@ -51,6 +79,6 @@ export class UsersController {
     } catch (err) {
       this.logger.error('Error updating user role', err);
       return { statusCode: 500, message: 'Failed to update user role' };
-      }
     }
   }
+}

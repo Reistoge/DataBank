@@ -1,7 +1,7 @@
-import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
+import { Contact, User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, UserResponse } from './dto/user.dto';
 import { AccountService } from 'src/account/account.service';
 import { AccountType } from 'src/account/dto/account.dto';
@@ -11,11 +11,69 @@ import { Neo4jService } from 'src/database/neo4j/neo4j.service';
 
 @Injectable()
 export class UserService {
+  async updateContacts(userNumber: string, contacts: Contact[]) {
+    try {
+      const user = await this.userModel.findOneAndUpdate(
+        { userNumber }, 
+        { contacts: contacts },
+        { new: true }  
+      ).exec();
+      
+      if (!user) {
+        throw new NotFoundException(`User not found while updating contacts`);
+      }
+      
+      return user; 
+    } catch (err) {
+   
+      throw err instanceof HttpException 
+        ? err 
+        : new InternalServerErrorException(`Error while updating user contacts`);
+    }
+
+  }
+  private readonly logger = new Logger(UserService.name);
+
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => AccountService))
+    private accountService: AccountService,
+    private neo4jService: Neo4jService,
+  ) { }
+
+
+  async getContacts(userNumber: string) {
+    try {
+      const user = await this.userModel.findOne({ userNumber }).exec();
+      if (!user) {
+        throw new NotFoundException(`User not found while getting contacts`);
+      }
+      return user.contacts;
+    }
+    catch (err) {
+      err instanceof HttpException ? err : new InternalServerErrorException(`error while getting user contacts`);
+    }
+  }
+  async addContact(userNumber: string, contact: Contact) {
+    try {
+      const user = await this.userModel.findOne({ userNumber }).exec();
+      if (!user) {
+        throw new NotFoundException(`User not found while adding a contact`);
+      }
+      if (!user.contacts.find((u) => u.accountNumber === contact.accountNumber)) {
+        user.contacts.push(contact);
+      }
+      await user.save();
+    }
+    catch (err) {
+      throw err instanceof HttpException ? err : new InternalServerErrorException(`error while adding user contacts`);
+    }
+  }
   async hasAccount(accountNumber: string, userNumber: string): Promise<boolean> {
     try {
       if ((await this.accountService.getUserByAccountNumber(accountNumber)).userNumber === userNumber) {
         return true;
-      }else{
+      } else {
         return false;
       }
 
@@ -35,14 +93,7 @@ export class UserService {
 
   }
 
-  private readonly logger = new Logger(UserService.name);
 
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    @Inject(forwardRef(() => AccountService))
-    private accountService: AccountService,
-    private neo4jService: Neo4jService,
-  ) { }
 
   async create(userData: CreateUserDto): Promise<UserResponse> {
     this.logger.log(`Creating user: ${userData.email}`);

@@ -19,6 +19,8 @@ import AdminPanel from './pages/AdminPanel';
 import Transfer from './pages/Transfer';
 import ShopPayment from './pages/ShopPayment';
 import MyCards from './pages/MyCards';
+import Contacts from './pages/Contacts';
+import TransferContact from './pages/TransferContact';
 
 function App() {
   return (
@@ -82,6 +84,14 @@ function App() {
               }
             />
             <Route
+              path={CONSTANT_ROUTES.TRANSFER_CONTACT}
+              element={
+                <ProtectedRoute>
+                  <TransferContact />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path={CONSTANT_ROUTES.ADMIN_PANEL}
               element={
                 <ProtectedRoute>
@@ -98,6 +108,15 @@ function App() {
               }
             />
             <Route path={CONSTANT_ROUTES.PAYMENT} element={<ShopPayment />} />
+            <Route
+              path={CONSTANT_ROUTES.CONTACTS}
+              element={
+                <ProtectedRoute>
+                  <Contacts />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={CONSTANT_ROUTES.PAYMENT} element={<Contacts />} />
 
             <Route
               path="*"

@@ -16,10 +16,11 @@ import {
   FiMapPin,
   FiCreditCard,
   FiInfo,
+  FiUserPlus,
 } from 'react-icons/fi';
 import displayAccountResponseComponent from '../components/display-account.component';
 import { useAuth } from '../hooks/useAuth.hook';
-import { getUserAccounts, makeAccountTransfer } from '../services/api.service';
+import { getUserAccounts, makeAccountTransfer, addContact } from '../services/api.service';
 import type { AccountResponse } from '../services/dto/account.types';
 import { ROUTES, ANIMATION, RESOURCES } from '../utils/constants';
 import { colors, components } from '../utils/design-system';
@@ -28,6 +29,7 @@ import type {
   TransactionRequest,
   StartTransactionResponse,
 } from '../types/transaction.types';
+import type { Contact } from '../types/auth.types';
 
 type FormState = 'form' | 'submit' | 'success' | 'error';
 
@@ -72,8 +74,9 @@ function Transfer() {
 
   const [txCountry, setTxCountry] = useState('');
   const [txRegion, setTxRegion] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState('');
+  const [wantsToAddContact, setWantsToAddContact] = useState(false);
+  const [addingContact, setAddingContact] = useState(false);
+  const [contactAdded, setContactAdded] = useState(false);
 
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<AccountResponse[]>([]);
@@ -160,56 +163,69 @@ function Transfer() {
   };
 
   const validateForm = (): boolean => {
-    // Validate sender account
     if (!formData.senderAccountNumber) {
       setFormError(new Error('Please select a sender account'));
       return false;
     }
 
-    // Validate receiver account
     if (!formData.receiverAccountNumber) {
       setFormError(new Error('Please enter receiver account number'));
       return false;
     }
 
-    // Check if sender and receiver are different
     if (formData.senderAccountNumber === formData.receiverAccountNumber) {
       setFormError(new Error('Cannot transfer to the same account'));
       return false;
     }
 
-    // Validate amount
     if (formData.amount <= 0) {
       setFormError(new Error('Amount must be greater than 0'));
       return false;
     }
 
-    // Check sufficient balance
     if (selectedAccount && formData.amount > selectedAccount.balance) {
       setFormError(new Error('Insufficient balance'));
       return false;
     }
 
-    // Validate location
     if (!formData.location || formData.location.trim() === '') {
       setFormError(new Error('Please select transaction location'));
       return false;
     }
 
-    // Validate receiver email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.receiverEmail)) {
       setFormError(new Error('Invalid receiver email'));
       return false;
     }
 
-    // Validate password
-    if (!password) {
-      setFormError(new Error('Password is required'));
-      return false;
-    }
+ 
 
     return true;
+  };
+
+  const handleAddContact = async () => {
+    if (!formData.receiverAccountNumber || !formData.receiverContact || !formData.receiverEmail) {
+      return;
+    }
+
+    setAddingContact(true);
+    try {
+      const newContact: Contact = {
+        accountNumber: formData.receiverAccountNumber,
+        name: formData.receiverContact,
+        email: formData.receiverEmail,
+        type: formData.type,
+        category: formData.merchantCategory,
+      };
+
+      await addContact(newContact);
+      setContactAdded(true);
+    } catch (err) {
+      console.error('Failed to add contact:', err);
+    } finally {
+      setAddingContact(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -228,25 +244,35 @@ function Transfer() {
       setTransactionResponse(response);
 
       if (response.status === 'PENDING' || response.status === 'COMPLETED') {
+        // Add contact if user wants to
+        if (wantsToAddContact) {
+          await handleAddContact();
+        }
+
         setFormState('success');
-        // Reset form
-        setFormData({
-          senderAccountNumber: '',
-          receiverAccountNumber: '',
-          amount: 0,
-          type: 'PAYMENT',
-          merchantCategory: 'OTHER',
-          location: '',
-          currency: 'USD',
-          description: '',
-          receiverContact: '',
-          receiverEmail: '',
-          device: 'web-browser',
-          ipAddress: formData.ipAddress,
-        });
-        setPassword('');
-        setTxCountry('');
-        setTxRegion('');
+        
+        // Reset form after delay
+        setTimeout(() => {
+          setFormData({
+            senderAccountNumber: '',
+            receiverAccountNumber: '',
+            amount: 0,
+            type: 'PAYMENT',
+            merchantCategory: 'OTHER',
+            location: '',
+            currency: 'USD',
+            description: '',
+            receiverContact: '',
+            receiverEmail: '',
+            device: 'web-browser',
+            ipAddress: formData.ipAddress,
+          });
+          
+          setTxCountry('');
+          setTxRegion('');
+          setWantsToAddContact(false);
+          setContactAdded(false);
+        }, 100);
       } else {
         setFormError(new Error(response.message || 'Transaction failed'));
         setFormState('error');
@@ -282,9 +308,17 @@ function Transfer() {
             <p className="text-white mb-2">
               <strong>Status:</strong> {transactionResponse.status}
             </p>
-            <p className="text-white/80 text-sm">
+            <p className="text-white/80 text-sm mb-2">
               {transactionResponse.message}
             </p>
+            {contactAdded && (
+              <div className="mt-4 bg-green-500/20 border border-green-400 rounded-lg p-3">
+                <p className="text-green-200 text-sm flex items-center justify-center gap-2">
+                  <FiUserPlus />
+                  Contact added successfully!
+                </p>
+              </div>
+            )}
           </div>
         )}
         <div className="flex gap-4">
@@ -349,6 +383,11 @@ function Transfer() {
         <p className="text-gray-300">
           Please wait while we validate and process your transaction
         </p>
+        {addingContact && (
+          <p className="text-gray-300 mt-2 text-sm">
+            Adding contact...
+          </p>
+        )}
       </motion.div>
     );
   }
@@ -404,24 +443,24 @@ function Transfer() {
                         <FiCreditCard />
                         From Account
                       </label>
-                        <select
-                          className={components.input.primary}
-                          value={formData.senderAccountNumber}
-                          onChange={handleChange}
-                          name="senderAccountNumber"
-                          required
-                        >
-                          <option value="">Select sender account...</option>
-                          {accounts.map((account) => (
-                            <option
-                              key={account.accountNumber}
-                              value={account.accountNumber}
-                            >
-                              {account.accountNumber} - {account.type} ($
-                              {account.balance.toFixed(2)})
-                            </option>
-                          ))}
-                        </select>
+                      <select
+                        className={components.input.primary}
+                        value={formData.senderAccountNumber}
+                        onChange={handleChange}
+                        name="senderAccountNumber"
+                        required
+                      >
+                        <option value="">Select sender account...</option>
+                        {accounts.map((account) => (
+                          <option
+                            key={account.accountNumber}
+                            value={account.accountNumber}
+                          >
+                            {account.accountNumber} - {account.type} ($
+                            {account.balance.toFixed(2)})
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     {/* Receiver Account */}
@@ -467,7 +506,7 @@ function Transfer() {
                       )}
                     </div>
 
-                    {/* Transaction Type & Currency */}
+                    {/* Currency */}
                     <div>
                       <label className="block text-white font-medium mb-2">
                         Currency
@@ -487,6 +526,7 @@ function Transfer() {
                       </select>
                     </div>
 
+                    {/* Transaction Type */}
                     <div>
                       <label className="block text-white font-medium mb-2">
                         Type
@@ -617,36 +657,30 @@ function Transfer() {
                     />
                   </div>
 
-                  {/* Password */}
-                  <div>
-                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
-                      <FiLock />
-                      Account Password
-                    </label>
-                    <div className="relative">
+                  {/* Add to Contacts Checkbox */}
+                  <div className="bg-white/10 rounded-lg p-4">
+                    <label className="flex items-center gap-3 cursor-pointer">
                       <input
-                        className={`${components.input.primary} pr-10`}
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        required
+                        type="checkbox"
+                        checked={wantsToAddContact}
+                        onChange={(e) => setWantsToAddContact(e.target.checked)}
+                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <FiEyeOff /> : <FiEye />}
-                      </button>
-                    </div>
+                      <span className="text-white font-medium flex items-center gap-2">
+                        <FiUserPlus />
+                        Add receiver to my contacts
+                      </span>
+                    </label>
+                    <p className="text-white/60 text-sm mt-2 ml-8">
+                      Save this receiver for future transactions
+                    </p>
                   </div>
 
+   
                   {/* Submit Button */}
                   <button
                     className={`${components.button.primary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                     type="submit"
-                    // disabled={!selectedAccount || formState === 'form'}
                   >
                     <FiSend />
                     Send Money

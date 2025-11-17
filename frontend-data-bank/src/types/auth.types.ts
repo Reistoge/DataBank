@@ -13,7 +13,14 @@ export interface User {
     roles: UserRole[];
 
 }
- 
+export interface Contact {
+    accountNumber: string;
+    name: string;
+    email: string;
+    type: string;
+    category: string;
+
+}
 
 export interface Account {
     id: string
@@ -24,7 +31,7 @@ export interface Account {
     bankBranch: string;
     isActive: boolean;
 
-    
+
 }
 
 

@@ -8,6 +8,15 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   EXEC = 'EXEC',
 }
+
+export class Contact{
+  accountNumber : string;
+  name: string;
+  email:string;
+  type: string;
+  category: string;
+
+}
 @Schema({ timestamps: true })
 export class User {
   _id: Types.ObjectId;
@@ -43,6 +52,9 @@ export class User {
 
   @Prop({ type: Date, default: null })
   lastLogin?: Date | null;
+
+  @Prop({ type: [Object], default: [] })
+  contacts: Contact[];
  
 }
 

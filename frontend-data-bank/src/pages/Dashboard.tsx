@@ -24,6 +24,7 @@ import {
   FiTrendingDown,
   FiTrendingUp,
   FiGift,
+  FiUsers,
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth.hook';
@@ -702,15 +703,33 @@ function Dashboard() {
                       <FiTrash2 />
                       Delete Account
                     </Link>
+                    <Link
+                      to={ROUTES.CONTACTS}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FiUsers />
+                      Contacts
+                    </Link>
 
                     <Link
                       to={ROUTES.TRANSFER}
                       className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
                       onClick={() => setOpen(false)}
                     >
-                      <FiDollarSign />
+                      <FiDollarSign className='text-yellow-500'/>
                       Transfer Money
                     </Link>
+
+                    <Link
+                      to={ROUTES.TRANSFER_CONTACT}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FiDollarSign className='text-green-500'/>
+                      Transfer to contacts
+                    </Link>
+
                     <Link
                       className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
                       to={ROUTES.PAYMENT}

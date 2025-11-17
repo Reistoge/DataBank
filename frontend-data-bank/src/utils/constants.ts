@@ -15,6 +15,9 @@ export const ROUTES = {
   SHOP_PAYMENT: '/shop-payment',
   PAYMENT: '/payment',
   MY_CARDS: '/my-cards', 
+  CONTACTS: '/contacts', 
+  TRANSFER_CONTACT: '/transfer-contact',
+
   HOME: '/',
 } as const;
 
@@ -68,6 +71,9 @@ export const CARD_ROUTES = Object.freeze({
 })
 export const USER_ROUTES = Object.freeze({
   GET_PROFILE: '/api/auth/profile', // req token
+  ADD_CONTACT: '/users/contacts', 
+  UPDATE_CONTACT: '/users/contacts', 
+  GET_CONTACTS: '/users/contacts', 
 
 
 })
