@@ -17,7 +17,7 @@ import { MerchantRepository } from 'src/payment/repository/merchant/merchant.rep
     ]),
     UsersModule,
     AccountModule,
-    CardModule, // Make sure this is imported
+    CardModule, 
   ],
   providers: [SeederService, MerchantService, MerchantRepository],
   exports: [SeederService],
