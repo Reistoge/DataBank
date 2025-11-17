@@ -14,7 +14,9 @@ import { GeolocationService } from './geolocation/geolocation.service';
 import { RepositoryService } from './repository/repository.service';
 import { UsersModule } from './users/users.module';
 import { HttpModule, HttpService } from '@nestjs/axios';
- 
+import { PaymentModule } from './payment/payment.module';
+import { SeederModule } from './database/seeds/seeder.module';
+  
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), 
@@ -27,6 +29,10 @@ import { HttpModule, HttpService } from '@nestjs/axios';
     ScheduleModule.forRoot(),
     TransactionModule, 
     FraudSystemModule,
+     PaymentModule,
+      SeederModule,
+      SeederModule,
+  
     
   ],
   controllers: [AppController],

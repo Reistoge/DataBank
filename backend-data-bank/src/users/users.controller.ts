@@ -1,5 +1,5 @@
 import { Controller, Get, Logger, Param, Patch, Query, UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UserService } from './users.service';
 import { ConfigService } from '@nestjs/config';
 import { UserRole } from './schemas/user.schema';
 import { RoleGuard, Roles } from 'src/auth/roles/roles.guard';
@@ -10,7 +10,7 @@ export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
   constructor(
-    private userService: UsersService,
+    private userService: UserService,
     private configService: ConfigService,
 
   ) { }

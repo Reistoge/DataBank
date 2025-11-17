@@ -8,21 +8,34 @@ import { AccountType } from 'src/account/dto/account.dto';
 import { AuthUserPayloadDto } from 'src/auth/auth.service';
 import { CreateUserNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
-  
-@Injectable()
-export class UsersService {
-  async updateUserById(id: string, user: UserDocument | null) {
-      const u = await this.getUserById(id);
-      this.logger.warn(`Updating ${u} with new data: ${user}`);
-      await this.userModel.findByIdAndUpdate(id,{...user}).exec();
-      const newSavedUser = await this.getUserById(id);
 
-      this.logger.log(`data updated succesfully ${newSavedUser}`);
-      return newSavedUser;
+@Injectable()
+export class UserService {
+  async hasAccount(accountNumber: string, userNumber: string): Promise<boolean> {
+    try {
+      if ((await this.accountService.getUserByAccountNumber(accountNumber)).userNumber === userNumber) {
+        return true;
+      }else{
+        return false;
+      }
+
+    } catch (error) {
+      this.logger.warn(`Error checking account existance for user: ${error}`);
+      return false;
+    }
+  }
+  async updateUserById(id: string, user: UserDocument | null) {
+    const u = await this.getUserById(id);
+    this.logger.warn(`Updating ${u} with new data: ${user}`);
+    await this.userModel.findByIdAndUpdate(id, { ...user }).exec();
+    const newSavedUser = await this.getUserById(id);
+
+    this.logger.log(`data updated succesfully ${newSavedUser}`);
+    return newSavedUser;
 
   }
 
-  private readonly logger = new Logger(UsersService.name);
+  private readonly logger = new Logger(UserService.name);
 
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
@@ -44,13 +57,13 @@ export class UsersService {
     this.logger.log(`User ${savedUser.id} saved with no errors`);
 
     const userResponse = this.toResponseDto(savedUser);
-    try{
+    try {
       this.logger.log(`creaing user node`);
-      const q : CypherQuery<UserDocument> = new CreateUserNode(this.neo4jService, savedUser);
+      const q: CypherQuery<UserDocument> = new CreateUserNode(this.neo4jService, savedUser);
       const records = q.execute();
       this.logger.log(`records ${records.toString()}`);
 
-    }catch(err){
+    } catch (err) {
       this.logger.warn(`Error while storing user in neo4j`);
     }
 
@@ -65,7 +78,7 @@ export class UsersService {
     return userResponse;
   }
   async logoutUser(user: AuthUserPayloadDto) {
-    await this.userModel.findOneAndUpdate({email:user.email}, {lastLogin: (new Date(Date.now()))});
+    await this.userModel.findOneAndUpdate({ email: user.email }, { lastLogin: (new Date(Date.now())) });
   }
   async getUserByUsername(username: string): Promise<UserResponse | null> {
     const user = await this.userModel.findOne({ username }).exec();
@@ -102,7 +115,7 @@ export class UsersService {
     } while (exists);
     return identifier;
   }
- 
+
 
   async findAllUsers(): Promise<UserResponse[]> {
     const users = await this.userModel.find().select('-password').exec();

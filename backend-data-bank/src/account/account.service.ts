@@ -4,20 +4,35 @@ import { Account, AccountDocument } from './schemas/account.schema';
 import { Model } from 'mongoose';
 import { CardService } from 'src/card/card.service';
 import { CreateAccountDto, AccountResponseDto, UpdateAccountDto, AccountType, AccountState, AccountAdminResponse } from './dto/account.dto';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/users/users.service';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
 import { CreateAccountNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
 
 @Injectable()
 export class AccountService {
-
+  async getAccountDocumentFromCardNumber(cardNumber: string): Promise<AccountDocument> {
+    this.logger.log(`Searching for account by card number ${cardNumber}`);
+    try {
+      const card = await this.cardService.getCardByCardNumber(cardNumber);
+      const account = await this.accountModel.findOne({ _id: card.accountId, state: AccountState.DEFAULT }).exec();
+      if (!account) {
+      throw new NotFoundException(`Account not found or not in default state`);
+      }
+      this.logger.log(`Account found for card ${cardNumber}`);
+      return account;
+    } catch (err) {
+      this.logger.error(`Error finding account by card number ${cardNumber}`, err);
+      throw err instanceof Error ? err : new Error('Error getting account from card number');
+    }
+  }
+v
   private readonly logger = new Logger(AccountService.name);
 
   constructor(
     @InjectModel(Account.name) private readonly accountModel: Model<AccountDocument>,
-    @Inject(forwardRef(() => UsersService))
-    private userService: UsersService,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
     private cardService: CardService,
     private neo4jService: Neo4jService
   ) { }
@@ -117,6 +132,17 @@ export class AccountService {
     }
     this.logger.log(`Account ${accountNumber} found`);
     return account;
+  }
+  async checkAccountExistance(accountNumber:string) : Promise<boolean>{
+    try {
+      await this.getAccountDocumentByAccountNumber(accountNumber);
+      return true;
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        return false;
+      }
+      throw err;
+    }
   }
 
 

@@ -123,8 +123,7 @@ export class TransactionService {
       };
     }
   }
-
-
+  
   private async buildTransactionDetails(txRequestDto: TransactionRequestDto): Promise<TransactionDocument> {
     const receiver = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.receiverAccountNumber);
     const sender = await this.accountService.getAccountDocumentByAccountNumber(txRequestDto.senderAccountNumber);

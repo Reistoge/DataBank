@@ -4,7 +4,7 @@ import { AccountService } from 'src/account/account.service';
 import { CardService } from 'src/card/card.service';
 import { CardDocument } from 'src/card/schemas/card.schema';
 import { UserDocument } from 'src/users/schemas/user.schema';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class RepositoryService {

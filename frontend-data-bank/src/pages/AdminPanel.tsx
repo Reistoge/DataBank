@@ -132,25 +132,26 @@ function AdminPanel() {
     };
 
     return (
-      <div className="group bg-white/10 backdrop-blur-sm rounded-lg p-3 hover:bg-white/20 transition-all duration-200">
+      <div className="group bg-white/10 backdrop-blur-sm rounded-lg p-3 hover:bg-white/20 transition-all duration-200 flex flex-col h-full min-h-[280px]">
         {/*  Account Info Display */}
-        <div className="mb-2">
-          <div className="text-xs text-gray-300 mb-1">
-            Created: {`${new Date(accountAdmin.createdAt).toLocaleDateString() } `}
+        <div className="flex-1 mb-3">
+          <div className="text-xs text-gray-300 mb-2 flex-shrink-0">
+            Created: {`${new Date(accountAdmin.createdAt).toLocaleDateString()}`}
           </div>
-          {displayAllAccountResponseComponentInputAdmin(
-            temp,
-            '',
-            'text-xs font-bold text-gray-400 uppercase tracking-wide',
-            'text-sm font-semibold text-gray-900 rounded p-1 bg-white/90',
-            'gap-2 grid grid-cols-2',
-            handleValueChange,
-          )}
+          <div className="flex-1 overflow-hidden">
+            {displayAllAccountResponseComponentInputAdmin(
+              temp,
+              '',
+              'text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block',
+              'text-sm font-semibold text-gray-900 rounded p-2 bg-white/90 w-full mb-2 block',
+              'space-y-2',
+              handleValueChange,
+            )}
+          </div>
         </div>
 
-
-        {/*  Action Buttons */}
-        <div className="grid grid-cols-3 gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/*  Action Buttons - Fixed at bottom */}
+        <div className="grid grid-cols-3 gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 mt-auto">
           <button
             type="button"
             className="text-xs bg-red-600 hover:bg-red-700 text-white rounded-md p-2 shadow-sm transition-colors"
@@ -280,10 +281,10 @@ function AdminPanel() {
             </div>
           )}
 
-          {/*  Accounts Grid */}
+          {/*  Accounts Grid - Fixed grid layout */}
           {!isLoading && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-6 auto-rows-fr">
                 {currentAccounts.length > 0 ? (
                   currentAccounts.map((accountAdmin) => (
                     <AccountRow

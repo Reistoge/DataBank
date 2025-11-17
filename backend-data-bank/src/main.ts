@@ -52,13 +52,13 @@ async function bootstrap() {
 
   try {
     const neo4jService = app.get(Neo4jService);
-    logger.log('Testing Neo4j connection...');  // ✅ Use logger, not this.logger
+    logger.log('Testing Neo4j connection...');   
     
     // Simple connection test
     await neo4jService.query('RETURN 1 as test');
-    logger.log('✅ Neo4j connection successful');  // ✅ Use logger, not this.logger
+    logger.log('✅ Neo4j connection successful');   
   } catch (error) {
-    logger.error('❌ Neo4j connection failed:', error.message);  // ✅ Use logger, not this.logger
+    logger.error('❌ Neo4j connection failed:', error.message);   
     // Continue startup even if Neo4j fails (for graceful degradation)
   }
 

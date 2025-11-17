@@ -51,4 +51,6 @@ export class TransactionResponseDto {
     status:string;
     message:string;
 }
+ 
+
 export class UpdateTransactionDto extends PartialType(TransactionRequestDto) {}

@@ -1,7 +1,7 @@
 // auth/auth.service.ts
 import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserDocument, UserRole } from 'src/users/schemas/user.schema';
@@ -23,7 +23,7 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private usersService: UsersService,
+    private usersService: UserService,
     private jwtService: JwtService,
   ) { }
 

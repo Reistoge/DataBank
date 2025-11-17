@@ -10,8 +10,8 @@ import { DatabaseModule } from 'src/database/database.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Account.name, schema: AccountSchema }]), 
-    CardModule, 
     forwardRef(() => UsersModule),   
+    forwardRef(() => CardModule),   
     DatabaseModule   
   ],
   controllers: [AccountController],
