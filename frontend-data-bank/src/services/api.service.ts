@@ -1,6 +1,10 @@
-import { ACCOUNT_ROUTES, API_BASE_URL, CARD_ROUTES } from "../utils/constants";
+import type { Account } from "../types/auth.types";
+import type { Product, Merchant } from "../types/payment.types";
+import type { TransactionRequest, StartTransactionResponse, TransactionHistory } from "../types/transaction.types";
+import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES, TRANSACTION_ROUTES } from "../utils/constants";
 import { createAuthHeaders, tokenStorage } from "../utils/storage";
 import type {
+  AccountAdminResponse,
   AccountResponse,
   CardResponse,
   CreateAccountDto,
@@ -49,6 +53,18 @@ export const getCards = async (accountId: string): Promise<CardResponse[]> => {
   if (!response.ok) throw new Error("getCards failed");
   return await response.json();
 };
+// Update an existing account for Admin
+export const updateAccount = async (dto: Account): Promise<Account> => {
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.UPDATE_ACCOUNT, {
+    method: "PATCH",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(dto),
+  });
+  if (!response.ok) throw new Error("updateAccount failed");
+  const result = await response.json();
+  return result;
+};
+
 
 // Create a new account for the authenticated user
 export const createAccount = async (dto: CreateAccountDto): Promise<AccountResponse> => {
@@ -111,9 +127,127 @@ export const deleteCard = async (cardId: string, accessPassword: string) => {
   return await response.json();
 };
 
+
 export const updateCardSpentLimit = async (dto: CardResponse, newLimit: number, accessPassword: string) => {
   const copy = { ...dto };
   copy.spentLimit = newLimit;
 
   return await updateCard(copy, accessPassword);
 }
+
+
+export const makeAccountTransfer = async (tx: TransactionRequest): Promise<StartTransactionResponse> => {
+  const response = await fetch(`${API_BASE_URL}${TRANSACTION_ROUTES.MAKE_TRANSACTION}`, {
+    method: "POST",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(tx),
+  });
+  const result = await response.json();
+  console.log(`request transaction api response ${JSON.stringify(result)}`)
+  if (!response.ok) throw new Error("start transaction failed");
+  return result.data;
+
+
+}
+export const getTransactionHistory = async (
+  accountNumber: string,
+): Promise<TransactionHistory> => {
+  const response = await fetch(
+    `${API_BASE_URL}${TRANSACTION_ROUTES.TRANSACTION}/${accountNumber}${TRANSACTION_ROUTES.HISTORY}`,
+    {
+      method: 'GET',
+      headers: createAuthHeaders(),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch transaction history');
+  }
+
+  const result = await response.json();
+
+  // Debug logging
+  console.log('Transaction history response:', result);
+
+  // Handle nested response if backend wraps it
+  const data = result.data || result;
+
+  // Validate data structure
+  if (!Array.isArray(data)) {
+    console.error('Invalid transaction history format:', data);
+    return [];
+  }
+
+  return data;
+};
+
+export const makePayment = async (paymentDto: any): Promise<StartTransactionResponse> => {
+  const response = await fetch(`${API_BASE_URL}/payment`, {
+    method: "POST",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(paymentDto),
+  });
+  const result = await response.json();
+  console.log(`Payment API response: ${JSON.stringify(result)}`);
+  if (!response.ok) {
+    const errorMessage = result.message || 'Payment creation failed';
+    throw new Error(errorMessage);
+  }
+  return result;
+};
+
+
+
+/**
+ * 
+ * ADMIN 
+ *  
+ */
+export const updateAccountAdmin = async (dto: AccountAdminResponse): Promise<AccountAdminResponse> => {
+  const response = await fetch(API_BASE_URL + ACCOUNT_ROUTES.UPDATE_ACCOUNT, {
+    method: "PATCH",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(dto),
+  });
+  if (!response.ok) throw new Error("updateAccount failed");
+  const result = await response.json();
+  return result;
+};
+
+export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => {
+  const response = await fetch(API_BASE_URL + ADMIN_ROUTES.FIND_ALL_ACCOUNTS, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getAllAccountsAdmin failed");
+  return await response.json();
+};
+
+export const getProducts = async (): Promise<Product[]> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/products`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getProducts failed");
+  return await response.json();
+};
+
+ export const getMerchants = async (): Promise<Merchant[]> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/merchants`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getMerchants failed");
+  return await response.json();
+};
+ 
+export const getMerchant = async (name: string): Promise<Merchant> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/merchants/${name}`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getMerchant failed");
+  return await response.json();
+};
+
+ 

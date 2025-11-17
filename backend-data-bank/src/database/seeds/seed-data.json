@@ -1,0 +1,204 @@
+{
+  "users": [
+    {
+      "rut": "12345678-9",
+      "username": "admin",
+      "email": "admin@databank.com",
+      "password": "admin123",
+      "birthday": "1990-01-01",
+      "country": "Chile",
+      "region": "Santiago",
+      "roles": ["ADMIN", "CLIENT"],
+      "accountTypes": ["DEBIT", "SAVINGS", "CHECKING", "BUSINESS"]
+    },
+    {
+      "rut": "98765432-1",
+      "username": "johndoe",
+      "email": "john.doe@email.com",
+      "password": "password123",
+      "birthday": "1985-05-15",
+      "country": "Chile",
+      "region": "Santiago",
+      "roles": ["CLIENT"],
+      "accountTypes": ["DEBIT", "BUSINESS"],
+      "merchantData": {
+        "name": "SuperMarket Central",
+        "category": "GROCERY",
+        "description": "Large grocery store chain",
+        "location": "Santiago, Chile",
+        "isActive": true,
+        "contact": "+56 9 1234 5678"
+      }
+    },
+    {
+      "rut": "11223344-5",
+      "username": "janesmith",
+      "email": "jane.smith@email.com",
+      "password": "password123",
+      "birthday": "1992-08-22",
+      "country": "Chile",
+      "region": "Valparaíso",
+      "roles": ["CLIENT"],
+      "accountTypes": ["DEBIT", "BUSINESS"],
+      "merchantData": {
+        "name": "TechStore Pro",
+        "category": "ELECTRONICS",
+        "description": "Electronics and technology store",
+        "location": "Valparaíso, Chile",
+        "isActive": true,
+        "contact": "+56 9 2345 6789"
+      }
+    },
+    {
+      "rut": "55667788-9",
+      "username": "bobwilson",
+      "email": "bob.wilson@email.com",
+      "password": "password123",
+      "birthday": "1988-12-03",
+      "country": "Chile",
+      "region": "Concepción",
+      "roles": ["CLIENT"],
+      "accountTypes": ["DEBIT", "SAVINGS"]
+    },
+    {
+      "rut": "77889900-1",
+      "username": "mariagarcia",
+      "email": "maria.garcia@email.com",
+      "password": "password123",
+      "birthday": "1987-03-10",
+      "country": "Chile",
+      "region": "La Serena",
+      "roles": ["CLIENT"],
+      "accountTypes": ["DEBIT", "BUSINESS"],
+      "merchantData": {
+        "name": "Fashion World",
+        "category": "CLOTHING",
+        "description": "Clothing and fashion retailer",
+        "location": "La Serena, Chile",
+        "isActive": true,
+        "contact": "+56 9 3456 7890"
+      }
+    },
+    {
+      "rut": "33445566-7",
+      "username": "carloslopez",
+      "email": "carlos.lopez@email.com",
+      "password": "password123",
+      "birthday": "1983-11-25",
+      "country": "Chile",
+      "region": "Santiago",
+      "roles": ["CLIENT"],
+      "accountTypes": ["DEBIT", "BUSINESS"],
+      "merchantData": {
+        "name": "BookHaven",
+        "category": "BOOKS",
+        "description": "Books and educational materials",
+        "location": "Santiago, Chile",
+        "isActive": true,
+        "contact": "+56 9 4567 8901"
+      }
+    }
+  ],
+  "systemMerchants": [
+    {
+      "name": "DataBank ATM Network",
+      "category": "FINANCIAL_SERVICES",
+      "description": "Official DataBank ATM and financial services",
+      "location": "Nationwide, Chile",
+      "isActive": true,
+      "email": "atm@databank.com",
+      "contact": "+56 2 1234 5678"
+    },
+    {
+      "name": "FuelStation Plus",
+      "category": "GAS_STATION",
+      "description": "Gas station with convenience store",
+      "location": "Santiago, Chile",
+      "isActive": true,
+      "email": "info@fuelstationplus.com",
+      "contact": "+56 2 9876 5432"
+    }
+  ],
+  "products": [
+    {
+      "name": "Organic Apples",
+      "category": "FOOD",
+      "price": 2.99,
+      "description": "Fresh organic apples",
+      "merchantName": "DataBank ATM Network",
+      "quantity": 150,
+      "sku": "PROD-001",
+      "isActive": true
+    },
+    {
+      "name": "Whole Wheat Bread",
+      "category": "FOOD",
+      "price": 3.49,
+      "description": "Nutritious whole wheat bread",
+      "merchantName": "DataBank ATM Network",
+      "quantity": 100,
+      "sku": "PROD-002",
+      "isActive": true
+    },
+    {
+      "name": "Smartphone Pro Max",
+      "category": "ELECTRONICS",
+      "price": 999.99,
+      "description": "Latest smartphone with advanced features",
+      "merchantName": "TechStore Pro",
+      "quantity": 50,
+      "sku": "PROD-003",
+      "isActive": true
+    },
+    {
+      "name": "Wireless Headphones",
+      "category": "ELECTRONICS",
+      "price": 149.99,
+      "description": "High-quality wireless headphones",
+      "merchantName": "TechStore Pro",
+      "quantity": 75,
+      "sku": "PROD-004",
+      "isActive": true
+    },
+    {
+      "name": "Casual T-Shirt",
+      "category": "CLOTHING",
+      "price": 19.99,
+      "description": "Comfortable cotton t-shirt",
+      "merchantName": "Fashion World",
+      "quantity": 200,
+      "sku": "PROD-005",
+      "isActive": true
+    },
+    {
+      "name": "Denim Jeans",
+      "category": "CLOTHING",
+      "price": 59.99,
+      "description": "Classic denim jeans",
+      "merchantName": "Fashion World",
+      "quantity": 120,
+      "sku": "PROD-006",
+      "isActive": true
+    },
+    {
+      "name": "Programming Guide",
+      "category": "BOOKS",
+      "price": 39.99,
+      "description": "Comprehensive programming guide",
+      "merchantName": "BookHaven",
+      "quantity": 80,
+      "sku": "PROD-007",
+      "isActive": true
+    },
+    {
+      "name": "Fiction Novel",
+      "category": "BOOKS",
+      "price": 14.99,
+      "description": "Bestselling fiction novel",
+      "merchantName": "BookHaven",
+      "quantity": 150,
+      "sku": "PROD-008",
+      "isActive": true
+    }
+  ]
+}

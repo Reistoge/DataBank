@@ -5,7 +5,6 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-
 import { AuthProvider } from './contexts/auth.context';
 import { CARD_ROUTES, ROUTES as CONSTANT_ROUTES } from './utils/constants';
 import ProtectedRoute from './components/protectedRoute.component';
@@ -16,6 +15,10 @@ import DeleteAccount from './pages/DeleteAccount';
 import DeleteCard from './pages/DeleteCard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminPanel from './pages/AdminPanel';
+import Transfer from './pages/Transfer';
+import ShopPayment from './pages/ShopPayment';
+import MyCards from './pages/MyCards';
 
 function App() {
   return (
@@ -70,6 +73,31 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path={CONSTANT_ROUTES.TRANSFER}
+              element={
+                <ProtectedRoute>
+                  <Transfer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={CONSTANT_ROUTES.ADMIN_PANEL}
+              element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={CONSTANT_ROUTES.MY_CARDS}
+              element={
+                <ProtectedRoute>
+                  <MyCards />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={CONSTANT_ROUTES.PAYMENT} element={<ShopPayment />} />
 
             <Route
               path="*"

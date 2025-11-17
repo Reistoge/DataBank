@@ -1,20 +1,22 @@
- 
-
 // API Configuration
 export const API_BASE_URL = 'http://localhost:5000/api';  // Changed from 6000 to 5000
 
 // Route Constants
-export const ROUTES = Object.freeze({
+export const ROUTES = {
   LOGIN: '/login',
-  REGISTER: '/register', 
+  REGISTER: '/register',
   DASHBOARD: '/dashboard',
   ADD_ACCOUNT: '/addAccount',
   ADD_CARD: '/addCard',
   DELETE_ACCOUNT: '/deleteAccount',
   DELETE_CARD: '/deleteCard',
- 
+  ADMIN_PANEL: '/adminPanel',
+  TRANSFER: '/transfer',
+  SHOP_PAYMENT: '/shop-payment',
+  PAYMENT: '/payment',
+  MY_CARDS: '/my-cards', 
   HOME: '/',
-} as const);
+} as const;
 
 
 // API Endpoint Routes
@@ -41,6 +43,20 @@ export const ACCOUNT_ROUTES = Object.freeze({
   CREATE_ACCOUNT: '/account', // req token
   GET_ACCOUNTS: '/account/myAccounts', // req token
   DELETE_ACCOUNT: '/account', // req token
+  UPDATE_ACCOUNT: '/account/updateAccount'
+
+
+})
+export const ADMIN_ROUTES = Object.freeze({ 
+  FIND_ALL_ACCOUNTS :'/account/findAll'
+
+
+})
+export const TRANSACTION_ROUTES = Object.freeze({ 
+  TRANSACTION:'/transaction',
+  MAKE_TRANSACTION :'/transaction',
+  HISTORY :'/history'
+
 
 })
 export const CARD_ROUTES = Object.freeze({
@@ -50,8 +66,8 @@ export const CARD_ROUTES = Object.freeze({
   DELETE_CARD: '/card'
 
 })
-export const USER_ROUTES =  Object.freeze({
-    GET_PROFILE: '/api/auth/profile', // req token
+export const USER_ROUTES = Object.freeze({
+  GET_PROFILE: '/api/auth/profile', // req token
 
 
 })
@@ -62,7 +78,7 @@ export const HTTP_STATUS = Object.freeze({
   OK: 200,
   CREATED: 201,
   NO_CONTENT: 204,
-  
+
   // Client Errors
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
@@ -70,7 +86,7 @@ export const HTTP_STATUS = Object.freeze({
   NOT_FOUND: 404,
   CONFLICT: 409,
   UNPROCESSABLE_ENTITY: 422,
-  
+
   // Server Errors
   INTERNAL_SERVER_ERROR: 500,
   BAD_GATEWAY: 502,

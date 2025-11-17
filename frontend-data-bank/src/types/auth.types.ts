@@ -1,15 +1,20 @@
 
+export type UserRole = 'ADMIN' | 'CLIENT' | 'EXEC';
 
 export interface User {
     id: string;
     username: string;
+    userNumber: string;
     email: string;
     rut: string;
     birthday: Date;
     country: string;
     region: string;
-    
+    roles: UserRole[];
+
 }
+ 
+
 export interface Account {
     id: string
     userId: string; // referencia al User
@@ -18,7 +23,11 @@ export interface Account {
     type: string; // tipo de cuenta
     bankBranch: string;
     isActive: boolean;
+
+    
 }
+
+
 export interface Card {
     id: string | undefined;
     cvv: Number;
@@ -76,10 +85,10 @@ export interface AuthContextType extends AuthState {
  * @string pass
  */
 export interface LoginCredentials {
- 
+
     email: string;
     password: string;
- 
+
 
 }
 export interface RegisterCredentials {
@@ -112,4 +121,3 @@ export interface AuthResponse {
     user: User;
     access_token: string;
 }
- 

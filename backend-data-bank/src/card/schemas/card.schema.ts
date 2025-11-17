@@ -11,6 +11,9 @@ export class Card extends Document {
     @Prop({ required: true })
     accountId: string; // referencia a la cuenta
 
+    @Prop({required:true})
+    accountNumber:string    
+
     @Prop({ required: true })
     password: string; // PIN de la tarjeta
 

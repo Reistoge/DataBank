@@ -3,9 +3,11 @@ import { Logger } from '@nestjs/common';
 import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
 import { AppModule } from './app.module';
+import { Neo4jService } from './database/neo4j/neo4j.service';
 
 async function bootstrap() {
   // Winston logger config (classic Nest look on console)
+  const logger = new Logger('Bootstrap');
   const winstonLogger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     defaultMeta: { service: 'data-bank' },
@@ -47,10 +49,23 @@ async function bootstrap() {
     credentials: true,
   });
 
+
+  try {
+    const neo4jService = app.get(Neo4jService);
+    logger.log('Testing Neo4j connection...');   
+    
+    // Simple connection test
+    await neo4jService.query('RETURN 1 as test');
+    logger.log('✅ Neo4j connection successful');   
+  } catch (error) {
+    logger.error('❌ Neo4j connection failed:', error.message);   
+    // Continue startup even if Neo4j fails (for graceful degradation)
+  }
+
   const port = process.env.PORT || 5000;
   await app.listen(port);
 
-  const logger = new Logger('Bootstrap');
+  
   logger.log(`Backend running on http://localhost:${port}`);
 }
 

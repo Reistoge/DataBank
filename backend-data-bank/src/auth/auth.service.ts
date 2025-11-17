@@ -1,18 +1,29 @@
 // auth/auth.service.ts
 import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
-import { UserDocument } from 'src/users/schemas/user.schema';
+import { UserDocument, UserRole } from 'src/users/schemas/user.schema';
 import { UserResponse } from 'src/users/dto/user.dto';
 
+export class AuthUserPayloadDto {
+  id: string;
+  username: string;
+  userNumber:string;
+  email: string;
+  rut: string;
+  roles: UserRole[];
+  
+}
 @Injectable()
 export class AuthService {
+
+
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private usersService: UsersService,
+    private usersService: UserService,
     private jwtService: JwtService,
   ) { }
 
@@ -20,7 +31,7 @@ export class AuthService {
     const { rut, username, email, password, birthday, country, region, } = registerDto;
     this.logger.log(`Registration attempt for email: ${email} with rut ${rut}`);
 
-    const existingUser = await this.usersService.findByEmail(email);
+    const existingUser = await this.usersService.getUserByEmail(email);
 
 
     if (existingUser) {
@@ -55,7 +66,7 @@ export class AuthService {
     const { email, password } = loginDto;
     this.logger.log(`Login attempt for email: ${email}`);
 
-    const userDoc = await this.usersService.findByEmail(email);
+    const userDoc = await this.usersService.getUserByEmail(email);
     if (!userDoc) throw new UnauthorizedException(`Invalid credentials`);
 
     const isPasswordValid = await bcrypt.compare(password, userDoc.password);
@@ -64,7 +75,7 @@ export class AuthService {
     this.logger.log(`User logged in successfully: ${email}`);
     userDoc.lastLogin = new Date();
     await userDoc.save();
-    const payload = { email: userDoc.email, sub: userDoc._id };
+    const payload = { email: userDoc.email, sub: userDoc._id.toString() };
     const access_token = this.jwtService.sign(payload);
     const user = this.toUserResponse(userDoc);
 
@@ -74,21 +85,27 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, sub: string) {
-    const user = await this.usersService.findByEmail(email);
+  async validateUser(userEmail: string, sub: string): Promise<AuthUserPayloadDto | null> {
+    const user = await this.usersService.getUserByEmail(userEmail);
     if (user && user._id.toString() === sub.toString()) {
       return {
-        id: user._id.toString(),
+        id: user.id,
         username: user.username,
         email: user.email,
         rut: user.rut,
+        userNumber:user.userNumber,
+        roles: user.roles
       };
     }
     return null;
   }
+  async logout(user: AuthUserPayloadDto) {
+    await this.usersService.logoutUser(user);
+  }
+
 
   toUserResponse(doc: UserDocument): UserResponse {
-    
+
     return {
       id: doc._id.toString(),
       rut: doc.rut,
@@ -97,6 +114,7 @@ export class AuthService {
       birthday: doc.birthday,
       country: doc.country,
       region: doc.region,
+      roles: doc.roles
     };
 
   }

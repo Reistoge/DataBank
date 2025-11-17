@@ -2,11 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { PredictionOutput } from 'src/fraud-system/dto/prediction.dto';
 import { TransactionSnapshot } from '../dto/transaction.dto';
+import { InvalidDetails } from '../transaction.service';
+ 
 
 
-export type TransactionDocument = Transaction & Document;
+export type TransactionDocument = Transaction & Document & { createdAt?: Date; updatedAt?: Date };
 export enum TransactionStatus {
     PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING',
     COMPLETED = 'COMPLETED',
     FAILED = 'FAILED',
 }
@@ -15,27 +18,20 @@ export enum TransactionStatus {
 export class Transaction extends Document {
 
     @Prop({ required: true })
-    senderId: string; // Gender, Age, State, City, Bank_Branch, Account_Type, contact, city, state
+    senderId: string;
 
     @Prop({ required: true })
-    receiverId: string // merchantId
+    receiverId: string
 
-    @Prop({required:true})
+    @Prop({ required: true, type: Object })
     snapshot: TransactionSnapshot
-    
-    @Prop({ required: true, enum: TransactionStatus, default: pending })
+
+    @Prop({ required: true, enum: TransactionStatus, default: TransactionStatus.PENDING })
     status: TransactionStatus
 
-
-
- 
-
-
-
-
-
-
-
+    
+    @Prop({type:Object})
+    invalidDetails?:InvalidDetails
 
 
 }
