@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCards, getUserAccounts, updateCardSpentLimit } from '../services/api.service';
-import type { AccountResponse, CardResponse } from '../services/dto/account.types';
+import {
+  getCards,
+  getUserAccounts,
+  updateCardSpentLimit,
+} from '../services/api.service';
+import type {
+  AccountResponse,
+  CardResponse,
+} from '../services/dto/account.types';
 import { ANIMATION, RESOURCES, ROUTES } from '../utils/constants';
 import { useAuth } from '../hooks/useAuth.hook';
+import { FiArrowLeft } from 'react-icons/fi';
 
 function MyCards() {
   const navigate = useNavigate();
@@ -14,14 +22,16 @@ function MyCards() {
   // State
   const [accounts, setAccounts] = useState<AccountResponse[]>([]);
   const [cards, setCards] = useState<CardResponse[]>([]);
-  const [selectedAccount, setSelectedAccount] = useState<AccountResponse | null>(null);
+  const [selectedAccount, setSelectedAccount] =
+    useState<AccountResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showFullCard, setShowFullCard] = useState<Record<string, boolean>>({});
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCardForUpdate, setSelectedCardForUpdate] = useState<CardResponse | null>(null);
+  const [selectedCardForUpdate, setSelectedCardForUpdate] =
+    useState<CardResponse | null>(null);
   const [newSpentLimit, setNewSpentLimit] = useState('');
   const [password, setPassword] = useState('');
   const [updateStatus, setUpdateStatus] = useState<{
@@ -72,7 +82,9 @@ function MyCards() {
   }, [selectedAccount]);
 
   const handleAccountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const account = accounts.find((acc) => acc.accountNumber === e.target.value);
+    const account = accounts.find(
+      (acc) => acc.accountNumber === e.target.value,
+    );
     setSelectedAccount(account || null);
   };
 
@@ -101,9 +113,12 @@ function MyCards() {
       await updateCardSpentLimit(
         selectedCardForUpdate,
         parseFloat(newSpentLimit),
-        password
+        password,
       );
-      setUpdateStatus({ state: 'success', message: 'Limit updated successfully!' });
+      setUpdateStatus({
+        state: 'success',
+        message: 'Limit updated successfully!',
+      });
 
       // Refresh cards
       if (selectedAccount) {
@@ -115,8 +130,12 @@ function MyCards() {
         handleCloseModal();
       }, 2000);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-      setUpdateStatus({ state: 'error', message: `Update failed: ${errorMessage}` });
+      const errorMessage =
+        err instanceof Error ? err.message : 'An unknown error occurred.';
+      setUpdateStatus({
+        state: 'error',
+        message: `Update failed: ${errorMessage}`,
+      });
       console.error(err);
     }
   };
@@ -138,13 +157,13 @@ function MyCards() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white p-4 sm:p-6 lg:p-8">
       <div className="fixed top-4 left-4 z-50">
-        <img
+        <button
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          className="w-8 h-8 cursor-pointer hover:scale-110 transition-transform"
-          src="../public/go-back.png"
-          alt="Go Back"
-          title="Return to Dashboard"
-        />
+          className="p-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
+        >
+          <FiArrowLeft />
+          Back
+        </button>
       </div>
 
       <header className="text-center my-8">
@@ -165,7 +184,10 @@ function MyCards() {
           animate={{ opacity: 1 }}
           className="mb-8 max-w-md mx-auto"
         >
-          <label htmlFor="account-selector" className="block text-lg font-semibold mb-2">
+          <label
+            htmlFor="account-selector"
+            className="block text-lg font-semibold mb-2"
+          >
             Select Account
           </label>
           <select
@@ -191,7 +213,9 @@ function MyCards() {
         {isLoading && <p className="text-center">Loading cards...</p>}
         {error && <p className="text-center text-red-400">{error}</p>}
         {!isLoading && !error && cards.length === 0 && (
-          <p className="text-center text-gray-500">No cards found for this account.</p>
+          <p className="text-center text-gray-500">
+            No cards found for this account.
+          </p>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -217,7 +241,9 @@ function MyCards() {
                   <button
                     onClick={() => handleToggleShowCard(card.id)}
                     className="text-gray-400 hover:text-white transition"
-                    title={showFullCard[card.id] ? 'Hide number' : 'Show number'}
+                    title={
+                      showFullCard[card.id] ? 'Hide number' : 'Show number'
+                    }
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -287,7 +313,10 @@ function MyCards() {
             </p>
             <form onSubmit={handleUpdateLimit}>
               <div className="mb-4">
-                <label htmlFor="spentLimit" className="block mb-2 font-semibold">
+                <label
+                  htmlFor="spentLimit"
+                  className="block mb-2 font-semibold"
+                >
                   New Limit ($)
                 </label>
                 <input
@@ -326,7 +355,9 @@ function MyCards() {
                   disabled={updateStatus.state === 'loading'}
                   className="bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition"
                 >
-                  {updateStatus.state === 'loading' ? 'Updating...' : 'Confirm Update'}
+                  {updateStatus.state === 'loading'
+                    ? 'Updating...'
+                    : 'Confirm Update'}
                 </button>
               </div>
             </form>
@@ -336,8 +367,8 @@ function MyCards() {
                   updateStatus.state === 'error'
                     ? 'text-red-400'
                     : updateStatus.state === 'success'
-                    ? 'text-green-400'
-                    : 'text-blue-400'
+                      ? 'text-green-400'
+                      : 'text-blue-400'
                 }`}
               >
                 {updateStatus.message}

@@ -1,135 +1,153 @@
-import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth.hook";
-import { getUserAccounts, getCards, deleteAccount } from "../services/api.service";
-import type { AccountResponse, CardResponse } from "../services/dto/account.types";
-import { ROUTES, ANIMATION, RESOURCES } from "../utils/constants";
+import { motion } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  FiTrash2,
+  FiArrowLeft,
+  FiCheckCircle,
+  FiXCircle,
+  FiLoader,
+  FiCreditCard,
+} from 'react-icons/fi';
+import { useAuth } from '../hooks/useAuth.hook';
+import {
+  getUserAccounts,
+  getCards,
+  deleteAccount,
+} from '../services/api.service';
+import type {
+  AccountResponse,
+  CardResponse,
+} from '../services/dto/account.types';
+import { ROUTES, ANIMATION, RESOURCES } from '../utils/constants';
+import { colors, components } from '../utils/design-system';
 
- 
+type FormDeleteState = 'form' | 'submit' | 'success' | 'error';
+
+// Success Display Component
+function SuccessDisplay({ navigate }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`${components.card.gradient} text-center`}
+    >
+      <div className="flex items-center justify-center mb-4">
+        <FiCheckCircle className="text-6xl text-green-400" />
+      </div>
+      <h2 className="text-2xl font-bold text-white mb-4">
+        Account Deleted Successfully
+      </h2>
+      <p className="text-gray-300 mb-6">
+        The account has been permanently removed from your profile.
+      </p>
+      <button
+        onClick={() => navigate(ROUTES.DASHBOARD)}
+        className={`${components.button.primary} w-full`}
+      >
+        Go to Dashboard
+      </button>
+    </motion.div>
+  );
+}
+
+// Error Display Component
+function ErrorDisplay({ error, setDeletionState }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-red-500/20 border border-red-400 rounded-xl p-6 text-center backdrop-blur-sm"
+    >
+      <div className="flex items-center justify-center mb-4">
+        <FiXCircle className="text-6xl text-red-400" />
+      </div>
+      <h2 className="text-xl font-bold text-red-200 mb-2">
+        Deletion Failed
+      </h2>
+      <p className="text-red-300 mb-4">
+        {error?.message || 'An unknown error occurred'}
+      </p>
+      <button
+        onClick={() => setDeletionState('form')}
+        className={`${components.button.secondary} w-full`}
+      >
+        Try Again
+      </button>
+    </motion.div>
+  );
+}
+
+// Loading Display Component
+function LoadingDisplay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={`${components.card.gradient} text-center`}
+    >
+      <div className="flex items-center justify-center mb-4">
+        <FiLoader className="text-6xl text-blue-400 animate-spin" />
+      </div>
+      <h2 className="text-xl font-bold text-white mb-2">Deleting Account...</h2>
+      <p className="text-gray-300">
+        Please wait while we process your request.
+      </p>
+    </motion.div>
+  );
+}
+
 function DeleteAccount() {
-  type FormDeleteState = 'form' | 'submit' | 'success' | 'error';
-
-  const [formData, setFormData] = useState({
-    accountNumber: '',
-  });
-
+  const [accountNumber, setAccountNumber] = useState('');
   const { user } = useAuth();
-
-  const [accounts, setAccounts] = useState<AccountResponse[]>();
+  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<AccountResponse>();
   const [cards, setCards] = useState<CardResponse[]>();
-  const [creationState, setDeletionState] = useState<FormDeleteState>('form');
-
+  const [deletionState, setDeletionState] = useState<FormDeleteState>('form');
   const navigate = useNavigate();
-
   const rotation = useRef(0);
-
-  const [creationError, setCreationError] = useState<Error>();
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const result = await getUserAccounts();
-        setAccounts(result);
-      } catch (err) {
-        console.error('Failed to fetch accounts:', err);
-      }
-    };
-
-    fetchAccounts();
-  }, []); // Only run once on mount
+  const [deletionError, setDeletionError] = useState<Error>();
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const result = await getUserAccounts();
-        setAccounts(result);
+        setAccounts(result || []);
       } catch (err) {
         console.error('Failed to fetch accounts:', err);
+        setDeletionError(new Error('Failed to load accounts.'));
       }
     };
-
     fetchAccounts();
-  }, [creationState]); // Only run once on mount
+  }, []);
 
   useEffect(() => {
-    if (!accounts || !formData.accountNumber) return;
+    if (!accounts || !accountNumber) {
+      setSelectedAccount(undefined);
+      setCards([]);
+      return;
+    }
+    const account = accounts.find((acc) => acc.accountNumber === accountNumber);
+    setSelectedAccount(account);
+  }, [accountNumber, accounts]);
 
-    const selectedAccount = accounts.find(
-      (account) => account.accountNumber === formData.accountNumber, // Fixed comparison
-    );
-
-    setSelectedAccount(selectedAccount);
-  }, [formData.accountNumber, accounts]); // Only depend on what you actually use
-
-  // Separate useEffect for fetching cards when selected account changes
   useEffect(() => {
     const fetchCards = async () => {
-      if (!selectedAccount?.id) return;
-
+      if (!selectedAccount?.id) {
+        setCards([]);
+        return;
+      }
       try {
-        const cards = await getCards(selectedAccount.id);
-        setCards(cards);
+        const fetchedCards = await getCards(selectedAccount.id);
+        setCards(fetchedCards);
       } catch (err) {
         console.error('Failed to fetch cards:', err);
         setCards([]);
       }
     };
-
     fetchCards();
-  }, [selectedAccount]); // Fetch cards when selected account changes
+  }, [selectedAccount]);
 
-  function showFormSubmitLoad() {
-    return (
-      <>
-        <div className="w-16">
-          <img src="public/loading-gif-3262986532.gif" alt="" />
-        </div>
-      </>
-    );
-  }
-  function displaySuccess() {
-    return (
-      <div className="text-green-600 bg-green-50 p-4 rounded-lg">
-        <p className="font-semibold">Success!</p>
-        <p>Account deleted successfully</p>
-        <button
-          onClick={() => navigate(ROUTES.DASHBOARD)}
-          className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Go to Dashboard
-        </button>
-      </div>
-    );
-  }
-
-  function displayError() {
-    return (
-      <div className="text-red-600 bg-red-50 p-4 rounded-lg">
-        <p className="font-semibold">Error:</p>
-        <p>{creationError?.message || 'An unknown error occurred'}</p>
-      </div>
-    );
-  }
-
-  function displayDoingForm() {
-    return <></>;
-  }
-  function handleDeletionResponse() {
-    switch (creationState) {
-      case 'form':
-        return displayDoingForm();
-      case 'submit':
-        return showFormSubmitLoad();
-      case 'success':
-        return displaySuccess(); // Added success display
-      case 'error':
-        return displayError();
-      default:
-        return null;
-    }
-  }
   const handleRotate = () => {
     const img = document.getElementById('appLogo');
     if (img) {
@@ -138,147 +156,159 @@ function DeleteAccount() {
       img.style.transition = `transform ${ANIMATION.TRANSITION_DURATION} ${ANIMATION.TRANSITION_EASING}`;
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setAccountNumber(e.target.value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedAccount?.id) {
       setDeletionState('error');
-      setCreationError(new Error('No account selected'));
+      setDeletionError(new Error('Please select a valid account to delete.'));
       return;
     }
-
     setDeletionState('submit');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
     try {
-      const response = await deleteAccount(selectedAccount.id); // Now guaranteed to be string
-      console.log(response);
+      await deleteAccount(selectedAccount.id);
       setDeletionState('success');
     } catch (err) {
       setDeletionState('error');
-      setCreationError(err instanceof Error ? err : new Error(String(err)));
+      setDeletionError(err instanceof Error ? err : new Error(String(err)));
     }
   };
 
-  function AccountIdPicker() {
-    function showCards(): React.ReactNode {
-      return (
-        <>
-          {cards && cards.length > 0 ? (
-            <ul>
-              {cards.map((card) => (
-                <li key={card.id}>{card.id}</li>
-              ))}{' '}
-            </ul>
-          ) : (
-            <p> No cards associated to this account </p>
-          )}
-        </>
-      );
-    }
-
-    return (
-      <>
-        <div >
-          <div className="fixed top-4 left-4 z-50">
-            <img 
-              id="go_back"
-              onClick={() => navigate(ROUTES.DASHBOARD)}
-              className="w-8 h-8 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200"
-              src="../public/go-back.png"
-              alt="go_back"
-              title="Click to return"
-            />
-          </div>
-          <label htmlFor="AccountIdPicker" className='font-semibold'>Select Account</label>
-          <select
-            className="rounded w-full p-2 bg-white text-black font-semibold"
-            value={formData.accountNumber}
-            onChange={handleChange}
-            name="accountNumber"
-            id="AccountIdPicker"
-          >
-            <option value="">Select an account</option>
-            {accounts && accounts.length > 0 ? (
-              accounts.map((account) => (
-                <option
-                  key={account.accountNumber}
-                  value={account.accountNumber}
-                >
-                  {account.accountNumber} - {account.type} (${account.balance})
-                </option>
-              ))
-            ) : (
-              <option disabled>No hay Cuentas disponibles</option>
-            )}
-          </select>
-          <div className='mt-2'>
-            <label htmlFor="cards" className='font-semibold'>Cards</label>
-            <div
-              id="cards"
-              className="bg-white text-black border-white border-1 rounded-lg p-1 "
-            >
-              {''}
-              {selectedAccount ? <div> {showCards()}</div> : <></>}
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-black">
-      <div className="flex flex-col items-center justify-center flex-1">
-        <form onSubmit={handleSubmit} className="flex flex-row">
-          <div
-            id="delete-account-form"
-            className="flex flex-col items-center gap-[5vh] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 box-border drop-shadow-sm w-80 p-5 rounded-lg bg-shadow flex-shrink-0 h-4/5 md:gap-10"
-          >
-            {/* Rotating Logo */}
-            <img
-              id="appLogo"
-              onClick={handleRotate}
-              className=" w-1/2 mt-5 md:mt-3 md:mb-0 md:pb-0 rounded-xl cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              src={RESOURCES.LOGO}
-              alt="App Logo"
-              title="Click to rotate!"
-            />
-
-            {AccountIdPicker()}
-            <button
-              className="bg-white hover:bg-gray-800 text-black font-semibold py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              type="submit"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="p-3 mt-2"
+    <div className={`min-h-screen ${colors.gradients.primary} flex flex-col`}>
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={() => navigate(ROUTES.DASHBOARD)}
+          className="p-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
         >
-          {handleDeletionResponse()}
-        </motion.div>
+          <FiArrowLeft />
+          Back
+        </button>
       </div>
 
-      <footer className="text-center py-4">
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
+        {deletionState === 'form' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md"
+          >
+            <form onSubmit={handleSubmit}>
+              <div className={`${components.card.gradient} p-8`}>
+                <div className="text-center mb-8">
+                  <img
+                    id="appLogo"
+                    onClick={handleRotate}
+                    className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                    src={RESOURCES.LOGO}
+                    alt="App Logo"
+                    title="Click to rotate!"
+                  />
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    Delete Account
+                  </h1>
+                  <p className="text-white/80">
+                    Permanently remove an account from your profile.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                      <FiCreditCard />
+                      Select Account to Delete
+                    </label>
+                    <select
+                      className={components.input.primary}
+                      value={accountNumber}
+                      onChange={handleChange}
+                      name="accountNumber"
+                      required
+                    >
+                      <option value="">Select an account...</option>
+                      {accounts.map((account) => (
+                        <option
+                          key={account.accountNumber}
+                          value={account.accountNumber}
+                        >
+                          {account.accountNumber} - {account.type} ($
+                          {account.balance.toFixed(2)})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {selectedAccount && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="bg-white/10 rounded-lg p-4"
+                    >
+                      <h3 className="text-white font-semibold mb-2">
+                        Associated Cards
+                      </h3>
+                      {cards && cards.length > 0 ? (
+                        <ul className="space-y-1 text-sm text-gray-300">
+                          {cards.map((card) => (
+                            <li key={card.id} className="flex items-center gap-2">
+                              <FiCreditCard />
+                              <span>**** **** **** {card.number.slice(-4)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-400 text-sm">
+                          No cards associated with this account.
+                        </p>
+                      )}
+                    </motion.div>
+                  )}
+
+                  <button
+                    className={`${components.button.danger} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    type="submit"
+                    disabled={!accountNumber || deletionState === 'submit'}
+                  >
+                    <FiTrash2 />
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </form>
+          </motion.div>
+        )}
+
+        {deletionState === 'submit' && (
+          <div className="w-full max-w-md">
+            <LoadingDisplay />
+          </div>
+        )}
+        {deletionState === 'success' && (
+          <div className="w-full max-w-md">
+            <SuccessDisplay navigate={navigate} />
+          </div>
+        )}
+        {deletionState === 'error' && (
+          <div className="w-full max-w-md">
+            <ErrorDisplay
+              error={deletionError}
+              setDeletionState={setDeletionState}
+            />
+          </div>
+        )}
+      </div>
+
+      <footer className="text-center py-6">
         <a
           href="https://github.com/Reistoge"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
+          className="text-gray-400 hover:text-white transition-colors duration-200"
         >
           @Ferran Rojas
         </a>
