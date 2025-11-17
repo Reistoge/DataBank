@@ -4,7 +4,7 @@ import { Neo4jService as Neo4jLibService } from 'nest-neo4j';
 @Injectable()
 export class Neo4jService {
   private readonly logger = new Logger(Neo4jService.name);
-  
+
   constructor(private readonly neo4jService: Neo4jLibService) {
     this.logger.log('Neo4j service injected from nest-neo4j');
   }
@@ -16,7 +16,7 @@ export class Neo4jService {
   async query(cypher: string, params: Record<string, any> = {}) {
     try {
       this.logger.log(`Executing query: ${cypher}`);
-  
+
       const result = await this.neo4jService.write(cypher, params);
       return result.records;
     } catch (error) {

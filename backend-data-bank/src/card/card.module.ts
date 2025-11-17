@@ -9,18 +9,17 @@ import { AccountModule } from 'src/account/account.module';
 import { UserService } from 'src/users/users.service';
 import { Account, AccountSchema } from 'src/account/schemas/account.schema';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
- 
- 
+
 @Module({
   imports: [
-  MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }]), 
-  MongooseModule.forFeature([{ name: Account.name, schema: AccountSchema }]), 
-  MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), 
-  DatabaseModule,
-  forwardRef(()=>AccountModule)
+    MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }]),
+    MongooseModule.forFeature([{ name: Account.name, schema: AccountSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    DatabaseModule,
+    forwardRef(() => AccountModule),
   ],
   controllers: [CardController],
   providers: [CardService, AccountService, UserService],
   exports: [CardService],
 })
-export class CardModule { }
+export class CardModule {}

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateMerchantDto } from 'src/payment/repository/merchant/merchant.repository';
 import { MerchantService } from './merchant.service';
@@ -33,6 +42,6 @@ export class MerchantController {
   @HttpCode(HttpStatus.OK)
   async getProducts() {
     const products = await this.merchantService.getProducts();
-    return products; 
+    return products;
   }
 }

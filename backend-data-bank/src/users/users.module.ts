@@ -15,13 +15,15 @@ import { Product, ProductSchema } from 'src/payment/entities/product.schema';
 
 @Module({
   imports: [
-  MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-  MongooseModule.forFeature([{ name: Merchant.name, schema: MerchantSchema }]),
-  MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
-  forwardRef(()=> AccountModule),
-  DatabaseModule
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: Merchant.name, schema: MerchantSchema },
+    ]),
+    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    forwardRef(() => AccountModule),
+    DatabaseModule,
   ],
-  
+
   providers: [UserService, AdminService, MerchantService, MerchantRepository],
   controllers: [UsersController, AdminController, MerchantController],
   exports: [UserService],

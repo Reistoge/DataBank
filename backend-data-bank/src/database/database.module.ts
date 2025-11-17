@@ -25,9 +25,9 @@ import { Neo4jService } from './neo4j/neo4j.service';
         encrypted: false,
       }),
       inject: [ConfigService],
-    })
+    }),
   ],
-  providers: [Neo4jService], 
-  exports: [Neo4jService],    
+  providers: [Neo4jService],
+  exports: [Neo4jService],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

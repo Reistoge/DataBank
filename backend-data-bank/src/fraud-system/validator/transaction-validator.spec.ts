@@ -8,13 +8,13 @@ import { LowAmountValidation } from './validations/low-amount.validation';
 enum MockTransactionStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
 }
 
 enum MockAccountState {
   DEFAULT = 'DEFAULT',
   FROZEN = 'FROZEN',
-  CLOSED = 'CLOSED'
+  CLOSED = 'CLOSED',
 }
 
 interface MockAccount {
@@ -94,14 +94,14 @@ describe('Enhanced LowAmountValidation', () => {
     it('should pass for amounts above threshold', async () => {
       const mockTransaction = createMockTransaction({ amount: 100 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(0);
     });
 
     it('should detect low amount (basic case)', async () => {
       const mockTransaction = createMockTransaction({ amount: 5 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(LowAmount);
       expect(result[0].code).toBe('LOW_AMOUNT');
@@ -112,7 +112,7 @@ describe('Enhanced LowAmountValidation', () => {
     it('should detect micro amounts with highest intensity', async () => {
       const mockTransaction = createMockTransaction({ amount: 0.5 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(1);
       expect(result[0].intensityMultiplier).toBe(2.5);
       expect(result[0].context?.suspicionLevel).toBe('MICRO');
@@ -122,14 +122,14 @@ describe('Enhanced LowAmountValidation', () => {
     it('should handle edge case: amount exactly at threshold', async () => {
       const mockTransaction = createMockTransaction({ amount: 10 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(0);
     });
 
     it('should handle invalid amounts gracefully', async () => {
       const mockTransaction = createMockTransaction({ amount: -5 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(0);
     });
 
@@ -137,27 +137,27 @@ describe('Enhanced LowAmountValidation', () => {
       const mockTransaction = createMockTransaction({});
       delete mockTransaction.snapshot.request.amount;
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result).toHaveLength(0);
     });
 
     it('should provide detailed context information', async () => {
       const mockTransaction = createMockTransaction({ amount: 2 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       expect(result[0].context).toMatchObject({
         amount: 2,
         threshold: 10,
         suspicionLevel: 'VERY_LOW',
         senderAccount: expect.any(String),
-        receiverAccount: expect.any(String)
+        receiverAccount: expect.any(String),
       });
     });
 
     it('should have proper explanation', async () => {
       const mockTransaction = createMockTransaction({ amount: 1 });
       const result = await lowAmountValidation.validate(mockTransaction as any);
-      
+
       const explanation = result[0].getExplanation();
       expect(explanation).toContain('Transaction amount (1) is unusually low');
       expect(explanation).toContain('MICRO');
@@ -170,7 +170,7 @@ describe('Enhanced LowAmountValidation', () => {
     it('should work within validator framework', async () => {
       const mockTransaction = createMockTransaction({ amount: 3 });
       const result = await validator.runAll(mockTransaction as any);
-      
+
       expect(result).toHaveLength(1);
       expect(result[0].code).toBe('LOW_AMOUNT');
     });
@@ -178,7 +178,7 @@ describe('Enhanced LowAmountValidation', () => {
     it('should handle validation errors gracefully', async () => {
       const invalidTransaction = {} as any;
       const result = await validator.runAll(invalidTransaction);
-      
+
       // Should not throw, should return empty array or handle gracefully
       expect(Array.isArray(result)).toBe(true);
     });
@@ -186,7 +186,9 @@ describe('Enhanced LowAmountValidation', () => {
 });
 
 // Helper function to create mock transactions
-function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDocument {
+function createMockTransaction(
+  overrides: Partial<any> = {},
+): MockTransactionDocument {
   const defaultTransaction: MockTransactionDocument = {
     _id: new Types.ObjectId('000000000000000000000003'),
     senderId: 'sender-id',
@@ -207,7 +209,7 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
         receiverEmail: 'receiver@test.com',
         device: 'mobile',
         ipAddress: '192.168.1.1',
-        ...overrides
+        ...overrides,
       },
       senderAccount: {
         _id: new Types.ObjectId('000000000000000000000001'),
@@ -218,7 +220,7 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
         bankBranch: 'MAIN',
         userId: 'user1',
         isActive: true,
-        state: MockAccountState.DEFAULT
+        state: MockAccountState.DEFAULT,
       },
       receiverAccount: {
         _id: new Types.ObjectId('000000000000000000000002'),
@@ -229,11 +231,11 @@ function createMockTransaction(overrides: Partial<any> = {}): MockTransactionDoc
         bankBranch: 'DOWNTOWN',
         userId: 'user2',
         isActive: true,
-        state: MockAccountState.DEFAULT
+        state: MockAccountState.DEFAULT,
       },
-      isFraud: false
+      isFraud: false,
     },
-    invalidDetails: undefined
+    invalidDetails: undefined,
   };
 
   // Apply overrides to request level

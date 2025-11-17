@@ -19,38 +19,40 @@ import { TransactionSchema } from 'src/transaction/schemas/transaction.schema';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-   imports: [
-      HttpModule,
-      DatabaseModule,
-      CardModule,
-      AccountModule,
-      MongooseModule.forFeature([{ name: Transaction.name, schema: TransactionSchema }]),
-      forwardRef(() => TransactionModule)
-   ],
-   providers: [
-      FraudSystemService,
-      TransactionService,
-      GeolocationService,
-      TransactionValidator,
-      LowAmountValidation,
-      AccountDrainValidation,
-      GeoDistanceValidation,
+  imports: [
+    HttpModule,
+    DatabaseModule,
+    CardModule,
+    AccountModule,
+    MongooseModule.forFeature([
+      { name: Transaction.name, schema: TransactionSchema },
+    ]),
+    forwardRef(() => TransactionModule),
+  ],
+  providers: [
+    FraudSystemService,
+    TransactionService,
+    GeolocationService,
+    TransactionValidator,
+    LowAmountValidation,
+    AccountDrainValidation,
+    GeoDistanceValidation,
 
-      // Factory provider approach - more explicit and type-safe
-      {
-         provide: 'TRANSACTION_VALIDATIONS',
-         useFactory: (
-            lowAmountValidation: LowAmountValidation,
-            accountDrainValidation: AccountDrainValidation,
-            geoDistanceValidation: GeoDistanceValidation
-         ) => [
-            lowAmountValidation,
-            accountDrainValidation,
-            geoDistanceValidation,
-         ],
-         inject: [LowAmountValidation, AccountDrainValidation, GeoDistanceValidation],
-      },
-   ],
-   exports: [FraudSystemService]
+    // Factory provider approach - more explicit and type-safe
+    {
+      provide: 'TRANSACTION_VALIDATIONS',
+      useFactory: (
+        lowAmountValidation: LowAmountValidation,
+        accountDrainValidation: AccountDrainValidation,
+        geoDistanceValidation: GeoDistanceValidation,
+      ) => [lowAmountValidation, accountDrainValidation, geoDistanceValidation],
+      inject: [
+        LowAmountValidation,
+        AccountDrainValidation,
+        GeoDistanceValidation,
+      ],
+    },
+  ],
+  exports: [FraudSystemService],
 })
-export class FraudSystemModule { }
+export class FraudSystemModule {}

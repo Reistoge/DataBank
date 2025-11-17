@@ -12,12 +12,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    MongooseModule.forFeature([{ name: Transaction.name, schema: TransactionSchema }]),
-    forwardRef(()=>FraudSystemModule) ,
+    MongooseModule.forFeature([
+      { name: Transaction.name, schema: TransactionSchema },
+    ]),
+    forwardRef(() => FraudSystemModule),
     AccountModule,
-    DatabaseModule
-
-
+    DatabaseModule,
   ],
   controllers: [TransactionController],
   providers: [TransactionService, TransactionWorker],
