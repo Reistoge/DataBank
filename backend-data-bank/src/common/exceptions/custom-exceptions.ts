@@ -1,12 +1,12 @@
 // src/common/exceptions/custom-exceptions.ts
-import { 
-  BadRequestException, 
-  NotFoundException, 
-  UnauthorizedException, 
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
   ConflictException,
   InternalServerErrorException,
   HttpException,
-  HttpStatus 
+  HttpStatus,
 } from '@nestjs/common';
 
 export class BusinessLogicException extends BadRequestException {

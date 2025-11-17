@@ -1,12 +1,12 @@
 // ...existing code...
-import { Inject, Injectable, Logger } from "@nestjs/common";
- import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
-import { TransactionValidation } from "../transaction-validation";
-import { Neo4jService } from "src/database/neo4j/neo4j.service";
-import { GeolocationService } from "src/geolocation/geolocation.service";
-import { TransactionService } from "src/transaction/transaction.service";
-import { SuspiciousBehaviour } from "src/fraud-system/suspicious-behaviours/suspicious-behaviour";
-import { HighFrequencyTransactions } from "../../suspicious-behaviours/impl/high-frequency-transactions";
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { TransactionDocument } from 'src/transaction/schemas/transaction.schema';
+import { TransactionValidation } from '../transaction-validation';
+import { Neo4jService } from 'src/database/neo4j/neo4j.service';
+import { GeolocationService } from 'src/geolocation/geolocation.service';
+import { TransactionService } from 'src/transaction/transaction.service';
+import { SuspiciousBehaviour } from 'src/fraud-system/suspicious-behaviours/suspicious-behaviour';
+import { HighFrequencyTransactions } from '../../suspicious-behaviours/impl/high-frequency-transactions';
 
 @Injectable()
 export class FrequencyValidation extends TransactionValidation {
@@ -33,13 +33,15 @@ export class FrequencyValidation extends TransactionValidation {
     if (!values || values.length === 0) return 0;
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    return sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
   }
 
   private mad(values: number[], med = NaN): number {
     if (!values || values.length === 0) return 0;
     if (isNaN(med)) med = this.median(values);
-    const deviations = values.map(v => Math.abs(v - med));
+    const deviations = values.map((v) => Math.abs(v - med));
     return this.median(deviations);
   }
 
@@ -70,18 +72,18 @@ export class FrequencyValidation extends TransactionValidation {
 
       // Determine lookback cutoff
       const now = new Date();
-      const lookbackCutoff = new Date(now.getTime() - this.LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
+      const lookbackCutoff = new Date(
+        now.getTime() - this.LOOKBACK_DAYS * 24 * 60 * 60 * 1000,
+      );
 
       // Fetch transactions for this account.
       // Expect transactionService to provide a method that returns recent tx documents sorted by createdAt desc.
       // If not present, implement: find({ $or: [{ senderAccount: acc }, { receiverAccount: acc }] }, { sort: { createdAt: -1 }, limit: MAX_HISTORY })
-      const history: TransactionDocument[] = await this.transactionService.getTransactionsForAccount(
-        senderAcc,
-        {
+      const history: TransactionDocument[] =
+        await this.transactionService.getTransactionsForAccount(senderAcc, {
           limit: this.MAX_HISTORY,
           since: lookbackCutoff.toISOString(),
-        },
-      );
+        });
 
       if (!Array.isArray(history) || history.length === 0) {
         // New user / no history -> cold account, no alert but log for metrics
@@ -91,7 +93,7 @@ export class FrequencyValidation extends TransactionValidation {
 
       // Extract and normalize timestamps (UTC). Use tx.createdAt if present, fallback to snapshot.request.timestamp if available.
       const timestamps = history
-        .map(h => {
+        .map((h) => {
           const t = h.createdAt;
           return t instanceof Date && !isNaN(t.getTime()) ? t : null;
         })
@@ -100,29 +102,39 @@ export class FrequencyValidation extends TransactionValidation {
         .sort((a, b) => a.getTime() - b.getTime());
 
       if (timestamps.length < 2) {
-        this.logger.log(`FrequencyValidation: insufficient timestamps for ${senderAcc}`);
+        this.logger.log(
+          `FrequencyValidation: insufficient timestamps for ${senderAcc}`,
+        );
         return behaviours;
       }
 
       // Remove exact-duplicate timestamps (possible batching)
       const uniqueTimestamps: Date[] = [];
       for (const t of timestamps) {
-        if (uniqueTimestamps.length === 0 || uniqueTimestamps[uniqueTimestamps.length - 1].getTime() !== t.getTime()) {
+        if (
+          uniqueTimestamps.length === 0 ||
+          uniqueTimestamps[uniqueTimestamps.length - 1].getTime() !==
+            t.getTime()
+        ) {
           uniqueTimestamps.push(t);
         }
       }
 
       if (uniqueTimestamps.length < 2) {
-        this.logger.log(`FrequencyValidation: after dedupe insufficient timestamps for ${senderAcc}`);
+        this.logger.log(
+          `FrequencyValidation: after dedupe insufficient timestamps for ${senderAcc}`,
+        );
         return behaviours;
       }
 
       // Compute gaps (seconds) between consecutive events
       const gapsSec: number[] = [];
       for (let i = 1; i < uniqueTimestamps.length; i++) {
-        const gap = (uniqueTimestamps[i].getTime() - uniqueTimestamps[i - 1].getTime()) / 1000;
+        const gap =
+          (uniqueTimestamps[i].getTime() - uniqueTimestamps[i - 1].getTime()) /
+          1000;
         // sanity filter
-        if (gap <= 0 || !isFinite(gap) || gap > (365 * 24 * 3600)) continue;
+        if (gap <= 0 || !isFinite(gap) || gap > 365 * 24 * 3600) continue;
         gapsSec.push(gap);
       }
 
@@ -133,7 +145,9 @@ export class FrequencyValidation extends TransactionValidation {
 
       // Define detection window end = tx.createdAt (use now if missing)
       const detectionTime = tx.createdAt ? new Date(tx.createdAt) : new Date();
-      const windowStart = new Date(detectionTime.getTime() - this.WINDOW_MINUTES * 60 * 1000);
+      const windowStart = new Date(
+        detectionTime.getTime() - this.WINDOW_MINUTES * 60 * 1000,
+      );
 
       // Split gaps into baseline (before windowStart) and window gaps (those that end inside window)
       const baselineGaps: number[] = [];
@@ -163,19 +177,28 @@ export class FrequencyValidation extends TransactionValidation {
         baselineMedian = this.median(baselineGaps);
         baselineMad = Math.max(this.mad(baselineGaps, baselineMedian), 1); // avoid zero MAD
       } else {
-        this.logger.log(`FrequencyValidation: baseline too small (${baselineGaps.length}) for ${senderAcc}, using fallback`);
+        this.logger.log(
+          `FrequencyValidation: baseline too small (${baselineGaps.length}) for ${senderAcc}, using fallback`,
+        );
       }
 
       // Detection window stats
       const windowCount = windowGaps.length;
-      const windowAvgGap = windowGaps.length > 0 ? (windowGaps.reduce((s, v) => s + v, 0) / windowGaps.length) : Infinity;
+      const windowAvgGap =
+        windowGaps.length > 0
+          ? windowGaps.reduce((s, v) => s + v, 0) / windowGaps.length
+          : Infinity;
       // Convert to rate: events per minute inside window
-      const windowDurationSec = Math.min((detectionTime.getTime() - windowStart.getTime()) / 1000, Math.max(60, this.WINDOW_MINUTES * 60));
+      const windowDurationSec = Math.min(
+        (detectionTime.getTime() - windowStart.getTime()) / 1000,
+        Math.max(60, this.WINDOW_MINUTES * 60),
+      );
       const txRate = windowGaps.length / (windowDurationSec / 60); // tx per minute
 
       // Baseline rate (approx) from median gap -> events per minute
-      const baselineRate = baselineMedian > 0 ? (60 / baselineMedian) : 0;
-      const rateFold = baselineRate > 0 ? (txRate / baselineRate) : Number.POSITIVE_INFINITY;
+      const baselineRate = baselineMedian > 0 ? 60 / baselineMedian : 0;
+      const rateFold =
+        baselineRate > 0 ? txRate / baselineRate : Number.POSITIVE_INFINITY;
 
       // Z-score like signal: (baselineMedian - windowAvgGap) / MAD -> large positive means gaps decreased => more frequent
       const z = (baselineMedian - windowAvgGap) / baselineMad;
@@ -193,33 +216,34 @@ export class FrequencyValidation extends TransactionValidation {
         z,
       });
 
-     
       const strongZ = z >= this.Z_THRESHOLD;
-      const strongRate = rateFold >= this.RATE_THRESHOLD && windowCount >= this.MIN_WINDOW_GAPS;
+      const strongRate =
+        rateFold >= this.RATE_THRESHOLD && windowCount >= this.MIN_WINDOW_GAPS;
 
       if ((strongZ && windowCount >= this.MIN_WINDOW_GAPS) || strongRate) {
-          
         const behaviour = new HighFrequencyTransactions({
-            z,
-            rateFold,
-            windowCount,
-            baselineMedian,
-            baselineMad,
-            windowAvgGap,
-            txRate,
-            baselineRate,
+          z,
+          rateFold,
+          windowCount,
+          baselineMedian,
+          baselineMad,
+          windowAvgGap,
+          txRate,
+          baselineRate,
         });
 
         behaviours.push(behaviour);
-      }
-
-      else {
-        this.logger.log(`FrequencyValidation: no significant anomaly for ${senderAcc}`);
+      } else {
+        this.logger.log(
+          `FrequencyValidation: no significant anomaly for ${senderAcc}`,
+        );
       }
 
       return behaviours;
     } catch (error) {
-      this.logger.error(`FrequencyValidation error: ${error?.message || error}`);
+      this.logger.error(
+        `FrequencyValidation error: ${error?.message || error}`,
+      );
       return [];
     }
   }

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
- import { TransactionDocument } from "src/transaction/schemas/transaction.schema";
+import { TransactionDocument } from 'src/transaction/schemas/transaction.schema';
 import { TransactionValidation } from '../transaction-validation';
 import { SuspiciousBehaviour } from 'src/fraud-system/suspicious-behaviours/suspicious-behaviour';
 import { LowAmount } from 'src/fraud-system/suspicious-behaviours/impl/low-amount.suspicious-behaviour';
@@ -7,7 +7,7 @@ import { LowAmount } from 'src/fraud-system/suspicious-behaviours/impl/low-amoun
 @Injectable()
 export class LowAmountValidation extends TransactionValidation {
   private readonly logger = new Logger(LowAmountValidation.name);
-  
+
   // Configurable thresholds
   private readonly MIN_AMOUNT = 10; // Minimum amount threshold
   private readonly MICRO_AMOUNT = 1; // Extremely low amounts (potential testing/probing)
@@ -15,10 +15,10 @@ export class LowAmountValidation extends TransactionValidation {
 
   async validate(tx: TransactionDocument): Promise<SuspiciousBehaviour[]> {
     this.logger.log('START LOW AMOUNT VALIDATION');
-    
+
     try {
       const amount = tx.snapshot?.request?.amount;
-      
+
       // Basic validation
       if (typeof amount !== 'number' || amount <= 0) {
         this.logger.warn('Invalid amount in transaction');
@@ -30,21 +30,27 @@ export class LowAmountValidation extends TransactionValidation {
         return [];
       }
 
-      this.logger.log(`SUSPICIOUS - Amount ${amount} below threshold ${this.MIN_AMOUNT}`);
-      
+      this.logger.log(
+        `SUSPICIOUS - Amount ${amount} below threshold ${this.MIN_AMOUNT}`,
+      );
+
       // Create enhanced LowAmount behavior with context
-      const behaviour = new LowAmount({
-        amount,
-        threshold: this.MIN_AMOUNT,
-        senderAccount: tx.snapshot.senderAccount?.accountNumber,
-        receiverAccount: tx.snapshot.receiverAccount?.accountNumber,
-        suspicionLevel: this.calculateSuspicionLevel(amount)
-      }, this.calculateIntensityMultiplier(amount));
+      const behaviour = new LowAmount(
+        {
+          amount,
+          threshold: this.MIN_AMOUNT,
+          senderAccount: tx.snapshot.senderAccount?.accountNumber,
+          receiverAccount: tx.snapshot.receiverAccount?.accountNumber,
+          suspicionLevel: this.calculateSuspicionLevel(amount),
+        },
+        this.calculateIntensityMultiplier(amount),
+      );
 
       return [behaviour];
-
     } catch (error) {
-      this.logger.error(`LowAmountValidation error: ${error?.message || error}`);
+      this.logger.error(
+        `LowAmountValidation error: ${error?.message || error}`,
+      );
       return [];
     }
   }
@@ -56,7 +62,9 @@ export class LowAmountValidation extends TransactionValidation {
     return 1.2; // Moderately suspicious
   }
 
-  private calculateSuspicionLevel(amount: number): 'MICRO' | 'VERY_LOW' | 'LOW' {
+  private calculateSuspicionLevel(
+    amount: number,
+  ): 'MICRO' | 'VERY_LOW' | 'LOW' {
     if (amount <= this.MICRO_AMOUNT) return 'MICRO';
     if (amount <= this.VERY_LOW_AMOUNT) return 'VERY_LOW';
     return 'LOW';

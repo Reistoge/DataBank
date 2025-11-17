@@ -16,24 +16,22 @@ import { UsersModule } from './users/users.module';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { PaymentModule } from './payment/payment.module';
 import { SeederModule } from './database/seeds/seeder.module';
-  
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), 
+    ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
-    AccountModule, 
-    UsersModule, 
-    CardModule, 
-    DatabaseModule, 
-    AuthModule, 
+    AccountModule,
+    UsersModule,
+    CardModule,
+    DatabaseModule,
+    AuthModule,
     ScheduleModule.forRoot(),
-    TransactionModule, 
+    TransactionModule,
     FraudSystemModule,
-     PaymentModule,
-      SeederModule,
-      SeederModule,
-  
-    
+    PaymentModule,
+    SeederModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],
