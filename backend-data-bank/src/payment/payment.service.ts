@@ -15,9 +15,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Payment, PaymentDocument } from './entities/payment.schema';
 import { MerchantRepository } from './repository/merchant/merchant.repository';
-import { Product } from './entities/product.schema';
-import { ProductResponseDto } from './dto/product.dto';
-import { MerchantResponseDto } from './dto/merchant.dto';
+ 
 
 @Injectable()
 export class PaymentService {
@@ -41,11 +39,11 @@ export class PaymentService {
     }
 
     try {
-      const { cardNumber, cvv, expiryDate, password, product, merchantName, location, device, ipAddress } = createPaymentDto;
+      const { cardNumber, cvv, expiryDate, password, product, merchantName, location, device, ipAddress,currency } = createPaymentDto;
 
-      // Get merchant
+     
       const merchant = await this.merchantRepo.getMerchantbyName(merchantName);
-
+      this.logger.log(`Merchant retrieved: ${JSON.stringify(merchant)}`);
       // Validate card
       const { cardDoc, accountDoc, userDoc } = await this.cardService.validateCard({
         cardNumber,
@@ -60,11 +58,15 @@ export class PaymentService {
       // Validate product price
       if (!product.price || product.price <= 0) {
         throw new BadRequestException('Product price must be greater than zero');
+        
       }
 
       // Check balance
       if (product.price > accountDoc.balance) {
         throw new BadRequestException('Insufficient balance for this payment');
+      }
+      if (product.price > cardDoc.spentLimit) {
+        throw new BadRequestException('spent limit reached');
       }
 
       // Create transaction request
@@ -93,12 +95,15 @@ export class PaymentService {
 
       // Create payment record
       const payment: Payment = {
-        merchantId: merchant.id.toString(), // Fixed: use _id instead of id
-        product: product,
+        merchantId: merchant._id, 
+        product: {
+          ...product,
+          merchantId: merchant._id, // Add the merchantId to the product object
+        },
         orderNumber: await this.generateUniqueOrderNumber(),
         txId: txResponse.transactionId,
       } as Payment;
-
+        
       await new this.paymentModel(payment).save();
 
       this.logger.log(`Payment created successfully: orderNumber=${payment.orderNumber}, txId=${payment.txId}`);
@@ -106,7 +111,9 @@ export class PaymentService {
       return {
         product: payment.product,
         orderNumber: payment.orderNumber,
-        transactionId: txResponse.transactionId.toString(),
+        transactionId: txResponse.transactionId,
+        status: txResponse.status, // Add the status here
+        message: txResponse.message, // Also good to include the message
         merchant: {
           name: merchant.name,
           category: merchant.category,
@@ -116,15 +123,17 @@ export class PaymentService {
       };
 
     } catch (error) {
-      // Re-throw known exceptions
+      // Re-throw known NestJS HTTP exceptions directly
       if (error instanceof BadRequestException ||
         error instanceof NotFoundException ||
         error instanceof InternalServerErrorException) {
         throw error;
       }
 
-      this.logger.error(`Payment creation failed: ${error?.message}`);
-      throw new InternalServerErrorException('Payment processing failed due to system error');
+      // For other errors, log them but throw a BadRequestException 
+      // with the original message so the user gets a meaningful response.
+      this.logger.error(`Payment creation failed: ${error?.message}`, error.stack);
+      throw new BadRequestException(error.message || 'Payment processing failed');
     }
   }
 

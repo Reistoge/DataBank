@@ -6,36 +6,33 @@ import { User } from '../decorator/user.guard';
 
 @Controller('merchant')
 export class MerchantController {
+  constructor(private readonly merchantService: MerchantService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async create(@Body() createMerchantDto: CreateMerchantDto, @User() user) {
+    return await this.merchantService.create(createMerchantDto, user);
+  }
 
-    constructor(private readonly merchantService: MerchantService) { }
-    @UseGuards(JwtAuthGuard)
-    @Post()
-    async create(@Body() createMerchantDto: CreateMerchantDto, @User() user) {
-        return await this.merchantService.create(createMerchantDto, user);
+  @Get('merchants')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getMerchants() {
+    return await this.merchantService.getMerchants();
+  }
 
-    }
+  @Get('merchants/:name')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getMerchant(@Param('name') name: string) {
+    return await this.merchantService.getMerchant(name);
+  }
 
-    @Get('/merchants')
-    @UseGuards(JwtAuthGuard)
-    @HttpCode(HttpStatus.OK)
-    async getMerchants() {
-        return await this.merchantService.getMerchants();
-    }
-
-    @Get('/merchants/:name')
-    @UseGuards(JwtAuthGuard)
-    @HttpCode(HttpStatus.OK)
-    async getMerchant(@Param('name') name: string) {
-        return await this.merchantService.getMerchant(name);
-    }
-
-    @Get('/products')
-    @UseGuards(JwtAuthGuard)
-    @HttpCode(HttpStatus.OK)
-    async getProducts() {
-        return await this.merchantService.getProducts();
-    }
-
-
+  @Get('products')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getProducts() {
+    const products = await this.merchantService.getProducts();
+    return products; 
+  }
 }

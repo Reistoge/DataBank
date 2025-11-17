@@ -13,7 +13,6 @@ export class CreatePaymentDto {
     password: string;
     
     merchantName: string;
-    senderAccountNumber: string
     location: string
     currency: string
     device: string

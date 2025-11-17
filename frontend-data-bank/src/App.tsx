@@ -17,6 +17,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
 import Transfer from './pages/Transfer';
+import ShopPayment from './pages/ShopPayment';
+import MyCards from './pages/MyCards';
 
 function App() {
   return (
@@ -87,6 +89,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path={CONSTANT_ROUTES.MY_CARDS}
+              element={
+                <ProtectedRoute>
+                  <MyCards />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={CONSTANT_ROUTES.PAYMENT} element={<ShopPayment />} />
 
             <Route
               path="*"

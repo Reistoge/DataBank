@@ -1,10 +1,8 @@
-
-
 // API Configuration
 export const API_BASE_URL = 'http://localhost:5000/api';  // Changed from 6000 to 5000
 
 // Route Constants
-export const ROUTES = Object.freeze({
+export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
@@ -14,9 +12,11 @@ export const ROUTES = Object.freeze({
   DELETE_CARD: '/deleteCard',
   ADMIN_PANEL: '/adminPanel',
   TRANSFER: '/transfer',
-
+  SHOP_PAYMENT: '/shop-payment',
+  PAYMENT: '/payment',
+  MY_CARDS: '/my-cards', 
   HOME: '/',
-} as const);
+} as const;
 
 
 // API Endpoint Routes

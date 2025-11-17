@@ -21,7 +21,7 @@ export class CardValidationCredential {
 export class CardService {
   async getCardByCardNumber(cardNumber: string): Promise<CardDocument> {
     try {
-      const doc = await this.cardModel.findOne({ accountNumber: cardNumber }).lean<CardDocument>().exec();
+      const doc = await this.cardModel.findOne({ number: cardNumber }).lean<CardDocument>().exec();
       if (!doc) {
         throw new NotFoundException(`Card with number ${cardNumber} not found`);
 

@@ -31,7 +31,7 @@ export class MerchantRepository {
         @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     ) { }
 
-    async getMerchantbyName(merchantName: string): Promise<Merchant> {
+    async getMerchantbyName(merchantName: string): Promise<MerchantDocument> {
         if (!merchantName || typeof merchantName !== 'string') {
             throw new BadRequestException('Merchant name is required and must be a string');
         }
@@ -122,10 +122,28 @@ export class MerchantRepository {
 
     async getAllProducts(): Promise<ProductResponseDto[]> {
         try {
-            return (await this.merchantModel.find().lean<ProductResponseDto[]>().exec());
+            const products = await this.productModel.find().lean<Product[]>().exec();
+            
+             
+            const productDtos : ProductResponseDto[]= await Promise.all(
+                products.map(async (product) => {
+                    const merchant = await this.merchantModel.findById(product.merchantId).lean().exec();
+                    return {
+                        name: product.name,
+                        category: product.category,
+                        price: product.price,
+                        description: product.description,
+                        merchantName: merchant?.name as string,
+                        quantity: product.quantity,
+                        sku: product.sku,
+                        isActive: product.isActive,
+                    };
+                })
+            );
+            return productDtos;
         } catch (error) {
-            this.logger.error(`Error getting all merchants: ${error?.message}`);
-            throw new InternalServerErrorException('Failed to retrieve merchants');
+            this.logger.error(`Error getting all products: ${error?.message}`);
+            throw new InternalServerErrorException('Failed to retrieve products');
         }
     }
 

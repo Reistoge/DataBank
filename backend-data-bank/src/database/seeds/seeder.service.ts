@@ -8,6 +8,11 @@ import { AccountType } from 'src/account/dto/account.dto';
 import * as bcrypt from 'bcryptjs';
 import * as fs from 'fs';
 import * as path from 'path';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product, ProductDocument } from 'src/payment/entities/product.schema';
+import { Merchant, MerchantDocument } from 'src/payment/entities/merchant.schema';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class SeederService implements OnModuleInit {
@@ -18,16 +23,17 @@ export class SeederService implements OnModuleInit {
     private readonly userService: UserService,
     private readonly accountService: AccountService,
     private readonly merchantService: MerchantService,
+    private readonly cardService: CardService,
     private readonly configService: ConfigService,
+    @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
+    @InjectModel(Merchant.name) private readonly merchantModel: Model<MerchantDocument>,
   ) {
-    // Load the JSON file synchronously on instantiation
     this.loadData();
   }
 
   private loadData() {
     try {
-      // Adjust path as needed. This assumes seed-data.json is in the same folder as this service or src/
-      const filePath = path.join(process.cwd(), 'src/database/seeds/seed-data.json'); 
+      const filePath = path.join(process.cwd(), 'src/database/seeds/seed-data.json');
       const fileContent = fs.readFileSync(filePath, 'utf8');
       this.data = JSON.parse(fileContent);
     } catch (error) {
@@ -60,15 +66,14 @@ export class SeederService implements OnModuleInit {
 
     for (const rawUser of this.data.users) {
       try {
-        // PREPARE DATA: Convert JSON strings to Types/Hashes
         const userData = {
           ...rawUser,
-          birthday: new Date(rawUser.birthday), // Convert String to Date
-          password: await bcrypt.hash(rawUser.password, 10), // Hash password
+          birthday: new Date(rawUser.birthday),
+          password: await bcrypt.hash(rawUser.password, 10),
         };
 
         const existingUser = await this.userService.getUserByEmail(userData.email);
-        
+
         if (existingUser) {
           this.logger.log(`User ${userData.email} already exists, skipping...`);
           const userDoc = await this.userService.getUserDocumentByRut(userData.rut);
@@ -76,8 +81,8 @@ export class SeederService implements OnModuleInit {
             createdUsers.push({
               user: existingUser,
               userDoc,
-              userData, // Use processed userData
-              accounts: await this.accountService.findAccountsByUserId(existingUser.id)
+              userData: userData,
+              accounts: await this.accountService.findAccountsByUserId(existingUser.id),
             });
           }
           continue;
@@ -105,14 +110,13 @@ export class SeederService implements OnModuleInit {
 
         const accounts = await this.seedAccountsForUser(user.id, user.username, userData.accountTypes);
         const userDoc = await this.userService.getUserDocumentById(user.id);
-        
+
         createdUsers.push({
           user,
           userDoc,
           userData,
-          accounts
+          accounts,
         });
-
       } catch (error) {
         this.logger.error(`Failed to create user ${rawUser.email}:`, error);
       }
@@ -121,20 +125,130 @@ export class SeederService implements OnModuleInit {
     return createdUsers;
   }
 
-  // ... (seedAccountsForUser, seedCardsForAccount, seedBusinessCardsForAccount remain EXACTLY the same) ...
+  private async seedAccountsForUser(
+    userId: string,
+    username: string,
+    accountTypes: AccountType[]
+  ) {
+    try {
+      const userDoc = await this.userService.getUserDocumentById(userId);
+      const createdAccounts: any[] = [];
+
+      for (const accountType of accountTypes) {
+        try {
+          const existingAccount = await this.accountService.findAccountsByUserIdAndType(
+            userId,
+            accountType
+          );
+          if (existingAccount && existingAccount.length > 0) {
+            this.logger.log(
+              `Account type ${accountType} already exists for ${username}, skipping...`
+            );
+            createdAccounts.push(...existingAccount);
+            continue;
+          }
+
+          const accountData = {
+            userId,
+            userNumber: userDoc.userNumber,
+            type: accountType,
+            bankBranch: userDoc.region || 'Santiago',
+          };
+
+          const account = await this.accountService.create(accountData);
+          this.logger.log(
+            `✅ Created ${accountType} account for ${username}: ${account.accountNumber}`
+          );
+
+          if (accountType === AccountType.BUSINESS) {
+            await this.seedBusinessCardsForAccount(
+              account.accountNumber!,
+              account.id!,
+              'business-card-password'
+            );
+          } else {
+            await this.seedCardsForAccount(
+              account.accountNumber!,
+              account.id!,
+              'default-card-password'
+            );
+          }
+
+          createdAccounts.push(account);
+        } catch (error) {
+          this.logger.error(`Failed to create ${accountType} account for ${username}:`, error);
+        }
+      }
+
+      return createdAccounts;
+    } catch (error) {
+      this.logger.error(`Failed to create accounts for user ${username}:`, error);
+      return [];
+    }
+  }
+
+  private async seedCardsForAccount(
+    accountNumber: string,
+    accountId: string,
+    cardPassword: string
+  ) {
+    try {
+      const cardData = {
+        accountNumber,
+        accountId,
+        password: cardPassword,
+      };
+
+      const card = await this.cardService.create(cardData);
+      this.logger.log(`✅ Created DEBIT card: ${card.number}`);
+    } catch (error) {
+      this.logger.error(`Failed to create cards for account ${accountNumber}:`, error);
+    }
+  }
+
+  private async seedBusinessCardsForAccount(
+    accountNumber: string,
+    accountId: string,
+    cardPassword: string
+  ) {
+    try {
+      const cardTypes = ['BUSINESS_DEBIT', 'BUSINESS_CREDIT'];
+
+      const cards = [
+        { accountNumber, accountId, password: cardPassword },
+        { accountNumber, accountId, password: cardPassword },
+      ];
+
+      for (let i = 0; i < cards.length; i++) {
+        try {
+          const card = await this.cardService.create(cards[i]);
+          this.logger.log(`✅ Created ${cardTypes[i]} card: ${card.number}`);
+        } catch (error) {
+          this.logger.error(`Failed to create business card ${cardTypes[i]}:`, error);
+        }
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to create business cards for account ${accountNumber}:`,
+        error
+      );
+    }
+  }
 
   private async seedMerchants(createdUsers: any[]) {
     this.logger.log('🏪 Seeding merchants...');
 
-    // 1. Create merchants attached to Business Users
-    const businessUsers = createdUsers.filter(u => 
-      u.userData.merchantData && 
-      u.accounts.some((acc: any) => acc.type === AccountType.BUSINESS)
+    const businessUsers = createdUsers.filter(
+      (u) =>
+        u.userData.merchantData &&
+        u.accounts.some((acc: any) => acc.type === AccountType.BUSINESS)
     );
 
     for (const businessUser of businessUsers) {
       try {
-        const businessAccount = businessUser.accounts.find((acc: any) => acc.type === AccountType.BUSINESS);
+        const businessAccount = businessUser.accounts.find(
+          (acc: any) => acc.type === AccountType.BUSINESS
+        );
         if (!businessAccount) continue;
 
         const merchantData = {
@@ -149,29 +263,34 @@ export class SeederService implements OnModuleInit {
           userNumber: businessUser.userDoc.userNumber,
           email: businessUser.userDoc.email,
           rut: businessUser.userDoc.rut,
-          roles: businessUser.userDoc.roles
+          roles: businessUser.userDoc.roles,
         };
 
         const merchant = await this.merchantService.create(merchantData, userPayload);
         this.logger.log(`✅ Created merchant: ${merchant.name}`);
-
       } catch (error) {
-        this.logger.error(`Failed to create merchant for user ${businessUser.user.email}:`, error);
+        this.logger.error(
+          `Failed to create merchant for user ${businessUser.user.email}:`,
+          error
+        );
       }
     }
 
-    // 2. Create System Merchants (Read from JSON now)
     await this.createSystemMerchants(createdUsers);
   }
 
   private async createSystemMerchants(createdUsers: any[]) {
-    const adminUser = createdUsers.find(u => u.userData.roles?.includes(UserRole.ADMIN));
+    const adminUser = createdUsers.find((u) =>
+      u.userData.roles?.includes(UserRole.ADMIN)
+    );
     if (!adminUser) {
       this.logger.warn('No admin user found for system merchants');
       return;
     }
 
-    const adminBusinessAccount = adminUser.accounts.find((acc: any) => acc.type === AccountType.BUSINESS);
+    const adminBusinessAccount = adminUser.accounts.find(
+      (acc: any) => acc.type === AccountType.BUSINESS
+    );
     if (!adminBusinessAccount) {
       this.logger.warn('Admin user has no business account for system merchants');
       return;
@@ -183,17 +302,16 @@ export class SeederService implements OnModuleInit {
       userNumber: adminUser.userDoc.userNumber,
       email: adminUser.userDoc.email,
       rut: adminUser.userDoc.rut,
-      roles: adminUser.userDoc.roles
+      roles: adminUser.userDoc.roles,
     };
 
-    // Loop through JSON data instead of hardcoded array
     for (const rawMerchant of this.data.systemMerchants) {
       try {
         const merchantData = {
-            ...rawMerchant,
-            accountNumber: adminBusinessAccount.accountNumber
+          ...rawMerchant,
+          accountNumber: adminBusinessAccount.accountNumber,
         };
-        
+
         const merchant = await this.merchantService.create(merchantData, adminPayload);
         this.logger.log(`✅ Created system merchant: ${merchant.name}`);
       } catch (error) {
@@ -204,27 +322,49 @@ export class SeederService implements OnModuleInit {
 
   private async seedProducts() {
     this.logger.log('📦 Seeding products...');
-    
-    // Loop through JSON data
+
+    const merchants = await this.merchantModel.find().lean().exec();
+    const merchantMap = new Map(merchants.map((m: any) => [m.name, m._id.toString()]));
+
+    if (merchantMap.size === 0) {
+      this.logger.warn('⚠️ No merchants found. Please seed merchants first before products.');
+      return;
+    }
+
     for (const productData of this.data.products) {
       try {
-        this.logger.log(`📦 Would create product: ${productData.name}`);
-        // Implementation logic...
+        const merchantId = merchantMap.get(productData.merchantName);
+
+        if (!merchantId) {
+          this.logger.warn(
+            `⚠️ Merchant '${productData.merchantName}' not found for product '${productData.name}'. Skipping...`
+          );
+          continue;
+        }
+
+        const existing = await this.productModel.findOne({ sku: productData.sku }).exec();
+        if (existing) {
+          this.logger.log(`✓ Product already exists: ${productData.name}, skipping...`);
+          continue;
+        }
+
+        const product = await this.productModel.create({
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          quantity: productData.quantity,
+          sku: productData.sku,
+          category: productData.category,
+          isActive: productData.isActive,
+          merchantId,
+        });
+
+        this.logger.log(
+          `✅ Created product: ${product.name} (Merchant: ${productData.merchantName}, ID: ${merchantId})`
+        );
       } catch (error) {
         this.logger.error(`Failed to create product ${productData.name}:`, error);
       }
     }
-  }
-
-  
-    
-  // Missing helper methods from your original code should be pasted here 
-  // (seedAccountsForUser, seedCardsForAccount, etc.)
-  // I excluded them to keep the answer short, but keep them in your file!
-  private async seedAccountsForUser(userId: string, username: string, accountTypes: AccountType[]) {
-      // ... Keep your original logic ...
-      // This is required for the code to compile
-      // (Just copy-paste the method from your original snippet)
-      return await this.accountService.findAccountsByUserId(userId) || []; // Placeholder return
   }
 }

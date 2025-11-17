@@ -9,6 +9,7 @@ export type AccountResponse = {
 };
 
 export type CardResponse = {
+    expiryDate: any;
     id: string;
     cvv: number;
     number: string;

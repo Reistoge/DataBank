@@ -125,56 +125,80 @@
       "category": "FOOD",
       "price": 2.99,
       "description": "Fresh organic apples",
-      "merchantCategory": "GROCERY"
+      "merchantName": "DataBank ATM Network",
+      "quantity": 150,
+      "sku": "PROD-001",
+      "isActive": true
     },
     {
       "name": "Whole Wheat Bread",
       "category": "FOOD",
       "price": 3.49,
       "description": "Nutritious whole wheat bread",
-      "merchantCategory": "GROCERY"
+      "merchantName": "DataBank ATM Network",
+      "quantity": 100,
+      "sku": "PROD-002",
+      "isActive": true
     },
     {
       "name": "Smartphone Pro Max",
       "category": "ELECTRONICS",
       "price": 999.99,
       "description": "Latest smartphone with advanced features",
-      "merchantCategory": "ELECTRONICS"
+      "merchantName": "TechStore Pro",
+      "quantity": 50,
+      "sku": "PROD-003",
+      "isActive": true
     },
     {
       "name": "Wireless Headphones",
       "category": "ELECTRONICS",
       "price": 149.99,
       "description": "High-quality wireless headphones",
-      "merchantCategory": "ELECTRONICS"
+      "merchantName": "TechStore Pro",
+      "quantity": 75,
+      "sku": "PROD-004",
+      "isActive": true
     },
     {
       "name": "Casual T-Shirt",
       "category": "CLOTHING",
       "price": 19.99,
       "description": "Comfortable cotton t-shirt",
-      "merchantCategory": "CLOTHING"
+      "merchantName": "Fashion World",
+      "quantity": 200,
+      "sku": "PROD-005",
+      "isActive": true
     },
     {
       "name": "Denim Jeans",
       "category": "CLOTHING",
       "price": 59.99,
       "description": "Classic denim jeans",
-      "merchantCategory": "CLOTHING"
+      "merchantName": "Fashion World",
+      "quantity": 120,
+      "sku": "PROD-006",
+      "isActive": true
     },
     {
       "name": "Programming Guide",
       "category": "BOOKS",
       "price": 39.99,
       "description": "Comprehensive programming guide",
-      "merchantCategory": "BOOKS"
+      "merchantName": "BookHaven",
+      "quantity": 80,
+      "sku": "PROD-007",
+      "isActive": true
     },
     {
       "name": "Fiction Novel",
       "category": "BOOKS",
       "price": 14.99,
       "description": "Bestselling fiction novel",
-      "merchantCategory": "BOOKS"
+      "merchantName": "BookHaven",
+      "quantity": 150,
+      "sku": "PROD-008",
+      "isActive": true
     }
   ]
 }

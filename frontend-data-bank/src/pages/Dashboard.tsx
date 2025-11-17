@@ -23,6 +23,7 @@ import {
   FiPlusCircle,
   FiTrendingDown,
   FiTrendingUp,
+  FiGift,
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth.hook';
@@ -188,7 +189,7 @@ function Dashboard() {
       setIsLoadingHistory(false);
     }
   };
-  
+
   const formatDirection = (
     direction: string,
     accountNumber: string,
@@ -684,6 +685,24 @@ function Dashboard() {
                       <FiCreditCard />
                       Add Card
                     </Link>
+
+                    <Link
+                      to={ROUTES.MY_CARDS}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FiCreditCard />
+                      My Cards
+                    </Link>
+                    <Link
+                      to={ROUTES.DELETE_ACCOUNT}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FiTrash2 />
+                      Delete Account
+                    </Link>
+
                     <Link
                       to={ROUTES.TRANSFER}
                       className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
@@ -691,6 +710,14 @@ function Dashboard() {
                     >
                       <FiDollarSign />
                       Transfer Money
+                    </Link>
+                    <Link
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
+                      to={ROUTES.PAYMENT}
+                      onClick={() => setOpen(false)}
+                    >
+                      <FiGift />
+                      Payment
                     </Link>
                     <Link
                       to={ROUTES.DELETE_ACCOUNT}

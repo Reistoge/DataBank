@@ -1,4 +1,5 @@
 import type { Account } from "../types/auth.types";
+import type { Product, Merchant } from "../types/payment.types";
 import type { TransactionRequest, StartTransactionResponse, TransactionHistory } from "../types/transaction.types";
 import { ACCOUNT_ROUTES, ADMIN_ROUTES, API_BASE_URL, CARD_ROUTES, TRANSACTION_ROUTES } from "../utils/constants";
 import { createAuthHeaders, tokenStorage } from "../utils/storage";
@@ -135,7 +136,7 @@ export const updateCardSpentLimit = async (dto: CardResponse, newLimit: number, 
 }
 
 
-export const transaction = async (tx: TransactionRequest): Promise<StartTransactionResponse> => {
+export const makeAccountTransfer = async (tx: TransactionRequest): Promise<StartTransactionResponse> => {
   const response = await fetch(`${API_BASE_URL}${TRANSACTION_ROUTES.MAKE_TRANSACTION}`, {
     method: "POST",
     headers: createAuthHeaders(),
@@ -180,6 +181,22 @@ export const getTransactionHistory = async (
   return data;
 };
 
+export const makePayment = async (paymentDto: any): Promise<StartTransactionResponse> => {
+  const response = await fetch(`${API_BASE_URL}/payment`, {
+    method: "POST",
+    headers: createAuthHeaders(),
+    body: JSON.stringify(paymentDto),
+  });
+  const result = await response.json();
+  console.log(`Payment API response: ${JSON.stringify(result)}`);
+  if (!response.ok) {
+    const errorMessage = result.message || 'Payment creation failed';
+    throw new Error(errorMessage);
+  }
+  return result;
+};
+
+
 
 /**
  * 
@@ -205,3 +222,32 @@ export const getAllAccountsAdmin = async (): Promise<AccountAdminResponse[]> => 
   if (!response.ok) throw new Error("getAllAccountsAdmin failed");
   return await response.json();
 };
+
+export const getProducts = async (): Promise<Product[]> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/products`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getProducts failed");
+  return await response.json();
+};
+
+ export const getMerchants = async (): Promise<Merchant[]> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/merchants`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getMerchants failed");
+  return await response.json();
+};
+ 
+export const getMerchant = async (name: string): Promise<Merchant> => {
+  const response = await fetch(`${API_BASE_URL}/merchant/merchants/${name}`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getMerchant failed");
+  return await response.json();
+};
+
+ 

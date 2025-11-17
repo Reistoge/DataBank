@@ -17,7 +17,7 @@ export class AccountService {
       const card = await this.cardService.getCardByCardNumber(cardNumber);
       const account = await this.accountModel.findOne({ _id: card.accountId, state: AccountState.DEFAULT }).exec();
       if (!account) {
-      throw new NotFoundException(`Account not found or not in default state`);
+        throw new NotFoundException(`Account not found or not in default state`);
       }
       this.logger.log(`Account found for card ${cardNumber}`);
       return account;
@@ -26,7 +26,7 @@ export class AccountService {
       throw err instanceof Error ? err : new Error('Error getting account from card number');
     }
   }
-v
+  v
   private readonly logger = new Logger(AccountService.name);
 
   constructor(
@@ -133,7 +133,7 @@ v
     this.logger.log(`Account ${accountNumber} found`);
     return account;
   }
-  async checkAccountExistance(accountNumber:string) : Promise<boolean>{
+  async checkAccountExistance(accountNumber: string): Promise<boolean> {
     try {
       await this.getAccountDocumentByAccountNumber(accountNumber);
       return true;
@@ -267,5 +267,20 @@ v
       throw err instanceof Error ? err : new Error('Error parsing accounts data');
     }
 
+  }
+
+  async findAccountsByUserIdAndType(
+    userId: string,
+    accountType: AccountType,
+  ): Promise<AccountResponseDto[]> {
+    try {
+      return await this.accountModel
+        .find({ userId, type: accountType })
+        .lean<AccountResponseDto[]>()
+        .exec();
+    } catch (error) {
+      this.logger.error(`Error finding accounts by type: ${error}`);
+      return [];
+    }
   }
 }

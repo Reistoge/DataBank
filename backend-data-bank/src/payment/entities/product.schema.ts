@@ -4,6 +4,8 @@ export type ProductDocument = Product & Document
 @Schema({ timestamps: true })
 export class Product extends Document {
 
+ 
+
     @Prop({ required: true })
     name: string;
 
@@ -25,8 +27,8 @@ export class Product extends Document {
     @Prop({ default: true })
     isActive: boolean;
 
-    @Prop({required:true})
-    merchantId:string;
+    @Prop({ required: true })
+    merchantId: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

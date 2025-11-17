@@ -19,7 +19,7 @@ import {
 } from 'react-icons/fi';
 import displayAccountResponseComponent from '../components/display-account.component';
 import { useAuth } from '../hooks/useAuth.hook';
-import { getUserAccounts, transaction } from '../services/api.service';
+import { getUserAccounts, makeAccountTransfer } from '../services/api.service';
 import type { AccountResponse } from '../services/dto/account.types';
 import { ROUTES, ANIMATION, RESOURCES } from '../utils/constants';
 import { colors, components } from '../utils/design-system';
@@ -224,7 +224,7 @@ function Transfer() {
     setFormState('submit');
 
     try {
-      const response = await transaction(formData);
+      const response = await makeAccountTransfer(formData);
       setTransactionResponse(response);
 
       if (response.status === 'PENDING' || response.status === 'COMPLETED') {
