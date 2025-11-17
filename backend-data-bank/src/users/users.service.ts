@@ -6,7 +6,10 @@ import { CreateUserDto, UserResponse } from './dto/user.dto';
 import { AccountService } from 'src/account/account.service';
 import { AccountType } from 'src/account/dto/account.dto';
 import { AuthUserPayloadDto } from 'src/auth/auth.service';
-import { CreateUserNode, CypherQuery } from 'src/fraud-system/queries/cypher-query';
+import {
+  CreateUserNode,
+  CypherQuery,
+} from 'src/fraud-system/queries/cypher-query';
 import { Neo4jService } from 'src/database/neo4j/neo4j.service';
 
 @Injectable()
@@ -71,12 +74,14 @@ export class UserService {
   }
   async hasAccount(accountNumber: string, userNumber: string): Promise<boolean> {
     try {
-      if ((await this.accountService.getUserByAccountNumber(accountNumber)).userNumber === userNumber) {
+      if (
+        (await this.accountService.getUserByAccountNumber(accountNumber))
+          .userNumber === userNumber
+      ) {
         return true;
       } else {
         return false;
       }
-
     } catch (error) {
       this.logger.warn(`Error checking account existance for user: ${error}`);
       return false;
@@ -90,7 +95,6 @@ export class UserService {
 
     this.logger.log(`data updated succesfully ${newSavedUser}`);
     return newSavedUser;
-
   }
 
 
@@ -101,8 +105,8 @@ export class UserService {
     const userNumber = await this.generateUniqueUserIdentifier();
     const newUser = {
       ...userData,
-      userNumber
-    }
+      userNumber,
+    };
     //const newUser = new this.userModel(userData);
     const savedUser = await new this.userModel(newUser).save();
     this.logger.log(`User ${savedUser.id} saved with no errors`);
@@ -110,10 +114,12 @@ export class UserService {
     const userResponse = this.toResponseDto(savedUser);
     try {
       this.logger.log(`creaing user node`);
-      const q: CypherQuery<UserDocument> = new CreateUserNode(this.neo4jService, savedUser);
+      const q: CypherQuery<UserDocument> = new CreateUserNode(
+        this.neo4jService,
+        savedUser,
+      );
       const records = q.execute();
       this.logger.log(`records ${records.toString()}`);
-
     } catch (err) {
       this.logger.warn(`Error while storing user in neo4j`);
     }
@@ -123,13 +129,16 @@ export class UserService {
       userId: savedUser.id,
       userNumber: savedUser.userNumber,
       type: 'DEBIT' as AccountType,
-      bankBranch: userResponse.region
+      bankBranch: userResponse.region,
     });
 
     return userResponse;
   }
   async logoutUser(user: AuthUserPayloadDto) {
-    await this.userModel.findOneAndUpdate({ email: user.email }, { lastLogin: (new Date(Date.now())) });
+    await this.userModel.findOneAndUpdate(
+      { email: user.email },
+      { lastLogin: new Date(Date.now()) },
+    );
   }
   async getUserByUsername(username: string): Promise<UserResponse | null> {
     const user = await this.userModel.findOne({ username }).exec();
@@ -161,16 +170,17 @@ export class UserService {
     let identifier: string;
     let exists: { _id: any } | null;
     do {
-      identifier = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      identifier = Math.floor(
+        1000000000 + Math.random() * 9000000000,
+      ).toString();
       exists = await this.userModel.exists({ identifier });
     } while (exists);
     return identifier;
   }
 
-
   async findAllUsers(): Promise<UserResponse[]> {
     const users = await this.userModel.find().select('-password').exec();
-    return users.map(u => this.toResponseDto(u));
+    return users.map((u) => this.toResponseDto(u));
   }
 
   private toResponseDto(user: UserDocument): UserResponse {

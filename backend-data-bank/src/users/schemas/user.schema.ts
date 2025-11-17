@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { timeStamp } from 'node:console';
-  
+
 export type UserDocument = User & Document;
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -23,8 +23,8 @@ export class User {
   @Prop({ required: true, unique: true })
   username: string;
 
-  @Prop({required:true,unique:true})
-  userNumber:string
+  @Prop({ required: true, unique: true })
+  userNumber: string;
 
   @Prop({ required: true })
   password: string; // almacenada con bcrypt
@@ -33,12 +33,16 @@ export class User {
   email: string;
 
   @Prop({ required: true, unique: true })
-  rut: string; 
+  rut: string;
 
   @Prop({ default: null })
   refreshToken: string;
 
-  @Prop({type: [String], enum: Object.values(UserRole), default: [UserRole.CLIENT] })
+  @Prop({
+    type: [String],
+    enum: Object.values(UserRole),
+    default: [UserRole.CLIENT],
+  })
   roles: UserRole[];
 
   @Prop({ type: Date })
@@ -57,6 +61,5 @@ export class User {
   contacts: Contact[];
  
 }
-
 
 export const UserSchema = SchemaFactory.createForClass(User);

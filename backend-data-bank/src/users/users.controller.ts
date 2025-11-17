@@ -15,25 +15,15 @@ export class UsersController {
   constructor(
     private userService: UserService,
     private configService: ConfigService,
-
-  ) { }
-
+  ) {}
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @Get('allUsers')
   async findAll() {
-    try {
-      this.logger.log('Fetching all users');
-      const users = await this.userService.findAllUsers();
-      return { statusCode: 200, data: users };
-    } catch (error) {
-      this.logger.error('Error fetching users', error);
-      return {
-        statusCode: 500,
-        message: error instanceof Error ? error.message : 'Failed to fetch users',
-      };
-    }
+    this.logger.log('Fetching all users');
+    const users = await this.userService.findAllUsers();
+    return { statusCode: 200, data: users };
   }
 
 

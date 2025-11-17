@@ -10,31 +10,31 @@ describe('TransactionController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      
       controllers: [TransactionController],
-
-    }).useMocker((token) => {
+    })
+      .useMocker((token) => {
         const results = ['test1', 'test2'];
         if (token === TransactionService) {
           return { findAll: jest.fn().mockResolvedValue(results) };
         }
-        
+
         if (typeof token === 'function') {
-          const mockMetadata = moduleMocker.getMetadata(
-            token,
-          ) as MockMetadata<any, any>;
+          const mockMetadata = moduleMocker.getMetadata(token) as MockMetadata<
+            any,
+            any
+          >;
           const Mock = moduleMocker.generateFromMetadata(
             mockMetadata,
           ) as ObjectConstructor;
           return new Mock();
         }
       })
-    .compile();
+      .compile();
 
-  controller = module.get<TransactionController>(TransactionController);
-});
+    controller = module.get<TransactionController>(TransactionController);
+  });
 
-it('should be defined', () => {
-  expect(controller).toBeDefined();
-});
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
 });

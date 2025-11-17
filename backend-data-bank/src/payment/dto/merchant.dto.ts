@@ -1,12 +1,9 @@
- 
 export class MerchantResponseDto {
- 
-    name: string;
+  name: string;
 
-    category: string;
+  category: string;
 
-    contact: string;
+  contact: string;
 
-    email: string;
-
+  email: string;
 }
