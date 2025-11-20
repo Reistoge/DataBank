@@ -8,7 +8,6 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   EXEC = 'EXEC',
 }
-
 export class Contact{
   accountNumber : string;
   name: string;

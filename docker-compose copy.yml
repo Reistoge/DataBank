@@ -18,6 +18,10 @@ services:
             - app-network
     mongodb-service:
      ## mongosh "mongodb://databank:password1234"
+     ## mongosh
+     ## use databank
+     ## show collections
+
         image: mongodb/mongodb-community-server:latest
         container_name: databank-mongodb
         restart: unless-stopped
@@ -33,7 +37,8 @@ services:
             - app-network
         
     backend-data-bank-service:
-       
+       ## to seed db
+       ## npm run seed
         build: ./backend-data-bank
         container_name: backend-data-bank
         restart: unless-stopped
