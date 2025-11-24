@@ -199,6 +199,9 @@ export class TransactionService {
         : new Error(`QueryTransactionHistory error`);
     }
   }
+  
+
+  
 
   async getTransactionsForAccount(
     senderAcc: string,
