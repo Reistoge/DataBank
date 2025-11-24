@@ -25,12 +25,12 @@ export const accountAdminTranslations: Translations<  AccountAdminResponse >  = 
 } satisfies Translations<AccountAdminResponse>;
 
 export const userTranslations: Translations<User> = {
-    username: 'Nombre',
-    birthday: 'Fecha de Nacimiento',
+    username: 'Name',
+    birthday: 'Birthdate',
     email: 'Email',
-    rut: 'Rut',
-    region: 'Región',
-    country: 'País',
+    rut: 'Rut/DNI',
+    region: 'Region',
+    country: 'Country',
 
 } satisfies Translations<User>;
 export const cardTranslations: Translations<CardResponse> = {

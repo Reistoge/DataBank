@@ -235,7 +235,7 @@ function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {user &&
             Object.entries(user)
-              .filter(([key]) => key !== 'id')
+              .filter(([key]) => (key !== 'id' )   )
               .map(([key, value]) => (
                 <div key={key} className="space-y-1">
                   <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
@@ -250,7 +250,7 @@ function Dashboard() {
               ))}
 
           {/* Token Display */}
-          <div className="col-span-full space-y-1">
+          <div className="col-span-full space-y-1 visibility = invisible" >
             <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
               Bearer Token
             </dt>
