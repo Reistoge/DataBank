@@ -262,8 +262,8 @@ function TransferContact() {
                   <img
                     id="appLogo"
                     onClick={handleRotate}
-                    className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
-                    src={RESOURCES.LOGO}
+                    className="w-25 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                    src={RESOURCES.LOGO_B}
                     alt="App Logo"
                     title="Click to rotate!"
                   />

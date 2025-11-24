@@ -285,7 +285,7 @@ function Dashboard() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <FiCreditCard className="text-green-600" />
-            Mi Cuenta
+            My Account
             {accountsData.length > 1 && (
               <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                 {selectedAccountIndex + 1} of {accountsData.length}
@@ -328,7 +328,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-1">
               <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-                Numero de cuenta
+                account number
               </dt>
               <dd className="text-xl font-bold text-gray-900">
                 {showId ? selectedAccount.accountNumber : 'XXXXXXXXXXXXXXXXX'}
@@ -337,7 +337,7 @@ function Dashboard() {
 
             <div className="space-y-1">
               <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-                Cuenta
+                account
               </dt>
               <dd className="text-xl font-semibold text-blue-600">
                 {selectedAccount.type}
@@ -346,7 +346,7 @@ function Dashboard() {
 
             <div className="space-y-1">
               <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-                Saldo
+                balance
               </dt>
               <dd className="text-2xl font-bold text-green-600">
                 ${selectedAccount.balance.toLocaleString()}
@@ -355,7 +355,8 @@ function Dashboard() {
 
             <div className="space-y-1">
               <dt className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-                Sucursal Bancaria
+                
+bank branch
               </dt>
               <dd className="text-lg font-semibold text-gray-900">
                 {selectedAccount.bankBranch}
@@ -636,24 +637,29 @@ function Dashboard() {
 
   return (
     <div className={`min-h-screen  ${colors.gradients.primary} `}>
-      {/* Navigation Bar */}
+      {/* Barra de navegacion */}
       <nav className={`${colors.gradients.card} shadow-lg`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 relative">
+            
             {/* Logo */}
             <div className="flex items-center gap-3">
               <img
                 id="dashboardLogo"
                 onClick={handleRotate}
-                className="w-10 h-10 rounded-full cursor-pointer hover:shadow-lg transition-all duration-200"
+                className="w-20 h-15 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-1"
                 src={RESOURCES.LOGO}
                 alt="App Logo"
                 title="Click to rotate!"
               />
-              <h1 className="text-xl font-bold text-white">DataBank</h1>
             </div>
 
-            {/* User Menu */}
+            {/* DataBank Centrado */}
+            <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold text-white">
+              DataBank
+            </h1>
+
+            {/* User Menu*/}
             <div className="flex items-center space-x-4 relative">
               <span className="text-white flex items-center gap-2">
                 <FiUser />
@@ -737,14 +743,6 @@ function Dashboard() {
                     >
                       <FiGift />
                       Payment
-                    </Link>
-                    <Link
-                      to={ROUTES.DELETE_ACCOUNT}
-                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-gray-700"
-                      onClick={() => setOpen(false)}
-                    >
-                      <FiTrash2 />
-                      Delete Account
                     </Link>
                     {user?.roles.includes('ADMIN') ? (
                       <Link

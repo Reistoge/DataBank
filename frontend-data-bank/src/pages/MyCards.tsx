@@ -230,7 +230,7 @@ function MyCards() {
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-400 font-mono">DataBank</span>
-                  <img src={RESOURCES.LOGO} alt="logo" className="w-10 h-10" />
+                  <img src={RESOURCES.LOGO_B} alt="logo" className="w-15 h-10" />
                 </div>
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-xl md:text-2xl font-mono tracking-wider">

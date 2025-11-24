@@ -90,20 +90,20 @@ function AddAccount() {
         <div className="flex items-center justify-center mb-4">
           <FiCheckCircle className="text-4xl text-green-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-4">Cuenta Creada!</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Account Created!</h2>
         {createdAccount && (
           <div className="space-y-3 mb-6">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <dt className="text-gray-300 font-medium">Numero de cuenta</dt>
+                <dt className="text-gray-300 font-medium">Account number</dt>
                 <dd className="text-white font-bold">{createdAccount.accountNumber}</dd>
               </div>
               <div>
-                <dt className="text-gray-300 font-medium">Tipo</dt>
+                <dt className="text-gray-300 font-medium">Type</dt>
                 <dd className="text-white font-bold">{createdAccount.type}</dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-gray-300 font-medium">Saldo</dt>
+                <dt className="text-gray-300 font-medium">Balance</dt>
                 <dd className="text-2xl text-green-400 font-bold">${createdAccount.balance}</dd>
               </div>
             </div>
@@ -113,7 +113,7 @@ function AddAccount() {
           onClick={() => navigate(ROUTES.DASHBOARD)}
           className={`${components.button.primary} w-full`}
         >
-          Ir al Dashboard
+          Go back to Dashboard
         </button>
       </motion.div>
     );
@@ -130,13 +130,13 @@ function AddAccount() {
         <div className="flex items-center justify-center mb-4">
           <FiXCircle className="text-4xl text-red-400" />
         </div>
-        <h2 className="text-xl font-bold text-red-200 mb-2">Error al Crear Cuenta</h2>
+        <h2 className="text-xl font-bold text-red-200 mb-2">Error creating account</h2>
         <p className="text-red-300 mb-4">{creationError?.message || 'Ocurrió un error desconocido'}</p>
         <button
           onClick={() => setCreationState('form')}
           className={`${components.button.secondary} w-full`}
         >
-          Intentar de nuevo
+          Try again
         </button>
       </motion.div>
     );
@@ -153,8 +153,8 @@ function AddAccount() {
         <div className="flex items-center justify-center mb-4">
           <FiLoader className="text-4xl text-blue-400 animate-spin" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Creando Cuenta...</h2>
-        <p className="text-gray-300">Por favor espera mientras configuramos tu cuenta</p>
+        <h2 className="text-xl font-bold text-white mb-2">Creating Account...</h2>
+        <p className="text-gray-300">Please wait while we set up your account</p>
       </motion.div>
     );
   }
@@ -168,7 +168,7 @@ function AddAccount() {
           className="p-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
         >
           <FiArrowLeft />
-          Volver
+          Back
         </button>
       </div>
 
@@ -188,13 +188,13 @@ function AddAccount() {
                   <img
                     id="appLogo"
                     onClick={handleRotate}
-                    className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                    className="w-25 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
                     src={RESOURCES.LOGO}
                     alt="App Logo"
                     title="Click to rotate!"
                   />
-                  <h1 className="text-2xl font-bold text-white mb-2">Crear Nueva Cuenta</h1>
-                  <p className="text-white/80">Agrega una nueva cuenta a tu perfil</p>
+                  <h1 className="text-2xl font-bold text-white mb-2">Add Account</h1>
+                  <p className="text-white/80">Link a new account to your profile</p>
                 </div>
 
                 {/* Form Fields */}
@@ -203,7 +203,7 @@ function AddAccount() {
                   <div>
                     <label className="block text-white font-medium mb-2 flex items-center gap-2">
                       <FiCreditCard />
-                      Tipo de Cuenta
+                      Account Type
                     </label>
                     <select
                       className={components.input.primary}
@@ -224,7 +224,7 @@ function AddAccount() {
                   <div>
                     <label className="block text-white font-medium mb-2 flex items-center gap-2">
                       <FiMapPin />
-                      Ubicación de la Sucursal
+                      Bank Branch
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <CountryDropdown
@@ -248,7 +248,7 @@ function AddAccount() {
                     disabled={creationState.toString() === 'submit' || !formData.bankBranch}
                   >
                     <FiPlus />
-                    Crear Cuenta
+                    Add Account
                   </button>
                 </div>
               </div>

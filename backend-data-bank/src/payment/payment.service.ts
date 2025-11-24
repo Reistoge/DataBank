@@ -118,10 +118,10 @@ export class PaymentService {
 
       // Create payment record
       const payment: Payment = {
-        merchantId: merchant._id,
+        merchantId: merchant.id,
         product: {
           ...product,
-          merchantId: merchant._id, // Add the merchantId to the product object
+          merchantId: merchant.id, // Add the merchantId to the product object
         },
         orderNumber: await this.generateUniqueOrderNumber(),
         txId: txResponse.transactionId,
