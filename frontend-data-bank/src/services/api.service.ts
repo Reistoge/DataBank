@@ -301,3 +301,13 @@ export const getMerchant = async (name: string): Promise<Merchant> => {
   return await response.json();
 };
 
+export const getAllUsersAdmin = async (): Promise<any[]> => {
+  const response = await fetch(`${API_BASE_URL}/users/allUsers`, {
+    method: "GET",
+    headers: createAuthHeaders(),
+  });
+  if (!response.ok) throw new Error("getAllUsersAdmin failed");
+  const result = await response.json();
+  return result.data;
+};
+
