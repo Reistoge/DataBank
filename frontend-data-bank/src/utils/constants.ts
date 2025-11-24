@@ -34,7 +34,8 @@ export const API_REQUEST_ROUTE = Object.freeze({
 
 // Resource URLs
 export const RESOURCES = Object.freeze({
-  LOGO: 'https://avatars.githubusercontent.com/u/64452194?v=4',
+  LOGO: '/DBO-W.png',
+  LOGO_B: '/DBO-B.png',
   VITE_LOGO: '/vite.svg',
   WARNING: 'https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/warning-circle.png://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.veryicon.com%2Ficons%2Fphotographic%2Fant-design-official-icon-library%2Fwarning-circle.html&psig=AOvVaw3dedn0n-bz4OdPgFYlr52r&ust=1758893099542000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDkv8SB9I8DFQAAAAAdAAAAABAE',
   VITE_WARNING: '/vite.svg',
