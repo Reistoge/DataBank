@@ -88,13 +88,13 @@ function CartSummary({
       </div>
 
       {/* Checkout Button */}
-      <button
+      {/* <button
         onClick={onCheckout}
         disabled={items.length === 0 || isLoading}
-        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-200"
+        className="invisible w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-200"
       >
         {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-      </button>
+      </button> */}
     </motion.div>
   );
 }

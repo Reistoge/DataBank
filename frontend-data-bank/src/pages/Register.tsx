@@ -281,12 +281,12 @@ function Register() {
       {/* Footer */}
       <footer className="text-center py-6">
         <a
-          href="https://github.com/Reistoge"
+          href="https://github.com/Reistoge/DataBank"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition-colors duration-200"
         >
-          @Ferran Rojas
+          @DataBank
         </a>
       </footer>
     </div>
