@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  deleteCard,
   getCards,
   getUserAccounts,
   updateCardSpentLimit,
@@ -38,6 +39,12 @@ function MyCards() {
     state: 'idle' | 'loading' | 'success' | 'error';
     message: string;
   }>({ state: 'idle', message: '' });
+
+  // Delete Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCardForDelete, setSelectedCardForDelete] = useState<CardResponse | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteStatus, setDeleteStatus] = useState<{ state: 'idle' | 'loading' | 'success' | 'error'; message: string }>({ state: 'idle', message: '' });
 
   // Fetch accounts on mount
   useEffect(() => {
@@ -140,6 +147,46 @@ function MyCards() {
     }
   };
 
+  const handleOpenDeleteModal = (card: CardResponse) => {
+    setSelectedCardForDelete(card);
+    setIsDeleteModalOpen(true);
+    setDeletePassword('');
+    setDeleteStatus({ state: 'idle', message: '' });
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedCardForDelete(null);
+    setDeletePassword('');
+    setDeleteStatus({ state: 'idle', message: '' });
+  };
+
+  const handleDeleteCard = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCardForDelete || !deletePassword) {
+      setDeleteStatus({ state: 'error', message: 'Password is required.' });
+      return;
+    }
+    setDeleteStatus({ state: 'loading', message: 'Deleting...' });
+    try {
+      await deleteCard(selectedCardForDelete.id, deletePassword);
+      setDeleteStatus({ state: 'success', message: 'Card deleted successfully!' });
+      // Refresh cards
+      if (selectedAccount) {
+        const updatedCards = await getCards(selectedAccount.id);
+        setCards(updatedCards);
+      }
+      setTimeout(() => {
+        handleCloseDeleteModal();
+      }, 1500);
+    } catch (err) {
+      setDeleteStatus({
+        state: 'error',
+        message: err instanceof Error ? err.message : 'Failed to delete card.',
+      });
+    }
+  };
+
   const handleToggleShowCard = (cardId: string) => {
     setShowFullCard((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
   };
@@ -152,7 +199,7 @@ function MyCards() {
     }
   };
 
-  const UNLIMITED_THRESHOLD = 9007199254740000; // A large number to represent 'unlimited'
+  const UNLIMITED_THRESHOLD = Number.MAX_VALUE; // A large number to represent 'unlimited'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white p-4 sm:p-6 lg:p-8">
@@ -282,18 +329,26 @@ function MyCards() {
                   </p>
                   <p>
                     <span className="text-gray-500">Limit:</span>{' '}
-                    {card.spentLimit > UNLIMITED_THRESHOLD
+                    {card.spentLimit >= UNLIMITED_THRESHOLD
                       ? 'Unlimited'
                       : `$${card.spentLimit.toLocaleString()}`}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => handleOpenModal(card)}
-                className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
-              >
-                Modify Limit
-              </button>
+              <div className="flex gap-2 mt-6">
+                <button
+                  onClick={() => handleOpenModal(card)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+                >
+                  Modify Limit
+                </button>
+                <button
+                  onClick={() => handleOpenDeleteModal(card)}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+                >
+                  Delete
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -322,7 +377,7 @@ function MyCards() {
                 <input
                   id="spentLimit"
                   type="number"
-                  value={newSpentLimit}
+                  value={parseFloat(newSpentLimit) >= Number.MAX_VALUE ? "500" : newSpentLimit}
                   onChange={(e) => setNewSpentLimit(e.target.value)}
                   className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="e.g., 5000"
@@ -372,6 +427,67 @@ function MyCards() {
                 }`}
               >
                 {updateStatus.message}
+              </p>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteModalOpen && selectedCardForDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-gray-800 rounded-2xl p-8 w-full max-w-md m-4"
+          >
+            <h2 className="text-2xl font-bold mb-4 text-red-400">Delete Card</h2>
+            <p className="font-mono mb-6 text-gray-400">
+              Card: **** {selectedCardForDelete.number.slice(-4)}
+            </p>
+            <form onSubmit={handleDeleteCard}>
+              <div className="mb-4">
+                <label htmlFor="deletePassword" className="block mb-2 font-semibold">
+                  Card Password
+                </label>
+                <input
+                  id="deletePassword"
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                  placeholder="Enter card password to confirm"
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={handleCloseDeleteModal}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleteStatus.state === 'loading'}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition"
+                >
+                  {deleteStatus.state === 'loading' ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+              </div>
+            </form>
+            {deleteStatus.state !== 'idle' && (
+              <p
+                className={`mt-4 text-center text-sm ${
+                  deleteStatus.state === 'error'
+                    ? 'text-red-400'
+                    : deleteStatus.state === 'success'
+                    ? 'text-green-400'
+                    : 'text-blue-400'
+                }`}
+              >
+                {deleteStatus.message}
               </p>
             )}
           </motion.div>

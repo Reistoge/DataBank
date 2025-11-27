@@ -233,7 +233,7 @@ function AddCard() {
                   <div>
                     <label className="block text-white font-medium mb-2 flex items-center gap-2">
                       <FiLock />
-                      Account Password
+                      Card Password
                     </label>
                     <div className="relative">
                       <input
