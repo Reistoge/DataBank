@@ -123,8 +123,8 @@ function CheckoutStep({
                 <img
                   id="paymentLogo"
                   onClick={handleRotate}
-                  className="w-20 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
-                  src={RESOURCES.LOGO}
+                  className="w-25 h-20 mx-auto rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 mb-4"
+                  src={RESOURCES.LOGO_B}
                   alt="Logo"
                   title="Click to rotate!"
                 />
@@ -672,12 +672,12 @@ function ShopPayment() {
       {/* Footer */}
       <footer className="text-center py-6">
         <a
-          href="https://github.com/Reistoge"
+          href="https://github.com/Reistoge/DataBank"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition-colors duration-200"
         >
-          @Ferran Rojas
+          @DataBank
         </a>
       </footer>
     </div>
