@@ -218,7 +218,7 @@ This project is for educational purposes.
 
 * * *
 
-**Author:** Ferran Rojas (
+**Author:** Reist (
 [@Reistoge](https://github.com/Reistoge)
 )
 
