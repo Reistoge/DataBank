@@ -1,12 +1,13 @@
 # Databank
+
 **Data-Bank** is a full-stack banking simulation platform designed to demonstrate complex transaction handling, account management, and a sophisticated **Fraud Detection System**. The system utilizes a hybrid database architecture with **MongoDB** for transactional data and **Neo4j** for graph-based relationship analysis and fraud pattern detection.
  
 [ppt](https://www.canva.com/design/DAG5iKXkoNE/191NyRKNSWGQINg3xdsupw/edit?utm_content=DAG5iKXkoNE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
  
-🚀 Features
+Features
 -----------
 
-### 🛡️ Fraud Detection System
+### Fraud Detection System
 
 The core of the application. Transactions are analyzed in real-time against a set of heuristic rules and graph patterns:
 
@@ -25,13 +26,13 @@ The core of the application. Transactions are analyzed in real-time against a se
 *   **Transactions:** Secure fund transfers between accounts.
 *   **Payment Simulation:** E-commerce "Shop" interface to simulate product purchases and checkout flows.
 
-### 👤 User & Security
+### User & Security
 
 *   **Authentication:** Secure Login/Register with JWT (JSON Web Token) and Bcrypt password hashing.
 *   **Role-Based Access Control (RBAC):** Support for Client and Admin roles.
 *   **Admin Panel:** interface for administrators to view all accounts and manage user statuses.
 
-🛠️ Tech Stack
+Tech Stack
 --------------
 
 ### Backend
@@ -64,7 +65,7 @@ The core of the application. Transactions are analyzed in real-time against a se
 
 * * *
 
-📦 Installation & Setup
+Installation & Setup
 -----------------------
 
 ### Prerequisites
