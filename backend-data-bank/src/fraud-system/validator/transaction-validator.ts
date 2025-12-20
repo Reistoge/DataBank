@@ -1,10 +1,8 @@
-// backend-data-bank/src/fraud-system/validator/transaction-validator.ts
-import { Inject, Injectable, Logger } from '@nestjs/common'; // <-- ADD @Injectable
+ import { Inject, Injectable, Logger } from '@nestjs/common';  
 import { TransactionDocument } from 'src/transaction/schemas/transaction.schema';
 import { TransactionValidation } from './transaction-validation';
 import { SuspiciousBehaviour } from '../suspicious-behaviours/suspicious-behaviour';
-// REMOVE all other imports
-
+ 
 @Injectable() // <-- MAKE IT INJECTABLE
 export class TransactionValidator {
   private readonly logger = new Logger(TransactionValidation.name);

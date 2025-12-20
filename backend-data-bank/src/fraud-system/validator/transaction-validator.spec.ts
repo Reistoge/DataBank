@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Types } from 'mongoose';
-import { LowAmount } from '../dto/fraud.dto';
-import { TransactionValidator } from './transaction-validator';
+ import { TransactionValidator } from './transaction-validator';
 import { LowAmountValidation } from './validations/low-amount.validation';
+import { LowAmount } from '../suspicious-behaviours/impl/low-amount.suspicious-behaviour';
 
 // Mock interfaces (keep existing ones)
 enum MockTransactionStatus {
